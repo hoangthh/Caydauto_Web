@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\SOA-BanGiay\\SOA_ShuehWeb\\server\\server.csproj": {}
+    "C:\\SOAProject\\Caydauto_Web\\server\\server.csproj": {}
   },
   "projects": {
-    "C:\\SOA-BanGiay\\SOA_ShuehWeb\\server\\server.csproj": {
+    "C:\\SOAProject\\Caydauto_Web\\server\\server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\SOA-BanGiay\\SOA_ShuehWeb\\server\\server.csproj",
+        "projectUniqueName": "C:\\SOAProject\\Caydauto_Web\\server\\server.csproj",
         "projectName": "server",
-        "projectPath": "C:\\SOA-BanGiay\\SOA_ShuehWeb\\server\\server.csproj",
+        "projectPath": "C:\\SOAProject\\Caydauto_Web\\server\\server.csproj",
         "packagesPath": "C:\\Users\\jiropc\\.nuget\\packages\\",
-        "outputPath": "C:\\SOA-BanGiay\\SOA_ShuehWeb\\server\\obj\\",
+        "outputPath": "C:\\SOAProject\\Caydauto_Web\\server\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

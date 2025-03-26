@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "8p42ofDFJYo=",
+  "dgSpecHash": "PSrf6CW99BQ=",
   "success": true,
-  "projectFilePath": "C:\\SOA-BanGiay\\SOA_ShuehWeb\\server\\server.csproj",
+  "projectFilePath": "C:\\SOAProject\\Caydauto_Web\\server\\server.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\jiropc\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\jiropc\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
