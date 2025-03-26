@@ -97,6 +97,12 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
             .HasForeignKey(ci => ci.CartId)
             .OnDelete(DeleteBehavior.Cascade); // Khi xóa Cart, xóa luôn CartItems
 
+        modelBuilder
+            .Entity<User>()
+            .HasOne(u => u.Role)
+            .WithMany(r => r.Users)
+            .HasForeignKey(u => u.RoleId);
+
         // Index cho các trường thường xuyên được tìm kiếm
         modelBuilder.Entity<Product>().HasIndex(p => p.Name).IsUnique(false); // Index cho tên sản phẩm
 

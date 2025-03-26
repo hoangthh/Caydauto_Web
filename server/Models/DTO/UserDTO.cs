@@ -4,10 +4,11 @@ public class UserGetDto
 {
     public int Id { get; set; }
     public string FullName { get; set; } = string.Empty;
+    public string ImageUrl { get; set; } = Constraint.Image.DefaultUserImageUrl;
+    public string DateOfBirth { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string UserName { get; set; } = string.Empty;
-    public string UserImageUrl { get; set; } = Constraint.Image.DefaultUserImageUrl;
-    public string DateOfBirth { get; set; } = string.Empty;
+    public string Role { get; set; } = string.Empty; // Một vai trò duy nhất
 }
 
 public class UserCreateDto
