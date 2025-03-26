@@ -1,13 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "5oyVMeMD67c=",
+  "dgSpecHash": "tp1R62SmGAk=",
   "success": true,
   "projectFilePath": "C:\\SOAProject\\Caydauto_Web\\server\\server.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\jiropc\\.nuget\\packages\\automapper\\14.0.0\\automapper.14.0.0.nupkg.sha512",
-    "C:\\Users\\jiropc\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
     "C:\\Users\\jiropc\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\jiropc\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
+    "C:\\Users\\jiropc\\.nuget\\packages\\bogus\\35.6.2\\bogus.35.6.2.nupkg.sha512",
     "C:\\Users\\jiropc\\.nuget\\packages\\devicedetector.net\\6.3.3\\devicedetector.net.6.3.3.nupkg.sha512",
     "C:\\Users\\jiropc\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\jiropc\\.nuget\\packages\\litedb\\5.0.19\\litedb.5.0.19.nupkg.sha512",
@@ -99,16 +99,5 @@
     "C:\\Users\\jiropc\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512",
     "C:\\Users\\jiropc\\.nuget\\packages\\yamldotnet\\15.1.2\\yamldotnet.15.1.2.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1608",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Detected package version outside of dependency constraint: AutoMapper.Extensions.Microsoft.DependencyInjection 12.0.1 requires AutoMapper (= 12.0.1) but version AutoMapper 14.0.0 was resolved.",
-      "libraryId": "AutoMapper",
-      "targetGraphs": [
-        "net9.0"
-      ]
-    }
-  ]
+  "logs": []
 }

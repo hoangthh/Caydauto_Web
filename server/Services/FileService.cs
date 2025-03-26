@@ -16,12 +16,6 @@ public class FileService
     /// <summary>
     /// Lưu danh sách các tệp hình ảnh vào thư mục cụ thể và trả về danh sách URL
     /// </summary>
-    /// <param name="files">Danh sách các tệp hình ảnh (IFormFile)</param>
-    /// <param name="folderName">Tên thư mục (Products, Users, ...), nếu null thì mặc định là "images"</param>
-    /// <param name="entityId">ID của thực thể (ProductId, UserId, ...)</param>
-    /// <param name="isUpdate">Nếu true, ghi đè ảnh cũ</param>
-    /// <returns>Danh sách URL của các tệp đã lưu</returns>
-    /// <exception cref="ArgumentException">Ném ra nếu danh sách files rỗng hoặc null</exception>
     public async Task<List<string>> SaveImagesAsync(
         List<IFormFile> files,
         string folderName = "images",
@@ -36,7 +30,6 @@ public class FileService
         var baseFolder = Path.Combine(_webRootPath, "images");
         var uploadFolder = Path.Combine(baseFolder, folderName);
 
-        // Đảm bảo thư mục tồn tại
         if (!Directory.Exists(uploadFolder))
             Directory.CreateDirectory(uploadFolder);
 
@@ -57,28 +50,96 @@ public class FileService
                 }
                 else
                 {
-                    fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName); // Mặc định
+                    fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                 }
 
                 var filePath = Path.Combine(uploadFolder, fileName);
 
-                // Nếu là cập nhật và file cũ tồn tại, ghi đè
                 if (isUpdate && File.Exists(filePath))
                 {
                     File.Delete(filePath);
                 }
 
-                // Lưu tệp
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);
                 }
 
-                // Thêm URL vào danh sách
                 imageUrls.Add($"/images/{folderName}/{fileName}");
             }
         }
 
         return imageUrls;
+    }
+
+    /// <summary>
+    /// Lưu hình ảnh tạm thời vào thư mục temp và trả về danh sách URL tạm
+    /// </summary>
+    public async Task<List<string>> SaveTempImagesAsync(List<IFormFile> files)
+    {
+        return await SaveImagesAsync(files, "temp", null, false);
+    }
+
+    /// <summary>
+    /// Di chuyển hình ảnh từ thư mục temp sang thư mục đích với tên file mới
+    /// </summary>
+    public List<string> MoveImagesToFolderAsync(
+        List<string> tempUrls,
+        string folderName,
+        int entityId
+    )
+    {
+        var imageUrls = new List<string>();
+        var baseFolder = Path.Combine(_webRootPath, "images");
+        var targetFolder = Path.Combine(baseFolder, folderName);
+
+        if (!Directory.Exists(targetFolder))
+            Directory.CreateDirectory(targetFolder);
+
+        for (int i = 0; i < tempUrls.Count; i++)
+        {
+            var tempUrl = tempUrls[i];
+            var tempFilePath = Path.Combine(_webRootPath, tempUrl.TrimStart('/'));
+            if (!File.Exists(tempFilePath))
+                continue;
+
+            var extension = Path.GetExtension(tempUrl);
+            string newFileName;
+
+            if (folderName == "Products")
+            {
+                newFileName = $"Product-{entityId}-{i + 1}{extension}";
+            }
+            else if (folderName == "Users")
+            {
+                newFileName = $"User-{entityId}{extension}";
+            }
+            else
+            {
+                newFileName = Guid.NewGuid().ToString() + extension;
+            }
+
+            var newFilePath = Path.Combine(targetFolder, newFileName);
+            File.Move(tempFilePath, newFilePath);
+
+            imageUrls.Add($"/images/{folderName}/{newFileName}");
+        }
+
+        return imageUrls;
+    }
+
+    /// <summary>
+    /// Xóa danh sách hình ảnh
+    /// </summary>
+    public void DeleteImagesAsync(List<string> imageUrls)
+    {
+        foreach (var url in imageUrls)
+        {
+            var filePath = Path.Combine(_webRootPath, url.TrimStart('/'));
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+        }
     }
 }

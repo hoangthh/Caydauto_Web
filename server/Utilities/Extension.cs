@@ -2,6 +2,13 @@ using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using server.Services.Mapping;
 
 public static class DateTimeExtensions
 {
@@ -83,7 +90,6 @@ public static class StringExtensions
     }
 }
 
-
 public static class ExpressionHelper
 {
     // Hàm build so sánh, xài chung cho cả Property vs Value và Property vs Property
@@ -104,6 +110,7 @@ public static class ExpressionHelper
             _ => throw new NotImplementedException($"Operator '{comparison}' chưa hỗ trợ."),
         };
     }
+
     // Hàm FilterByProperties
     /// <summary>
     /// Lọc dữ liệu theo các thuộc tính của đối tượng
@@ -114,7 +121,7 @@ public static class ExpressionHelper
     ///     ("Age", 30, null, "GreaterThan", LogicOperator.And),
     ///     ("Salary", null, "MinSalary", "GreaterThan", LogicOperator.Or)
     /// };
-    /// var result = source.FilterByProperties(filters);    
+    /// var result = source.FilterByProperties(filters);
     /// </summary>
     /// <typeparam name="T">Kiểu dữ liệu của đối tượng</typeparam>
     /// <param name="source">Dữ liệu nguồn</param>
@@ -208,6 +215,64 @@ public static class ExpressionHelper
         var lambda = Expression.Lambda<Func<T, bool>>(combinedExpression!, parameter);
         return source.Where(lambda);
     }
+
+    public static IQueryable<T> OrderByMultiple<T>(
+        this IQueryable<T> source,
+        params (string property, bool descending)[] orders
+    )
+    {
+        Type entityType = typeof(T);
+        ParameterExpression parameter = Expression.Parameter(entityType, "x");
+
+        IQueryable<T> result = source;
+
+        for (int i = 0; i < orders.Length; i++)
+        {
+            (string property, bool descending) order = orders[i];
+
+            PropertyInfo? propertyInfo = entityType.GetProperty(order.property);
+            if (propertyInfo == null)
+            {
+                throw new ArgumentException($"Property '{order.property}' không tồn tại.");
+            }
+
+            MemberExpression propertyAccess = Expression.MakeMemberAccess(parameter, propertyInfo);
+            LambdaExpression orderByExp = Expression.Lambda(propertyAccess, parameter);
+
+            string methodName =
+                i == 0
+                    ? (order.descending ? "OrderByDescending" : "OrderBy")
+                    : (order.descending ? "ThenByDescending" : "ThenBy");
+
+            MethodCallExpression orderCall = Expression.Call(
+                typeof(Queryable),
+                methodName,
+                new Type[] { entityType, propertyInfo.PropertyType },
+                result.Expression,
+                Expression.Quote(orderByExp)
+            );
+
+            result = result.Provider.CreateQuery<T>(orderCall);
+        }
+
+        return result;
+    }
+
+    public static IQueryable<T> IncludeMultiple<T>(
+        this IQueryable<T> query,
+        params Expression<Func<T, object>>[] includes
+    )
+        where T : class
+    {
+        if (includes != null)
+        {
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+        }
+        return query;
+    }
 }
 
 public static class LogicOperatorExtensions
@@ -226,5 +291,181 @@ public static class LogicOperatorExtensions
                 $"LogicOperator '{logicOperator}' chưa được hỗ trợ."
             ),
         };
+    }
+}
+
+public static class ServiceExtensions
+{
+    public static void AddProjectServices(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
+    {
+        ConfigureCors(services);
+        services.AddControllers();
+        ConfigureAutoMapper(services);
+        ConfigureAuthentication(services);
+        ConfigureMemoryCache(services);
+        ConfigureSwagger(services);
+        ConfigureSingletonServices(services);
+        ConfigureTransientServices(services);
+        ConfigureScopedServices(services);
+        ConfigureSessionService(services);
+        ConfigureEntityFramework(services, configuration);
+    }
+    private static void ConfigureAutoMapper(IServiceCollection services)
+    {
+        services.AddAutoMapper(typeof(MappingProfile).Assembly);
+    }
+    /// <summary>
+    /// Cấu hình dịch vụ Session
+    /// </summary>
+    private static void ConfigureSessionService(IServiceCollection services)
+    {
+        services.AddSession(options =>
+        {
+            options.IdleTimeout = TimeSpan.FromDays(1); // Set session timeout
+            options.Cookie.HttpOnly = true; // Make the session cookie HTTP only
+            options.Cookie.IsEssential = true; // Make the session cookie essential
+        });
+    }
+
+    /// <summary>
+    /// Cấu hình EntityFramework.
+    /// </summary>
+    private static void ConfigureEntityFramework(
+        IServiceCollection services,
+        IConfiguration configuration
+    )
+    {
+        services.AddDbContext<AppDbContext>(options =>
+        {
+            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+        });
+
+        services
+            .AddIdentity<User, Role>(options =>
+            {
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+            })
+            .AddEntityFrameworkStores<AppDbContext>()
+            .AddDefaultTokenProviders();
+    }
+
+    private static void ConfigureSwagger(IServiceCollection services)
+    {
+        // Thêm Swagger
+        services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc(
+                "v1",
+                new OpenApiInfo
+                {
+                    Title = "My API",
+                    Version = "v1",
+                    Description = "API for managing products, users, and more",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Mach Gia Huy",
+                        Email = "huymachgia555@gmail.com",
+                    },
+                }
+            );
+        });
+    }
+
+    /// <summary>
+    /// Cấu hình dịch vụ xác thực bằng cookie.
+    /// </summary>
+    private static void ConfigureAuthentication(IServiceCollection services)
+    {
+        services
+            .AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme =
+                    CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme; // Đặt DefaultSignInScheme
+            })
+            .AddCookie(options =>
+            {
+                options.Cookie.Name = "ShUEHApplication-Cookies-Authentication"; // Tên của cookie
+                options.Cookie.HttpOnly = true; // Cookie chỉ có thể truy cập qua HTTP
+                options.Cookie.IsEssential = true; // Đảm bảo cookie được gửi ngay cả khi người dùng chưa đồng ý
+                options.Cookie.SameSite = SameSiteMode.None;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            })
+            .AddGoogle(options =>
+            {
+                options.ClientId =
+                    "11161045560-r08im8g3rll7ifg200tgmc8gmpa1am1t.apps.googleusercontent.com"; // Thay bằng Client ID của bạn
+                options.ClientSecret = "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"; // Thay bằng Client Secret của bạn
+                options.ClaimActions.MapJsonKey("urn:google:picture", "picture", "url");
+                options.ClaimActions.MapJsonKey("urn:google:locale", "locale", "string");
+            });
+    }
+
+    private static void ConfigureSingletonServices(IServiceCollection services) { }
+
+    /// <summary>
+    /// Cấu hình các dịch vụ Transient.
+    /// </summary>
+    private static void ConfigureTransientServices(IServiceCollection services)
+    {
+        // Thêm các dịch vụ transient khác nếu cần
+    }
+
+    /// <summary>
+    /// Cấu hình các dịch vụ Cache
+    /// </summary>
+    private static void ConfigureMemoryCache(IServiceCollection services)
+    {
+        services.AddMemoryCache();
+        services.AddDistributedMemoryCache();
+    }
+
+    /// <summary>
+    /// Cấu hình các dịch vụ Scoped.
+    /// </summary>
+    private static void ConfigureScopedServices(IServiceCollection services)
+    {
+        /*Repository*/
+        services.AddScoped<IProductRepository, ProductRepository>();
+        /*Services*/
+        services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<FileService>();
+        /*Identity*/
+        services.AddScoped<UserManager<User>>(); // Quản lý người dùng trong hệ thống
+        services.AddScoped<SignInManager<User>>(); // Quản lý đăng nhập người dùng
+    }
+
+    /// <summary>
+    /// Cấu hình dịch vụ CORS.
+    /// </summary>
+    private static void ConfigureCors(IServiceCollection services)
+    {
+        services.AddCors(options =>
+        {
+            options.AddPolicy(
+                name: "CorsPolicy",
+                builder =>
+                {
+                    builder
+                        .WithOrigins(Constraint.Url.Clients)
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                    // Allow localhost origins
+                    // builder.WithOrigins("http://localhost:3000", "http://localhost:5118") // Liệt kê các origin cụ thể
+                    //     .AllowAnyHeader()
+                    //     .AllowAnyMethod()
+                    //     .AllowCredentials();
+                }
+            );
+        });
     }
 }

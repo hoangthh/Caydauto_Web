@@ -1,11 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Storage;
 
 public class Repository<TEntity> : IRepository<TEntity>
     where TEntity : class
 {
     protected readonly AppDbContext _context;
-    private readonly DbSet<TEntity> _entities;
+    protected readonly DbSet<TEntity> _entities;
 
     public Repository(AppDbContext context)
     {
@@ -17,7 +18,7 @@ public class Repository<TEntity> : IRepository<TEntity>
         int pageNumber = 1,
         int pageSize = 10,
         bool usePaging = true,
-        Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null
     )
     {
         var query = _entities.AsQueryable();
@@ -93,5 +94,10 @@ public class Repository<TEntity> : IRepository<TEntity>
 
         _entities.Remove(entity);
         return await _context.SaveChangesAsync() > 0;
+    }
+
+    public async Task<IDbContextTransaction> BeginTransactionAsync()
+    {
+        return await _context.Database.BeginTransactionAsync();
     }
 }

@@ -10,6 +10,8 @@ public class ProductGetDto
     public int StockQuantity { get; set; }
     public double AverageRating { get; set; }
     public bool IsWished { get; set; } // Đánh dấu sản phẩm đã được thêm vào danh sách yêu thích của User hay chưa
+    public int Sold {get; set;} // Số lượng sản phẩm đã bán
+    public bool IsNew { get; set; } // Đánh dấu sản phẩm mới
     public List<ImageGetDto> Images { get; set; } = new List<ImageGetDto>();
     public List<CategoryGetDto> Categories { get; set; } = new List<CategoryGetDto>(); // Thêm Categories
     public List<ColorGetDto> Colors { get; set; } = new List<ColorGetDto>(); // Thêm Colors

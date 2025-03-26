@@ -19,7 +19,12 @@ namespace server.Services.Mapping.Profiles
                 .ForMember(
                     dest => dest.Colors,
                     opt => opt.MapFrom(src => src.Colors ?? new List<Color>())
-                );
+                )
+                .ForMember(
+                    dest => dest.AverageRating,
+                    opt => opt.MapFrom(src => src.Comments.Any() ? src.Comments.Average(c => c.Rating) : 0)
+                )
+                .ForMember(dest => dest.IsNew, opt => opt.MapFrom(src => (DateTime.Now - src.CreatedDate).TotalDays <= 7));
 
             // Image -> ImageGetDto
             CreateMap<Image, ImageGetDto>();

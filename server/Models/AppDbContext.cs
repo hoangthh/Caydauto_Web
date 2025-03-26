@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,43 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options) { }
+
+    public override int SaveChanges()
+    {
+        UpdateDateTracking();
+        return base.SaveChanges();
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        UpdateDateTracking();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    //Phương thức này dùng để cập nhật thời gian tạo và sửa đổi cho các đối tượng có thể theo dõi thời gian
+    private void UpdateDateTracking()
+    {
+        var entries = ChangeTracker
+            .Entries()
+            .Where(e =>
+                e.Entity is IDateTracking
+                && (e.State == EntityState.Added || e.State == EntityState.Modified)
+            );
+
+        foreach (var entry in entries)
+        {
+            var dateTrackingEntity = (IDateTracking)entry.Entity;
+            // Sử dụng DateTimeOffset cho thời gian với múi giờ Việt Nam
+            var vietnamTime = DateTime.Now.AddHours(7); // UTC+7
+
+            if (entry.State == EntityState.Added)
+            {
+                dateTrackingEntity.CreatedDate = vietnamTime; // Cập nhật thời gian tạo
+            }
+
+            dateTrackingEntity.UpdatedDate = vietnamTime; // Cập nhật thời gian sửa đổi
+        }
+    }
 
     // DbSets
     public DbSet<Product> Products { get; set; }
@@ -22,10 +60,36 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder); // Quan trọng khi dùng Identity
+        base.OnModelCreating(modelBuilder);
 
+        // Tạo dữ liệu mẫu
+        var categories = SeedData.GetCategories(5); // 5 danh mục
+        var (products, relationships) = SeedData.GetProducts(10, categories); // 10 sản phẩm và mối quan hệ
+
+        // Seed Categories (clear navigation property)
+        foreach (var category in categories)
+        {
+            category.Products = null;
+        }
+        modelBuilder.Entity<Category>().HasData(categories);
+
+        // Seed Products (clear navigation property)
+        foreach (var product in products)
+        {
+            product.Categories = null;
+        }
+        modelBuilder.Entity<Product>().HasData(products);
+
+        // Seed the many-to-many relationship (CategoryProduct)
+        var productCategoryData = relationships
+            .Select(r => new { ProductsId = r.ProductId, CategoriesId = r.CategoryId })
+            .ToList();
         // Many-to-many: Product - Category
-        modelBuilder.Entity<Product>().HasMany(p => p.Categories).WithMany(c => c.Products);
+        modelBuilder
+            .Entity<Product>()
+            .HasMany(p => p.Categories)
+            .WithMany(c => c.Products)
+            .UsingEntity(j => j.HasData(productCategoryData));
 
         // Many-to-many: Product - Color
         modelBuilder.Entity<Product>().HasMany(p => p.Colors).WithMany(c => c.Products);
@@ -63,7 +127,7 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
             .HasMany(u => u.Comments)
             .WithOne(c => c.User)
             .HasForeignKey(c => c.UserId)
-            .OnDelete(DeleteBehavior.SetNull); // Khi xóa User, UserId trong Comment thành null
+            .OnDelete(DeleteBehavior.Cascade); // Xóa Comment khi xóa User
 
         // One-to-many: Comment - CommentImage
         modelBuilder
@@ -101,7 +165,22 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
             .Entity<User>()
             .HasOne(u => u.Role)
             .WithMany(r => r.Users)
-            .HasForeignKey(u => u.RoleId);
+            .HasForeignKey(u => u.RoleId)
+            .OnDelete(DeleteBehavior.Restrict); // Khi xóa Role, không cho xóa User
+
+        modelBuilder
+            .Entity<IdentityUserRole<int>>()
+            .HasOne<IdentityUser<int>>()
+            .WithMany()
+            .HasForeignKey(ur => ur.UserId)
+            .OnDelete(DeleteBehavior.NoAction); // ⚡ Đổi từ Restrict -> NoAction
+
+        modelBuilder
+            .Entity<IdentityUserRole<int>>()
+            .HasOne<IdentityRole<int>>()
+            .WithMany()
+            .HasForeignKey(ur => ur.RoleId)
+            .OnDelete(DeleteBehavior.NoAction); // ⚡ Đổi từ Restrict -> NoAction
 
         // Index cho các trường thường xuyên được tìm kiếm
         modelBuilder.Entity<Product>().HasIndex(p => p.Name).IsUnique(false); // Index cho tên sản phẩm
