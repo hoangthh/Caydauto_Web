@@ -1,0 +1,42 @@
+.navbar {
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &--activity {
+    width: 100%;
+    display: flex;
+    gap: 50px;
+    justify-content: space-between;
+    align-items: center;
+
+    &__logo {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    &__search {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    &__actions {
+      display: flex;
+      gap: 10px;
+
+      &.img {
+        cursor: pointer;
+      }
+    }
+  }
+
+  &--wrapper {
+    padding: 20px 0;
+    display: flex;
+    gap: 50px;
+  }
+}

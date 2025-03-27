@@ -1,0 +1,89 @@
+.filter {
+  padding-right: 30px;
+  border-right: 1px solid #ccc;
+
+  &--category {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &--category__item,
+  &--brands__item,
+  &--price__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 200px;
+  }
+
+  &--color {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+
+.input {
+  appearance: none; /* Ẩn checkbox mặc định */
+  width: 20px;
+  height: 20px;
+  border: 1px solid #000;
+  border-radius: 5px;
+  position: relative;
+
+  &:checked {
+    background: green;
+
+    &::before {
+      content: "✔";
+      font-size: 15px;
+      color: #fff;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  &.color {
+    height: 30px;
+    flex-basis: 20%;
+    &:checked::before {
+      font-size: 20px;
+    }
+  }
+
+  &.white {
+    background: white;
+    &:checked::before {
+      color: black;
+    }
+  }
+  &.gray {
+    background: gray;
+  }
+  &.yellow {
+    background: #e6d770;
+  }
+  &.orange {
+    background: orange;
+  }
+  &.black {
+    background: black;
+  }
+  &.red {
+    background: red;
+  }
+  &.blue {
+    background: blue;
+  }
+  &.pink {
+    background: pink;
+  }
+  &.green {
+    background: green;
+  }
+  &.brown {
+    background: brown;
+  }
+}
