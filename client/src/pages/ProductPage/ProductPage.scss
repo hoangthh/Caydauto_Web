@@ -1,0 +1,21 @@
+.product-page {
+  display: flex;
+  margin-top: 20px;
+
+  &--product-wrapper {
+    margin-left: 30px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &--product-list {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+
+    &__product-item {
+      flex-basis: calc(100% / 3 - 20px);
+    }
+  }
+}
