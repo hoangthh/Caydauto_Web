@@ -13,9 +13,11 @@ public class User : IdentityUser<int>
     public string ImageUrl { get; set; } = Constraint.Image.DefaultUserImageUrl;
     public DateTime DateOfBirth { get; set; } = DateTime.Now;
     public string Gender { get; set; } = "Unknown";
+    public int RoleId { get; set; } // Khóa ngoại đến Role
 
     // Navigation properties
     public ICollection<Order> Orders { get; set; } = new List<Order>();
+    public Role? Role { get; set; }  // Navigation property
     public Cart Cart { get; set; } = new Cart(); // One-to-one với Cart
     public ICollection<Product> WishList { get; set; } = new List<Product>(); // Many-to-many với Product
     public ICollection<Comment> Comments { get; set; } = new List<Comment>();

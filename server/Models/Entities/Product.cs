@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
-public class Product
+public class Product : IDateTracking
 {
     public int Id { get; set; }
 
@@ -28,9 +28,11 @@ public class Product
     [Required(ErrorMessage = "Stock quantity is required")]
     [Range(0, int.MaxValue, ErrorMessage = "Stock quantity must be greater than or equal to 0")]
     public int StockQuantity { get; set; }
-
+    public int Sold { get; set; } = 0;
     public double AverageRating => Comments.Any() ? Comments.Average(c => c.Rating) : 0;
 
+    public DateTime CreatedDate { get; set; } = DateTime.Now;
+    public DateTime UpdatedDate {get; set;}
     // Navigation properties
     public ICollection<Category> Categories { get; set; } = new List<Category>();
     public ICollection<Color> Colors { get; set; } = new List<Color>();

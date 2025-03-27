@@ -9,6 +9,13 @@ public class ProductGetDto
     public string Brand { get; set; } = "Blank brand";
     public int StockQuantity { get; set; }
     public double AverageRating { get; set; }
+    public bool IsWished { get; set; } // Đánh dấu sản phẩm đã được thêm vào danh sách yêu thích của User hay chưa
+    public int Sold {get; set;} // Số lượng sản phẩm đã bán
+    public bool IsNew { get; set; } // Đánh dấu sản phẩm mới
+    public List<ImageGetDto> Images { get; set; } = new List<ImageGetDto>();
+    public List<CategoryGetDto> Categories { get; set; } = new List<CategoryGetDto>(); // Thêm Categories
+    public List<ColorGetDto> Colors { get; set; } = new List<ColorGetDto>(); // Thêm Colors
+
 }
 
 public class ProductCreateDto
@@ -36,6 +43,8 @@ public class ProductCreateDto
     [Range(0, int.MaxValue, ErrorMessage = "Stock quantity must be greater than or equal to 0")]
     public int StockQuantity { get; set; }
     public List<ImageCreateDto> Images { get; set; } = new List<ImageCreateDto>();
+    public List<int> CategoryIds { get; set; } = new List<int>(); // Danh sách Id của Categories
+    public List<int> ColorIds { get; set; } = new List<int>(); // Danh sách Id của Colors
 }
 
 public class ProductPutDto
@@ -63,4 +72,6 @@ public class ProductPutDto
     [Range(0, int.MaxValue, ErrorMessage = "Stock quantity must be greater than or equal to 0")]
     public int StockQuantity { get; set; }
     public List<ImagePutDto> Images { get; set; } = new List<ImagePutDto>();
+    public List<int> CategoryIds { get; set; } = new List<int>(); // Danh sách Id của Categories
+    public List<int> ColorIds { get; set; } = new List<int>(); // Danh sách Id của Colors
 }

@@ -5,8 +5,7 @@ public class Order
 {
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "User ID is required")]
-    public int UserId { get; set; }
+    public int? UserId { get; set; }
 
     [Required(ErrorMessage = "Order date is required")]
     public DateTime OrderDate { get; set; } = DateTime.Now;
@@ -46,7 +45,7 @@ public class Order
     public int? DiscountId { get; set; }
 
     // Navigation properties
-    public User User { get; set; } = new User();
+    public User? User { get; set; }
     public Discount Discount { get; set; } = new Discount();
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 }
