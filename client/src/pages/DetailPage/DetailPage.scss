@@ -1,0 +1,45 @@
+.detail-page {
+  &--product {
+    display: flex;
+    gap: 50px;
+
+    &__image {
+      flex-basis: calc(50% + 50px);
+
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    &__detail {
+      &.color {
+        margin-top: 20px;
+      }
+
+      &.quantity {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+      }
+
+      &.action {
+        margin-top: 20px;
+      }
+    }
+  }
+
+  &--similar-product {
+    &.product-wrapper {
+      margin-top: 20px;
+      display: flex;
+      white-space: nowrap;
+      gap: 20px;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+    &.product-item {
+      flex: 0 0 300px;
+    }
+  }
+}
