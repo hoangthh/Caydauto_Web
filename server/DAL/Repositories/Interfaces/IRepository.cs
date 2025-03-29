@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -20,7 +21,10 @@ public interface IRepository<TEntity>
         )[] filters
     );
 
-    Task<TEntity?> GetByIdAsync(int id);
+    Task<TEntity?> GetByIdAsync(
+        int id,
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null
+    );
     Task<TEntity?> AddAsync(TEntity entity); // Trả về null nếu thất bại
     Task<IEnumerable<TEntity>?> AddRangeAsync(IEnumerable<TEntity> entities); // Trả về null nếu thất bại
     Task<bool> UpdateAsync(TEntity entity);

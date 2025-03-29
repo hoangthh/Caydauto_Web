@@ -18,7 +18,7 @@ public class CartItem
     public int Quantity { get; set; }
 
     // Navigation properties
-    public Cart Cart { get; set; } = new Cart();
+    public Cart Cart { get; set; }
     public Product Product { get; set; } = new Product();
     public Color Color { get; set; } = new Color();
 }

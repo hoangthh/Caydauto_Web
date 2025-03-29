@@ -97,32 +97,32 @@ namespace server.Migrations
                         new
                         {
                             Id = 1,
-                            Description = "Adipisci eius qui voluptatibus aut sit dolorem iste atque consequatur pariatur.",
-                            Name = "Beauty, Kids & Movies"
+                            Description = "Et asperiores numquam quasi et fugit consectetur ut facilis placeat id molestias doloremque perspiciatis.",
+                            Name = "Clothing, Sports & Baby"
                         },
                         new
                         {
                             Id = 2,
-                            Description = "Animi distinctio non cum quia quos modi non laborum est.",
-                            Name = "Games, Sports & Beauty"
+                            Description = "Sequi maxime aut blanditiis aut repudiandae eum commodi perspiciatis rem repellat sint ducimus.",
+                            Name = "Computers, Shoes & Outdoors"
                         },
                         new
                         {
                             Id = 3,
-                            Description = "Fugiat exercitationem corrupti asperiores voluptas odio aut ratione et occaecati.",
-                            Name = "Home & Health"
+                            Description = "Maiores nihil sed deserunt distinctio accusamus molestias eum repellendus sequi laboriosam.",
+                            Name = "Games"
                         },
                         new
                         {
                             Id = 4,
-                            Description = "Culpa omnis illo a quia assumenda vel deserunt eos veniam minima dolorem aspernatur.",
-                            Name = "Baby"
+                            Description = "Magni ut dignissimos consequatur aut culpa accusamus dolores magnam porro.",
+                            Name = "Automotive & Baby"
                         },
                         new
                         {
                             Id = 5,
-                            Description = "Beatae incidunt saepe unde laboriosam culpa magnam.",
-                            Name = "Books & Games"
+                            Description = "Id neque minus consequuntur aliquid illo aut dolorem.",
+                            Name = "Beauty & Electronics"
                         });
                 });
 
@@ -143,13 +143,18 @@ namespace server.Migrations
                     b.HasData(
                         new
                         {
-                            CategoriesId = 4,
+                            CategoriesId = 2,
                             ProductsId = 1
                         },
                         new
                         {
-                            CategoriesId = 2,
-                            ProductsId = 1
+                            CategoriesId = 1,
+                            ProductsId = 2
+                        },
+                        new
+                        {
+                            CategoriesId = 3,
+                            ProductsId = 2
                         },
                         new
                         {
@@ -158,38 +163,23 @@ namespace server.Migrations
                         },
                         new
                         {
-                            CategoriesId = 5,
+                            CategoriesId = 1,
                             ProductsId = 3
                         },
                         new
                         {
-                            CategoriesId = 5,
+                            CategoriesId = 1,
                             ProductsId = 4
-                        },
-                        new
-                        {
-                            CategoriesId = 3,
-                            ProductsId = 4
-                        },
-                        new
-                        {
-                            CategoriesId = 3,
-                            ProductsId = 5
-                        },
-                        new
-                        {
-                            CategoriesId = 2,
-                            ProductsId = 5
-                        },
-                        new
-                        {
-                            CategoriesId = 5,
-                            ProductsId = 6
                         },
                         new
                         {
                             CategoriesId = 4,
-                            ProductsId = 6
+                            ProductsId = 4
+                        },
+                        new
+                        {
+                            CategoriesId = 1,
+                            ProductsId = 5
                         },
                         new
                         {
@@ -198,32 +188,22 @@ namespace server.Migrations
                         },
                         new
                         {
-                            CategoriesId = 3,
+                            CategoriesId = 5,
                             ProductsId = 7
                         },
                         new
                         {
-                            CategoriesId = 4,
+                            CategoriesId = 2,
                             ProductsId = 8
                         },
                         new
                         {
-                            CategoriesId = 3,
+                            CategoriesId = 5,
                             ProductsId = 8
                         },
                         new
                         {
-                            CategoriesId = 1,
-                            ProductsId = 8
-                        },
-                        new
-                        {
-                            CategoriesId = 3,
-                            ProductsId = 9
-                        },
-                        new
-                        {
-                            CategoriesId = 1,
+                            CategoriesId = 5,
                             ProductsId = 9
                         },
                         new
@@ -233,12 +213,12 @@ namespace server.Migrations
                         },
                         new
                         {
-                            CategoriesId = 3,
+                            CategoriesId = 4,
                             ProductsId = 10
                         },
                         new
                         {
-                            CategoriesId = 2,
+                            CategoriesId = 1,
                             ProductsId = 10
                         });
                 });
@@ -397,7 +377,7 @@ namespace server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("IdentityRole<int>");
+                    b.ToTable("Roles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -476,7 +456,7 @@ namespace server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("IdentityUser<int>");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
@@ -536,7 +516,7 @@ namespace server.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetUserRoles", (string)null);
+                    b.ToTable("UserRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
@@ -696,122 +676,122 @@ namespace server.Migrations
                         new
                         {
                             Id = 1,
-                            Brand = "Halvorson - Medhurst",
-                            CreatedDate = new DateTime(2024, 11, 9, 20, 6, 21, 483, DateTimeKind.Local).AddTicks(1996),
-                            Description = "The Nagasaki Lander is the trademarked name of several series of Nagasaki sport bikes, that started with the 1984 ABC800J",
-                            Name = "Small Plastic Bike",
-                            Price = 307.951519430068570m,
-                            Sold = 44,
-                            StockQuantity = 14,
-                            UpdatedDate = new DateTime(2025, 3, 19, 7, 2, 29, 155, DateTimeKind.Local).AddTicks(4528)
+                            Brand = "Mohr - Ernser",
+                            CreatedDate = new DateTime(2024, 7, 30, 11, 23, 55, 40, DateTimeKind.Local).AddTicks(7897),
+                            Description = "New range of formal shirts are designed keeping you in mind. With fits and styling that will make you stand apart",
+                            Name = "Generic Rubber Fish",
+                            Price = 852.200379965878120m,
+                            Sold = 22,
+                            StockQuantity = 5,
+                            UpdatedDate = new DateTime(2025, 3, 1, 23, 30, 50, 924, DateTimeKind.Local).AddTicks(452)
                         },
                         new
                         {
                             Id = 2,
-                            Brand = "Mertz - Cole",
-                            CreatedDate = new DateTime(2024, 4, 7, 8, 53, 29, 82, DateTimeKind.Local).AddTicks(3146),
-                            Description = "The Football Is Good For Training And Recreational Purposes",
-                            Name = "Handcrafted Plastic Shirt",
-                            Price = 651.133525964928040m,
-                            Sold = 5,
-                            StockQuantity = 87,
-                            UpdatedDate = new DateTime(2025, 3, 8, 15, 4, 31, 814, DateTimeKind.Local).AddTicks(255)
+                            Brand = "Becker Inc",
+                            CreatedDate = new DateTime(2024, 9, 7, 7, 20, 19, 228, DateTimeKind.Local).AddTicks(2705),
+                            Description = "Carbonite web goalkeeper gloves are ergonomically designed to give easy fit",
+                            Name = "Licensed Wooden Gloves",
+                            Price = 262.985668335473590m,
+                            Sold = 10,
+                            StockQuantity = 67,
+                            UpdatedDate = new DateTime(2025, 3, 21, 11, 35, 8, 66, DateTimeKind.Local).AddTicks(4546)
                         },
                         new
                         {
                             Id = 3,
-                            Brand = "Kshlerin, Blanda and Kautzer",
-                            CreatedDate = new DateTime(2025, 2, 24, 21, 44, 31, 560, DateTimeKind.Local).AddTicks(6877),
+                            Brand = "Tillman Group",
+                            CreatedDate = new DateTime(2024, 11, 15, 19, 15, 55, 884, DateTimeKind.Local).AddTicks(8868),
                             Description = "The beautiful range of Apple Naturalé that has an exciting mix of natural ingredients. With the Goodness of 100% Natural Ingredients",
-                            Name = "Unbranded Concrete Pizza",
-                            Price = 945.254144795247640m,
-                            Sold = 9,
-                            StockQuantity = 53,
-                            UpdatedDate = new DateTime(2025, 3, 4, 1, 52, 26, 29, DateTimeKind.Local).AddTicks(5691)
+                            Name = "Intelligent Rubber Tuna",
+                            Price = 74.7780295897698040m,
+                            Sold = 21,
+                            StockQuantity = 45,
+                            UpdatedDate = new DateTime(2025, 3, 15, 19, 9, 33, 803, DateTimeKind.Local).AddTicks(3216)
                         },
                         new
                         {
                             Id = 4,
-                            Brand = "Treutel - Lindgren",
-                            CreatedDate = new DateTime(2024, 11, 14, 4, 22, 11, 101, DateTimeKind.Local).AddTicks(9363),
-                            Description = "Ergonomic executive chair upholstered in bonded black leather and PVC padded seat and back for all-day comfort and support",
-                            Name = "Tasty Cotton Pants",
-                            Price = 151.625383271140780m,
-                            Sold = 16,
-                            StockQuantity = 73,
-                            UpdatedDate = new DateTime(2025, 3, 9, 17, 43, 23, 291, DateTimeKind.Local).AddTicks(6225)
+                            Brand = "Hartmann LLC",
+                            CreatedDate = new DateTime(2025, 3, 2, 18, 11, 22, 565, DateTimeKind.Local).AddTicks(3905),
+                            Description = "Andy shoes are designed to keeping in mind durability as well as trends, the most stylish range of shoes & sandals",
+                            Name = "Rustic Plastic Ball",
+                            Price = 335.740566152668150m,
+                            Sold = 22,
+                            StockQuantity = 68,
+                            UpdatedDate = new DateTime(2025, 3, 20, 9, 34, 12, 87, DateTimeKind.Local).AddTicks(366)
                         },
                         new
                         {
                             Id = 5,
-                            Brand = "Hilll and Sons",
-                            CreatedDate = new DateTime(2024, 12, 15, 2, 49, 14, 198, DateTimeKind.Local).AddTicks(9615),
-                            Description = "The beautiful range of Apple Naturalé that has an exciting mix of natural ingredients. With the Goodness of 100% Natural Ingredients",
-                            Name = "Awesome Plastic Ball",
-                            Price = 677.069507116227160m,
-                            Sold = 17,
-                            StockQuantity = 22,
-                            UpdatedDate = new DateTime(2025, 3, 15, 11, 20, 19, 130, DateTimeKind.Local).AddTicks(2759)
+                            Brand = "Denesik, Hansen and Fritsch",
+                            CreatedDate = new DateTime(2025, 2, 20, 5, 10, 17, 227, DateTimeKind.Local).AddTicks(670),
+                            Description = "The Apollotech B340 is an affordable wireless mouse with reliable connectivity, 12 months battery life and modern design",
+                            Name = "Practical Cotton Car",
+                            Price = 110.299856652613090m,
+                            Sold = 9,
+                            StockQuantity = 100,
+                            UpdatedDate = new DateTime(2025, 3, 15, 0, 4, 17, 471, DateTimeKind.Local).AddTicks(588)
                         },
                         new
                         {
                             Id = 6,
-                            Brand = "Schmidt - Rolfson",
-                            CreatedDate = new DateTime(2024, 10, 20, 10, 19, 56, 931, DateTimeKind.Local).AddTicks(8944),
-                            Description = "Carbonite web goalkeeper gloves are ergonomically designed to give easy fit",
-                            Name = "Small Concrete Fish",
-                            Price = 765.090559339335010m,
-                            Sold = 48,
-                            StockQuantity = 16,
-                            UpdatedDate = new DateTime(2025, 3, 3, 2, 19, 51, 21, DateTimeKind.Local).AddTicks(3619)
+                            Brand = "Beahan LLC",
+                            CreatedDate = new DateTime(2024, 10, 8, 14, 47, 53, 952, DateTimeKind.Local).AddTicks(6540),
+                            Description = "Boston's most advanced compression wear technology increases muscle oxygenation, stabilizes active muscles",
+                            Name = "Unbranded Cotton Hat",
+                            Price = 408.44407334398480m,
+                            Sold = 8,
+                            StockQuantity = 93,
+                            UpdatedDate = new DateTime(2025, 3, 26, 0, 46, 16, 7, DateTimeKind.Local).AddTicks(3626)
                         },
                         new
                         {
                             Id = 7,
-                            Brand = "Padberg - O'Keefe",
-                            CreatedDate = new DateTime(2024, 6, 10, 17, 30, 21, 765, DateTimeKind.Local).AddTicks(5151),
-                            Description = "The beautiful range of Apple Naturalé that has an exciting mix of natural ingredients. With the Goodness of 100% Natural Ingredients",
-                            Name = "Practical Metal Tuna",
-                            Price = 328.515827021750710m,
-                            Sold = 21,
-                            StockQuantity = 7,
-                            UpdatedDate = new DateTime(2025, 2, 26, 6, 23, 45, 396, DateTimeKind.Local).AddTicks(4554)
+                            Brand = "Ullrich - Parker",
+                            CreatedDate = new DateTime(2024, 5, 13, 6, 35, 33, 143, DateTimeKind.Local).AddTicks(3193),
+                            Description = "Ergonomic executive chair upholstered in bonded black leather and PVC padded seat and back for all-day comfort and support",
+                            Name = "Handcrafted Fresh Keyboard",
+                            Price = 782.49026648214190m,
+                            Sold = 29,
+                            StockQuantity = 12,
+                            UpdatedDate = new DateTime(2025, 3, 4, 20, 28, 56, 135, DateTimeKind.Local).AddTicks(5908)
                         },
                         new
                         {
                             Id = 8,
-                            Brand = "Heller Inc",
-                            CreatedDate = new DateTime(2025, 2, 23, 14, 24, 48, 101, DateTimeKind.Local).AddTicks(3643),
-                            Description = "The beautiful range of Apple Naturalé that has an exciting mix of natural ingredients. With the Goodness of 100% Natural Ingredients",
-                            Name = "Intelligent Fresh Towels",
-                            Price = 405.391123623462670m,
-                            Sold = 23,
-                            StockQuantity = 24,
-                            UpdatedDate = new DateTime(2025, 3, 15, 19, 34, 29, 126, DateTimeKind.Local).AddTicks(4240)
+                            Brand = "Wiegand, Spencer and Glover",
+                            CreatedDate = new DateTime(2025, 2, 1, 1, 41, 57, 844, DateTimeKind.Local).AddTicks(2806),
+                            Description = "The slim & simple Maple Gaming Keyboard from Dev Byte comes with a sleek body and 7- Color RGB LED Back-lighting for smart functionality",
+                            Name = "Generic Steel Ball",
+                            Price = 935.047518042237040m,
+                            Sold = 13,
+                            StockQuantity = 9,
+                            UpdatedDate = new DateTime(2025, 3, 17, 10, 24, 45, 648, DateTimeKind.Local).AddTicks(8023)
                         },
                         new
                         {
                             Id = 9,
-                            Brand = "Moen LLC",
-                            CreatedDate = new DateTime(2024, 4, 26, 18, 26, 11, 271, DateTimeKind.Local).AddTicks(6281),
-                            Description = "New ABC 13 9370, 13.3, 5th Gen CoreA5-8250U, 8GB RAM, 256GB SSD, power UHD Graphics, OS 10 Home, OS Office A & J 2016",
-                            Name = "Rustic Metal Towels",
-                            Price = 982.005050984841280m,
-                            Sold = 13,
-                            StockQuantity = 39,
-                            UpdatedDate = new DateTime(2025, 3, 6, 2, 21, 47, 363, DateTimeKind.Local).AddTicks(513)
+                            Brand = "Dibbert - Blanda",
+                            CreatedDate = new DateTime(2025, 1, 30, 22, 56, 53, 788, DateTimeKind.Local).AddTicks(287),
+                            Description = "The slim & simple Maple Gaming Keyboard from Dev Byte comes with a sleek body and 7- Color RGB LED Back-lighting for smart functionality",
+                            Name = "Practical Cotton Keyboard",
+                            Price = 777.169716620040910m,
+                            Sold = 0,
+                            StockQuantity = 28,
+                            UpdatedDate = new DateTime(2025, 3, 18, 22, 49, 51, 479, DateTimeKind.Local).AddTicks(2531)
                         },
                         new
                         {
                             Id = 10,
-                            Brand = "Sporer - Fadel",
-                            CreatedDate = new DateTime(2025, 2, 25, 1, 19, 17, 893, DateTimeKind.Local).AddTicks(2195),
-                            Description = "The Football Is Good For Training And Recreational Purposes",
-                            Name = "Ergonomic Steel Salad",
-                            Price = 275.599877991119650m,
-                            Sold = 25,
-                            StockQuantity = 4,
-                            UpdatedDate = new DateTime(2025, 3, 1, 0, 20, 4, 787, DateTimeKind.Local).AddTicks(5731)
+                            Brand = "Goldner, Herzog and Langworth",
+                            CreatedDate = new DateTime(2024, 9, 24, 18, 33, 21, 39, DateTimeKind.Local).AddTicks(8098),
+                            Description = "New ABC 13 9370, 13.3, 5th Gen CoreA5-8250U, 8GB RAM, 256GB SSD, power UHD Graphics, OS 10 Home, OS Office A & J 2016",
+                            Name = "Handmade Wooden Bacon",
+                            Price = 874.701987699915640m,
+                            Sold = 32,
+                            StockQuantity = 87,
+                            UpdatedDate = new DateTime(2025, 2, 28, 2, 5, 17, 491, DateTimeKind.Local).AddTicks(1800)
                         });
                 });
 
@@ -862,6 +842,22 @@ namespace server.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Administrator role",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "User role",
+                            Name = "User",
+                            NormalizedName = "USER"
+                        });
                 });
 
             modelBuilder.Entity("User", b =>

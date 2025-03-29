@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using server.Services.Mapping;
@@ -313,10 +314,12 @@ public static class ServiceExtensions
         ConfigureSessionService(services);
         ConfigureEntityFramework(services, configuration);
     }
+
     private static void ConfigureAutoMapper(IServiceCollection services)
     {
         services.AddAutoMapper(typeof(MappingProfile).Assembly);
     }
+
     /// <summary>
     /// Cấu hình dịch vụ Session
     /// </summary>
@@ -351,6 +354,13 @@ public static class ServiceExtensions
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = true;
                 options.Password.RequireLowercase = true;
+
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.AllowedForNewUsers = true;
+
+                options.User.RequireUniqueEmail = true;
+                options.SignIn.RequireConfirmedEmail = true;
             })
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
@@ -396,7 +406,7 @@ public static class ServiceExtensions
                 options.Cookie.Name = "ShUEHApplication-Cookies-Authentication"; // Tên của cookie
                 options.Cookie.HttpOnly = true; // Cookie chỉ có thể truy cập qua HTTP
                 options.Cookie.IsEssential = true; // Đảm bảo cookie được gửi ngay cả khi người dùng chưa đồng ý
-                options.Cookie.SameSite = SameSiteMode.None;
+                options.Cookie.SameSite = SameSiteMode.Unspecified;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             })
             .AddGoogle(options =>
@@ -435,9 +445,21 @@ public static class ServiceExtensions
     {
         /*Repository*/
         services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<ICartRepository, CartRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IUserRepostory, UserRepository>();
         /*Services*/
         services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<ICartService, CartService>();
+        services.AddScoped<IEmailSender, EmailService>();
+        services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<IDeliveryService, DeliveryService>();
+
         services.AddScoped<FileService>();
+        /*Others*/
+        services.AddScoped<HttpClient>();
         /*Identity*/
         services.AddScoped<UserManager<User>>(); // Quản lý người dùng trong hệ thống
         services.AddScoped<SignInManager<User>>(); // Quản lý đăng nhập người dùng
@@ -455,7 +477,7 @@ public static class ServiceExtensions
                 builder =>
                 {
                     builder
-                        .WithOrigins(Constraint.Url.Clients)
+                        .WithOrigins(Constraint.Url.Server, Constraint.Url.Client)
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();

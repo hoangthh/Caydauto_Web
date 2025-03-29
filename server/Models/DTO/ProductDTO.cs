@@ -1,6 +1,24 @@
 using System.ComponentModel.DataAnnotations;
 
-public class ProductGetDto
+public class ProductAllGetDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = "Blank product";
+    public decimal Price { get; set; }
+    public string Description { get; set; } = "This is a blank product";
+    public string Brand { get; set; } = "Blank brand";
+    public int StockQuantity { get; set; }
+    public double AverageRating { get; set; }
+    public bool IsWished { get; set; } // Đánh dấu sản phẩm đã được thêm vào danh sách yêu thích của User hay chưa
+    public int Sold {get; set;} // Số lượng sản phẩm đã bán
+    public bool IsNew { get; set; } // Đánh dấu sản phẩm mới
+    public ImageGetDto? Image { get; set; } // Thay đổi kiểu dữ liệu của Image thành ImageGetDto
+    public List<CategoryGetDto> Categories { get; set; } = new List<CategoryGetDto>(); // Thêm Categories
+    public List<ColorGetDto> Colors { get; set; } = new List<ColorGetDto>(); // Thêm Colors
+
+}
+
+public class ProductDetailGetDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = "Blank product";

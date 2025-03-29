@@ -1,12 +1,15 @@
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 
 public class ProductService : IProductService
 {
     private readonly IProductRepository _productRepository;
+
     //private readonly IRepository<Category> _categoryRepository;
     //private readonly IRepository<Color> _colorRepository;
     private readonly FileService _fileService;
+    private readonly ICategoryRepository _categoryRepository;
     private readonly IMapper _mapper;
 
     public ProductService(
@@ -14,6 +17,7 @@ public class ProductService : IProductService
         //IRepository<Category> categoryRepository,
         //IRepository<Color> colorRepository,
         FileService fileService,
+        ICategoryRepository categoryRepository,
         IMapper mapper
     )
     {
@@ -21,10 +25,11 @@ public class ProductService : IProductService
         //_categoryRepository = categoryRepository;
         //_colorRepository = colorRepository;
         _fileService = fileService;
+        _categoryRepository = categoryRepository;
         _mapper = mapper;
     }
 
-    public Task<ProductGetDto> AddProduct(ProductCreateDto productPostDto)
+    public Task<ProductDetailGetDto> AddProduct(ProductCreateDto productPostDto)
     {
         throw new NotImplementedException();
     }
@@ -34,12 +39,17 @@ public class ProductService : IProductService
         throw new NotImplementedException();
     }
 
-    public Task<ProductGetDto> GetProduct(int id)
+    public async Task<ProductDetailGetDto?> GetProduct(int id)
     {
-        throw new NotImplementedException();
+        var product = await _productRepository.GetByIdAsync(
+            id,
+            q => q.IncludeMultiple(q => q.Categories, q => q.Colors, q => q.Images, q => q.Comments)
+        );
+        var productGetDto = _mapper.Map<ProductDetailGetDto>(product);
+        return productGetDto;
     }
 
-    public async Task<PagedResult<ProductGetDto>> GetProducts(int page = 1, int pageSize = 6)
+    public async Task<PagedResult<ProductAllGetDto>> GetProducts(int page = 1, int pageSize = 6)
     {
         var product = await _productRepository.GetAllAsync(
             page,
@@ -47,32 +57,8 @@ public class ProductService : IProductService
             true,
             q => q.IncludeMultiple(q => q.Categories, q => q.Colors, q => q.Images, q => q.Comments)
         );
-        var productGetDto = _mapper.Map<IEnumerable<ProductGetDto>>(product.Items);
-        return new PagedResult<ProductGetDto>
-        {
-            Items = productGetDto,
-            TotalItems = product.TotalItems,
-            PageNumber = product.PageNumber,
-            PageSize = product.PageSize,
-        };  
-    }
-    public async Task<PagedResult<ProductGetDto>> GetProducts(ProductFilter productFilter)
-    {
-        var product = await _productRepository.GetAllAsync(
-            productFilter.Page,
-            productFilter.PageSize,
-            true,
-            q => q.IncludeMultiple(q => q.Categories, q => q.Colors, q => q.Images, q => q.Comments).Where(p =>
-                (string.IsNullOrEmpty(productFilter.Name) || p.Name.Contains(productFilter.Name, StringComparison.OrdinalIgnoreCase)) &&
-                (productFilter.Categories == null || p.Categories.Any(c => productFilter.Categories.Contains(c.Name))) &&
-                (productFilter.MinPrice == null || p.Price >= productFilter.MinPrice) &&
-                (productFilter.MaxPrice == null || p.Price <= productFilter.MaxPrice) &&
-                (productFilter.Colors == null || p.Colors.Any(c => productFilter.Colors.Contains(c.Name))) &&
-                (productFilter.Brands == null || productFilter.Brands.Contains(p.Brand))).OrderByMultiple((productFilter.OrderBy, productFilter.IsDesc))
-        );
-        
-        var productGetDto = _mapper.Map<IEnumerable<ProductGetDto>>(product.Items);
-        return new PagedResult<ProductGetDto>
+        var productGetDto = _mapper.Map<IEnumerable<ProductAllGetDto>>(product.Items);
+        return new PagedResult<ProductAllGetDto>
         {
             Items = productGetDto,
             TotalItems = product.TotalItems,
@@ -80,9 +66,57 @@ public class ProductService : IProductService
             PageSize = product.PageSize,
         };
     }
+
+    public async Task<PagedResult<ProductAllGetDto>> GetProducts(ProductFilter productFilter)
+    {
+        var product = await _productRepository.GetAllAsync(
+            productFilter.Page,
+            productFilter.PageSize,
+            true,
+            q =>
+                q.IncludeMultiple(q => q.Categories, q => q.Colors, q => q.Images, q => q.Comments)
+                    .Where(p =>
+                        (
+                            string.IsNullOrEmpty(productFilter.Name)
+                            || p.Name.Contains(
+                                productFilter.Name,
+                                StringComparison.OrdinalIgnoreCase
+                            )
+                        )
+                        && (
+                            productFilter.Categories == null
+                            || p.Categories.Any(c => productFilter.Categories.Contains(c.Name))
+                        )
+                        && (productFilter.MinPrice == null || p.Price >= productFilter.MinPrice)
+                        && (productFilter.MaxPrice == null || p.Price <= productFilter.MaxPrice)
+                        && (
+                            productFilter.Colors == null
+                            || p.Colors.Any(c => productFilter.Colors.Contains(c.Name))
+                        )
+                        && (productFilter.Brands == null || productFilter.Brands.Contains(p.Brand))
+                    )
+                    .OrderByMultiple((productFilter.OrderBy, productFilter.IsDesc))
+        );
+
+        var productGetDto = _mapper.Map<IEnumerable<ProductAllGetDto>>(product.Items);
+        return new PagedResult<ProductAllGetDto>
+        {
+            Items = productGetDto,
+            TotalItems = product.TotalItems,
+            PageNumber = product.PageNumber,
+            PageSize = product.PageSize,
+        };
+    }
+
+    public async Task<IEnumerable<ProductAllGetDto>> GetSimilarProducts(int id)
+    {
+        var categoriesId = await _categoryRepository.GetAllCategoriesAsync();
+        var similarProducts = await _productRepository.GetSimilarProductsAsync(id, categoriesId.Select(c => c.Id).ToList());
+        var productGetDto = _mapper.Map<IEnumerable<ProductAllGetDto>>(similarProducts.Items);
+        return productGetDto;
+    }
     public Task<bool> UpdateProduct(ProductPutDto productPutDto)
     {
         throw new NotImplementedException();
     }
-
 }
