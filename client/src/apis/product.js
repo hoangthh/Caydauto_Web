@@ -5,8 +5,21 @@ const axiosInstance = axios.create({
   // withCredentials: true
 });
 
-export const fetchProductsByPagination = async () => {
-  const response = axiosInstance.get(`/api/Product/`);
+export const fetchProductsWithFilterByPagination = async () => {
+  try {
+    const response = await axiosInstance.get(`/api/Product/`);
 
-  return response.data.item;
+    return response.data.item;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const fetchDetailProductById = async (productId) => {
+  try {
+    const response = await axiosInstance.get(`/api/Product/${productId}`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
 };

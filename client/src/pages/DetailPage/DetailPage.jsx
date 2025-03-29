@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./DetailPage.scss";
 import product from "../../assets/product.svg";
 import {
@@ -13,8 +13,9 @@ import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import RemoveCircleRoundedIcon from "@mui/icons-material/RemoveCircleRounded";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Product } from "../../components/Product/Product";
-import { fetchDetailProduct } from "../../mockData";
 import { useParams } from "react-router-dom";
+import { fetchDetailProductById } from "../../apis/product";
+import { fetchDetailProduct } from "../../mockData";
 
 const ProductName = styled(Typography)`
   font-size: 20px;
@@ -70,10 +71,21 @@ const SimilarProductHeader = styled(Typography)`
 `;
 
 export const DetailPage = () => {
+  const [detailProduct, setDetailProduct] = useState({});
+  const [color, setColor] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
   const { productId } = useParams();
-  const detailProduct = fetchDetailProduct(productId);
+
+  useEffect(() => {
+    const fetchDetailProduct = async () => {
+      // const detailProduct = await fetchDetailProductById(productId);
+      const detailProduct = await fetchDetailProduct(productId);
+      setDetailProduct(detailProduct);
+    };
+
+    detailProduct && fetchDetailProduct();
+  }, [detailProduct, productId]);
 
   const handleDecreaseQuantity = () => {
     if (quantity === 1) return;
@@ -100,12 +112,18 @@ export const DetailPage = () => {
         {/* Main Product Detail */}
         <div className="detail-page--product__detail">
           {/*Main Product Name */}
-          <ProductName>{detailProduct.name}</ProductName>
+          <ProductName>{detailProduct?.name}</ProductName>
           {/*Main Product Name */}
 
           {/* Main Product Color */}
           <div className="detail-page--product__detail color">
-            <input type="checkbox" className="input orange" />
+            <input
+              type="checkbox"
+              className="input orange"
+              onChange={(e) => {
+                console.log(e);
+              }}
+            />
             <input type="checkbox" className="input pink" />
             <input type="checkbox" className="input red" />
             <input type="checkbox" className="input black" />
