@@ -34,8 +34,7 @@ const navbarItemList = [
 export const Navbar = () => {
   // const [activeNavbarItem, setActiveNavbarItem] = useState("home");
   const location = useLocation();
-  console.log(location.pathname);
-  navbarItemList.map((item) => console.log(location.pathname === item.linkTo));
+
   return (
     <div className="navbar">
       {/* Navbar Info */}
