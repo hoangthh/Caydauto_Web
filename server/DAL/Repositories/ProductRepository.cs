@@ -13,12 +13,12 @@ public class ProductRepository(AppDbContext context)
                 (IIncludableQueryable<Product, object>)
                     q.IncludeMultiple(q => q.Categories, q => q.Colors, q => q.Images)
                         .Where(p => p.Name.Contains(name, StringComparison.OrdinalIgnoreCase))
-        );
+        ).ConfigureAwait(false);
     }
 
     public async Task<decimal> GetProductPriceByIdAsync(int productId)
     {
-        var product = await GetByIdAsync(productId);
+        var product = await GetByIdAsync(productId).ConfigureAwait(false);
         if (product == null)
         {
             throw new KeyNotFoundException($"Product with ID {productId} not found.");
@@ -40,7 +40,7 @@ public class ProductRepository(AppDbContext context)
                     .Where(p =>
                         p.Id != productId && p.Categories.Any(c => categoriesId.Contains(c.Id))
                     )
-        );
+        ).ConfigureAwait(false);
     }
 
     public async Task<decimal> GetTotalPriceByProductsIdAsync(
@@ -53,7 +53,7 @@ public class ProductRepository(AppDbContext context)
             .AsNoTracking()
             .Where(p => productsId.Select(p => p.productId).Contains(p.Id))
             .Select(p => Tuple.Create(p.Id, p.Price))
-            .ToListAsync();
+            .ToListAsync().ConfigureAwait(false);
         foreach (var product in products)
         {
             productQuantities.Add(product.Item1, product.Item2);

@@ -13,9 +13,9 @@ using (var scope = app.Services.CreateScope())
 
     foreach (var roleName in roles)
     {
-        if (!await roleManager.RoleExistsAsync(roleName))
+        if (!await roleManager.RoleExistsAsync(roleName).ConfigureAwait(false))
         {
-            await roleManager.CreateAsync(new Role { Name = roleName });
+            await roleManager.CreateAsync(new Role { Name = roleName }).ConfigureAwait(false);
         }
     }
 }

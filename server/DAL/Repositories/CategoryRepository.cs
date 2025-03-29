@@ -9,6 +9,6 @@ public class CategoryRepository : Repository<Category>, ICategoryRepository
     }
     public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
     {
-        return await _entities.AsNoTracking().ToListAsync();
+        return await _entities.AsNoTracking().ToListAsync().ConfigureAwait(false);
     }
 }

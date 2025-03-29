@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Scrutor;
 using server.Services.Mapping;
 
 public static class DateTimeExtensions
@@ -297,6 +298,8 @@ public static class LogicOperatorExtensions
 
 public static class ServiceExtensions
 {
+    static readonly HashSet<Type> excludedTypes = new HashSet<Type> { typeof(UserIdMiddleware) };
+
     public static void AddProjectServices(
         this IServiceCollection services,
         IConfiguration configuration
@@ -308,8 +311,16 @@ public static class ServiceExtensions
         ConfigureAuthentication(services);
         ConfigureMemoryCache(services);
         ConfigureSwagger(services);
-        ConfigureSingletonServices(services);
-        ConfigureTransientServices(services);
+        services.AddHttpClient(); // Thêm HttpClient vào DI container
+        services.Scan(scan =>
+            scan.FromAssemblies(Assembly.GetExecutingAssembly())
+                .AddClasses(classes => classes.Where(type => !excludedTypes.Contains(type))) // Sử dụng Where() thay vì toán tử !
+                .UsingRegistrationStrategy(RegistrationStrategy.Skip)
+                .AsImplementedInterfaces()
+                .AsSelf()
+                .WithScopedLifetime()
+        );
+
         ConfigureScopedServices(services);
         ConfigureSessionService(services);
         ConfigureEntityFramework(services, configuration);
@@ -443,26 +454,26 @@ public static class ServiceExtensions
     /// </summary>
     private static void ConfigureScopedServices(IServiceCollection services)
     {
-        /*Repository*/
-        services.AddScoped<IProductRepository, ProductRepository>();
-        services.AddScoped<ICategoryRepository, CategoryRepository>();
-        services.AddScoped<ICartRepository, CartRepository>();
-        services.AddScoped<IRoleRepository, RoleRepository>();
-        services.AddScoped<IUserRepostory, UserRepository>();
-        /*Services*/
-        services.AddScoped<IProductService, ProductService>();
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
-        services.AddScoped<ICartService, CartService>();
-        services.AddScoped<IEmailSender, EmailService>();
-        services.AddScoped<IAccountService, AccountService>();
-        services.AddScoped<IDeliveryService, DeliveryService>();
+        // /*Repository*/
+        // services.AddScoped<IProductRepository, ProductRepository>();
+        // services.AddScoped<ICategoryRepository, CategoryRepository>();
+        // services.AddScoped<ICartRepository, CartRepository>();
+        // services.AddScoped<IRoleRepository, RoleRepository>();
+        // services.AddScoped<IUserRepostory, UserRepository>();
+        // /*Services*/
+        // services.AddScoped<IProductService, ProductService>();
+        // services.AddScoped<ICurrentUserService, CurrentUserService>();
+        // services.AddScoped<ICartService, CartService>();
+        // services.AddScoped<IEmailSender, EmailService>();
+        // services.AddScoped<IAccountService, AccountService>();
+        // services.AddScoped<IDeliveryService, DeliveryService>();
 
-        services.AddScoped<FileService>();
+        //services.AddScoped<FileService>();
         /*Others*/
-        services.AddScoped<HttpClient>();
+        //services.AddScoped<HttpClient>();
         /*Identity*/
-        services.AddScoped<UserManager<User>>(); // Quản lý người dùng trong hệ thống
-        services.AddScoped<SignInManager<User>>(); // Quản lý đăng nhập người dùng
+        //services.AddScoped<UserManager<User>>(); // Quản lý người dùng trong hệ thống
+        //services.AddScoped<SignInManager<User>>(); // Quản lý đăng nhập người dùng
     }
 
     /// <summary>

@@ -15,27 +15,42 @@ public class DeliveryController : ControllerBase
     [HttpGet("provinces")]
     public async Task<IActionResult> GetProvinces()
     {
-        return Ok(await _deliveryService.GetProvincesAsync());
+        return Ok(await _deliveryService.GetProvincesAsync().ConfigureAwait(false));
     }
+
     [HttpGet("districts/{provinceId}")]
     public async Task<IActionResult> GetDistricts(int provinceId)
     {
-        return Ok(await _deliveryService.GetDistrictsAsync(provinceId));
+        return Ok(await _deliveryService.GetDistrictsAsync(provinceId).ConfigureAwait(false));
     }
+
     [HttpGet("wards/{districtId}")]
     public async Task<IActionResult> GetWards(int districtId)
     {
-        return Ok(await _deliveryService.GetWardsAsync(districtId));
+        return Ok(await _deliveryService.GetWardsAsync(districtId).ConfigureAwait(false));
     }
+
     [HttpGet("services/{fromDistrictId}/{toDistrictId}")]
     public async Task<IActionResult> GetServices(int fromDistrictId, int toDistrictId)
     {
-        return Ok(await _deliveryService.GetAvailableServicesAsync(fromDistrictId, toDistrictId));
-    }
-    [HttpGet("shipping-fee")]
-    public async Task<IActionResult> GetShippingFee(int toDistrictId, string toWardCode, int insuranceValue)
-    {
-        return Ok(await _deliveryService.GetShippingFeeAsync(toDistrictId, toWardCode, insuranceValue));
+        return Ok(
+            await _deliveryService
+                .GetAvailableServicesAsync(fromDistrictId, toDistrictId)
+                .ConfigureAwait(false)
+        );
     }
 
+    [HttpGet("shipping-fee")]
+    public async Task<IActionResult> GetShippingFee(
+        int toDistrictId,
+        string toWardCode,
+        int insuranceValue
+    )
+    {
+        return Ok(
+            await _deliveryService
+                .GetShippingFeeAsync(toDistrictId, toWardCode, insuranceValue)
+                .ConfigureAwait(false)
+        );
+    }
 }

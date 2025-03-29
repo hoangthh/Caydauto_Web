@@ -9,11 +9,11 @@ public class RoleRepository : Repository<Role>, IRoleRepository
 
     public async Task<Role> GetUserRole()
     {
-        return await _entities.FirstOrDefaultAsync(r => r.Name == "User") ?? new Role{Name = "User"};
+        return await _entities.FirstOrDefaultAsync(r => r.Name == "User").ConfigureAwait(false) ?? new Role{Name = "User"};
     }
 
     public async Task<Role> GetAdminRole()
     {
-        return await _entities.FirstOrDefaultAsync(r => r.Name == "Admin") ?? new Role{Name = "Admin"};
+        return await _entities.FirstOrDefaultAsync(r => r.Name == "Admin").ConfigureAwait(false) ?? new Role{Name = "Admin"};
     }
 }

@@ -62,7 +62,7 @@ public class FileService
 
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    await file.CopyToAsync(stream);
+                    await file.CopyToAsync(stream).ConfigureAwait(false);
                 }
 
                 imageUrls.Add($"/images/{folderName}/{fileName}");
@@ -77,7 +77,7 @@ public class FileService
     /// </summary>
     public async Task<List<string>> SaveTempImagesAsync(List<IFormFile> files)
     {
-        return await SaveImagesAsync(files, "temp", null, false);
+        return await SaveImagesAsync(files, "temp", null, false).ConfigureAwait(false);
     }
 
     /// <summary>

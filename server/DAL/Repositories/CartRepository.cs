@@ -21,7 +21,7 @@ public class CartRepository : ICartRepository
 
     public async Task<bool> AddToCart(int userId, CartItem cartItem)
     {
-        var cart = await GetCartByUserId(userId);
+        var cart = await GetCartByUserId(userId).ConfigureAwait(false);
         // Kiểm tra xem giỏ hàng đã tồn tại chưa
         if (cart == null)
         {
@@ -48,35 +48,35 @@ public class CartRepository : ICartRepository
                 cart.CartItems.Add(cartItem);
             }
         }
-        return await _context.SaveChangesAsync() > 0;
+        return await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
     }
 
     public async Task<bool> ClearCart(int userId)
     {
-        var cart = await GetCartByUserId(userId);
+        var cart = await GetCartByUserId(userId).ConfigureAwait(false);
         if (cart != null)
         {
             cart.CartItems.Clear();
-            return await _context.SaveChangesAsync() > 0;
+            return await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
         }
         return false;
     }
 
     public async Task<Cart?> GetCart(int userId)
     {
-        return await GetCartByUserId(userId);
+        return await GetCartByUserId(userId).ConfigureAwait(false);
     }
 
     public async Task<bool> RemoveFromCart(int userId, int cartItemId)
     {
-        var cart = await GetCartByUserId(userId);
+        var cart = await GetCartByUserId(userId).ConfigureAwait(false);
         if (cart != null)
         {
             var cartItem = cart.CartItems.FirstOrDefault(ci => ci.Id == cartItemId);
             if (cartItem != null)
             {
                 cart.CartItems.Remove(cartItem);
-                return await _context.SaveChangesAsync() > 0;
+                return await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
             }
         }
         return false;

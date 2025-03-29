@@ -11,7 +11,7 @@ public static class Constraint
     public static class Url
     {
         public const string Server = "http://localhost:5118";
-        public const string Client = "https://localhost:3000";
+        public const string Client = "http://localhost:3000";
         public static readonly string[] Clients =
         {
             "http://localhost:5118",

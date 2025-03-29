@@ -9,6 +9,6 @@ public class UserRepository : Repository<User>, IUserRepostory
     {
         return await _entities
             .Include(u => u.Role)
-            .FirstOrDefaultAsync(u => u.Id == id);
+            .FirstOrDefaultAsync(u => u.Id == id).ConfigureAwait(false);
     }
 }

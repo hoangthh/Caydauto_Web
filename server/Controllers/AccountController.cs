@@ -19,10 +19,7 @@ public class AccountController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> RegisterAsync([FromBody] RegisterDTO model)
     {
-        _logger.LogInformation("Registering user with email: {Email}", model.Email);
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-        var result = await _accountService.RegisterAsync(model);
+        var result = await _accountService.RegisterAsync(model).ConfigureAwait(false);
         if (result.IsSuccess)
             return Ok(result);
         return BadRequest(result);
@@ -33,7 +30,7 @@ public class AccountController : ControllerBase
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
-        var result = await _accountService.LoginAsync(model);
+        var result = await _accountService.LoginAsync(model).ConfigureAwait(false);
         if (result.IsSuccess)
             return Ok(result);
         return BadRequest(result);
@@ -43,7 +40,7 @@ public class AccountController : ControllerBase
     [Authorize]
     public async Task<IActionResult> LogoutAsync()
     {
-        await _accountService.LogoutAsync();
+        await _accountService.LogoutAsync().ConfigureAwait(false);
         return Ok(new { Message = "Logout successful" });
     }
 
@@ -52,7 +49,7 @@ public class AccountController : ControllerBase
     {
         if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(email))
             return BadRequest("Invalid token or email");
-        var result = await _accountService.VerifyEmailAsync(token, email);
+        var result = await _accountService.VerifyEmailAsync(token, email).ConfigureAwait(false);
         if (result)
             return Ok(new { Message = "Email confirmed successfully" });
         return BadRequest(new { Message = "Email confirmation failed" });
@@ -77,10 +74,10 @@ public class AccountController : ControllerBase
     {
         _logger.LogInformation("Google authentication started.");
         // Lấy thông tin xác thực từ Google
-        var info = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+        var info = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme).ConfigureAwait(false);
         if (!info.Succeeded)
             return Redirect(Constraint.Url.Client); // Chuyển hướng về trang đăng nhập nếu không thành công
-        var result = await _accountService.GoogleAuthen(info); // Gọi phương thức GoogleAuthen trong AccountService\
+        var result = await _accountService.GoogleAuthen(info).ConfigureAwait(false); // Gọi phương thức GoogleAuthen trong AccountService\
         if (result.IsSuccess)
             return Redirect(result.RedirectUrl); // Chuyển hướng về trang chủ nếu thành công
         return Redirect($"{Constraint.Url.Client}/user/login"); // Chuyển hướng về trang đăng nhập nếu không thành công

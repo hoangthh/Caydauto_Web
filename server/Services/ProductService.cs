@@ -44,7 +44,7 @@ public class ProductService : IProductService
         var product = await _productRepository.GetByIdAsync(
             id,
             q => q.IncludeMultiple(q => q.Categories, q => q.Colors, q => q.Images, q => q.Comments)
-        );
+        ).ConfigureAwait(false);
         var productGetDto = _mapper.Map<ProductDetailGetDto>(product);
         return productGetDto;
     }
@@ -56,7 +56,7 @@ public class ProductService : IProductService
             pageSize,
             true,
             q => q.IncludeMultiple(q => q.Categories, q => q.Colors, q => q.Images, q => q.Comments)
-        );
+        ).ConfigureAwait(false);
         var productGetDto = _mapper.Map<IEnumerable<ProductAllGetDto>>(product.Items);
         return new PagedResult<ProductAllGetDto>
         {
@@ -85,18 +85,18 @@ public class ProductService : IProductService
                         )
                         && (
                             productFilter.Categories == null
-                            || p.Categories.Any(c => productFilter.Categories.Contains(c.Name))
+                            || p.Categories.Any(c => productFilter.Categories.Contains(c.Id))
                         )
                         && (productFilter.MinPrice == null || p.Price >= productFilter.MinPrice)
                         && (productFilter.MaxPrice == null || p.Price <= productFilter.MaxPrice)
                         && (
                             productFilter.Colors == null
-                            || p.Colors.Any(c => productFilter.Colors.Contains(c.Name))
+                            || p.Colors.Any(c => productFilter.Colors.Contains(c.Id))
                         )
                         && (productFilter.Brands == null || productFilter.Brands.Contains(p.Brand))
                     )
                     .OrderByMultiple((productFilter.OrderBy, productFilter.IsDesc))
-        );
+        ).ConfigureAwait(false);
 
         var productGetDto = _mapper.Map<IEnumerable<ProductAllGetDto>>(product.Items);
         return new PagedResult<ProductAllGetDto>
@@ -110,8 +110,8 @@ public class ProductService : IProductService
 
     public async Task<IEnumerable<ProductAllGetDto>> GetSimilarProducts(int id)
     {
-        var categoriesId = await _categoryRepository.GetAllCategoriesAsync();
-        var similarProducts = await _productRepository.GetSimilarProductsAsync(id, categoriesId.Select(c => c.Id).ToList());
+        var categoriesId = await _categoryRepository.GetAllCategoriesAsync().ConfigureAwait(false);
+        var similarProducts = await _productRepository.GetSimilarProductsAsync(id, categoriesId.Select(c => c.Id).ToList()).ConfigureAwait(false);
         var productGetDto = _mapper.Map<IEnumerable<ProductAllGetDto>>(similarProducts.Items);
         return productGetDto;
     }
