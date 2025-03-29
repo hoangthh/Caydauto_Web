@@ -1,5 +1,9 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Identity.Client;
+using Microsoft.VisualBasic;
+using Newtonsoft.Json;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -8,45 +12,73 @@ public class ProductController : ControllerBase
     private readonly IProductService _productService;
     private readonly ICategoryService _categoryService;
     private readonly IColorService _colorService;
+    private readonly IDistributedCache _cache;
+    private readonly ILogger<ProductController> _logger;
 
     public ProductController(
         IProductService productService,
         ICategoryService categoryService,
-        IColorService colorService
+        IColorService colorService,
+        IDistributedCache cache,
+        ILogger<ProductController> logger
     )
     {
         _productService = productService;
         _categoryService = categoryService;
         _colorService = colorService;
+        _cache = cache;
+        _logger = logger;
     }
 
     [HttpGet("filter")]
     public async Task<IActionResult> GetFilter()
     {
+        const string cacheKey = "filterData";
+        // Kiểm tra dữ liệu trong cache
+        var cachedData = await _cache.GetStringAsync(cacheKey).ConfigureAwait(false);
+        if (!string.IsNullOrEmpty(cachedData))
+        {
+            var filterData = JsonConvert.DeserializeObject<FilterData>(cachedData);
+            return Ok(filterData);
+        }
+
+        // Lấy dữ liệu từ các service nếu cache trống
         var categories = await _categoryService.GetAllCategoriesAsync().ConfigureAwait(false);
         var colors = await _colorService.GetAllColorsAsync().ConfigureAwait(false);
         var brands = await _productService.GetBrands().ConfigureAwait(false);
-        return Ok(
-            new
-            {
-                Categories = categories.Select(c => new { c.Id, c.Name }),
-                Colors = colors.Select(c => new
+
+        var filterDataObj = new FilterData
+        {
+            Categories = categories
+                .Select(c => new FilterData.Category { Id = c.Id.ToString(), Name = c.Name })
+                .ToList(),
+            Colors = colors
+                .Select(c => new FilterData.Color
                 {
-                    c.Id,
-                    c.Name,
-                    c.HexCode,
-                }),
-                Brands = brands,
-                Prices = SeedData
-                    .PriceRanges.Select(p => new
-                    {
-                        Label = p.Key,
-                        Min = p.Value.Min * 1000,
-                        Max = p.Value.Max * 1000,
-                    })
-                    .ToList(),
-            }
-        );
+                    Id = c.Id.ToString(),
+                    Name = c.Name,
+                    HexCode = c.HexCode,
+                })
+                .ToList(),
+            Brands = brands.ToList(),
+            Prices = SeedData
+                .PriceRanges.Select(pr => new FilterData.Price
+                {
+                    Label = pr.Key,
+                    Min = pr.Value.Min,
+                    Max = pr.Value.Max,
+                })
+                .ToList(),
+        };
+        // Serialize dữ liệu và lưu vào cache với thời gian sống (ví dụ 30 phút)
+        var serializedData = JsonConvert.SerializeObject(filterDataObj);
+        var options = new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(30),
+        };
+        await _cache.SetStringAsync(cacheKey, serializedData, options).ConfigureAwait(false);
+
+        return Ok(filterDataObj);
     }
 
     [HttpGet("all")]
@@ -98,4 +130,32 @@ public class ProductFilter
     public List<string>? Brands { get; set; }
     public string OrderBy { get; set; } = "Sold";
     public bool IsDesc { get; set; } = true;
+}
+
+public class FilterData
+{
+    public class Category
+    {
+        public string? Id { get; set; }
+        public string? Name { get; set; }
+    }
+
+    public class Color
+    {
+        public string? Id { get; set; }
+        public string? Name { get; set; }
+        public string? HexCode { get; set; }
+    }
+
+    public class Price
+    {
+        public string? Label { get; set; }
+        public decimal Min { get; set; }
+        public decimal Max { get; set; }
+    }
+
+    public List<Category>? Categories { get; set; }
+    public List<Color>? Colors { get; set; }
+    public List<string>? Brands { get; set; }
+    public List<Price>? Prices { get; set; }
 }

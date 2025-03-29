@@ -309,6 +309,7 @@ public static class ServiceExtensions
         services.AddControllers();
         ConfigureAutoMapper(services);
         ConfigureAuthentication(services);
+        ConfigureRedis(services);
         ConfigureMemoryCache(services);
         ConfigureSwagger(services);
         services.AddHttpClient(); // Thêm HttpClient vào DI container
@@ -329,6 +330,15 @@ public static class ServiceExtensions
     private static void ConfigureAutoMapper(IServiceCollection services)
     {
         services.AddAutoMapper(typeof(MappingProfile).Assembly);
+    }
+
+    private static void ConfigureRedis(IServiceCollection services)
+    {
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = $"localhost:{Constraint.Port.Redis}"; // thay đổi cấu hình theo môi trường của bạn
+            options.InstanceName = "CayDauToInstance";
+        });
     }
 
     /// <summary>
