@@ -17,7 +17,7 @@ public class Comment
     public int UserId { get; set; }
 
     // Navigation properties
-    public Product Product { get; set; } = new Product();
-    public User User { get; set; } = new User();
+    public Product Product { get; set; } = null!;
+    public User User { get; set; } = null!;
     public ICollection<CommentImage> Images { get; set; } = new List<CommentImage>();
 }

@@ -181,7 +181,11 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
             .WithMany()
             .HasForeignKey(ur => ur.RoleId)
             .OnDelete(DeleteBehavior.NoAction); // ⚡ Đổi từ Restrict -> NoAction
-
+        modelBuilder.Entity<IdentityUserRole<int>>().ToTable("UserRoles"); // Đặt tên cho bảng UserRoles
+        modelBuilder.Entity<IdentityRole<int>>().ToTable("Roles"); // Đặt tên cho bảng Roles
+        modelBuilder.Entity<IdentityUser<int>>().ToTable("Users"); // Đặt tên cho bảng Users
+        modelBuilder.Entity<Role>().HasData(new Role { Id = 1, Name = "Admin", NormalizedName = "ADMIN", Description = "Administrator role" });
+        modelBuilder.Entity<Role>().HasData(new Role { Id = 2, Name = "User", NormalizedName = "USER", Description = "User role" });
         // Index cho các trường thường xuyên được tìm kiếm
         modelBuilder.Entity<Product>().HasIndex(p => p.Name).IsUnique(false); // Index cho tên sản phẩm
 

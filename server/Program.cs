@@ -4,6 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddProjectServices(builder.Configuration);
 var app = builder.Build();
+
 // Seed Roles
 using (var scope = app.Services.CreateScope())
 {
@@ -18,18 +19,22 @@ using (var scope = app.Services.CreateScope())
         }
     }
 }
-
 // Sử dụng Swagger và Swagger UI trong pipeline
+
+// Middleware Pipeline
+app.UseStaticFiles();
+app.UseRouting();
+app.UseCors("CorsPolicy");
+app.UseSession(); // Before authentication
+app.UseAuthentication(); // Must come before custom middleware and authorization
+app.UseUserIdMiddleware(); // Assuming this depends on authenticated user
+app.UseAuthorization();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-    c.RoutePrefix = string.Empty; // Đặt Swagger UI tại gốc (http://localhost:<port>/)
+    c.RoutePrefix = string.Empty; // Swagger UI at root
 });
-
-app.UseAuthentication();
-app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -61,9 +62,21 @@ public class Repository<TEntity> : IRepository<TEntity>
         return await _entities.FilterByProperties(filters).ToListAsync();
     }
 
-    public async Task<TEntity?> GetByIdAsync(int id)
+    public async Task<TEntity?> GetByIdAsync(
+        int id,
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null
+    )
     {
-        return await _entities.FindAsync(id);
+        IQueryable<TEntity> query = _entities.AsQueryable();
+
+        if(include == null)
+        {
+            return await _entities.FindAsync(id);
+        }
+
+        query = include(query);
+
+        return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
     }
 
     public async Task<TEntity?> AddAsync(TEntity entity)

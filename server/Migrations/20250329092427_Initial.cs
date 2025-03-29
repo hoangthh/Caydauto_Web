@@ -72,7 +72,27 @@ namespace server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "IdentityRole<int>",
+                name: "Products",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Brand = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    StockQuantity = table.Column<int>(type: "int", nullable: false),
+                    Sold = table.Column<int>(type: "int", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Products", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Roles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -83,11 +103,11 @@ namespace server.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_IdentityRole<int>", x => x.Id);
+                    table.PrimaryKey("PK_Roles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "IdentityUser<int>",
+                name: "Users",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -109,27 +129,7 @@ namespace server.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_IdentityUser<int>", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Products",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Brand = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    StockQuantity = table.Column<int>(type: "int", nullable: false),
-                    Sold = table.Column<int>(type: "int", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Products", x => x.Id);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -300,40 +300,6 @@ namespace server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUserRoles",
-                columns: table => new
-                {
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    RoleId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
-                    table.ForeignKey(
-                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "AspNetRoles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AspNetUserRoles_IdentityRole<int>_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "IdentityRole<int>",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_AspNetUserRoles_IdentityUser<int>_UserId",
-                        column: x => x.UserId,
-                        principalTable: "IdentityUser<int>",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
@@ -459,6 +425,40 @@ namespace server.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserRoles",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    RoleId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserRoles", x => new { x.UserId, x.RoleId });
+                    table.ForeignKey(
+                        name: "FK_UserRoles_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserRoles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserRoles_Roles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "Roles",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_UserRoles_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CartItems",
                 columns: table => new
                 {
@@ -548,15 +548,24 @@ namespace server.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Description", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { 1, null, "Administrator role", "Admin", "ADMIN" },
+                    { 2, null, "User role", "User", "USER" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Categories",
                 columns: new[] { "Id", "Description", "Name" },
                 values: new object[,]
                 {
-                    { 1, "Adipisci eius qui voluptatibus aut sit dolorem iste atque consequatur pariatur.", "Beauty, Kids & Movies" },
-                    { 2, "Animi distinctio non cum quia quos modi non laborum est.", "Games, Sports & Beauty" },
-                    { 3, "Fugiat exercitationem corrupti asperiores voluptas odio aut ratione et occaecati.", "Home & Health" },
-                    { 4, "Culpa omnis illo a quia assumenda vel deserunt eos veniam minima dolorem aspernatur.", "Baby" },
-                    { 5, "Beatae incidunt saepe unde laboriosam culpa magnam.", "Books & Games" }
+                    { 1, "Et asperiores numquam quasi et fugit consectetur ut facilis placeat id molestias doloremque perspiciatis.", "Clothing, Sports & Baby" },
+                    { 2, "Sequi maxime aut blanditiis aut repudiandae eum commodi perspiciatis rem repellat sint ducimus.", "Computers, Shoes & Outdoors" },
+                    { 3, "Maiores nihil sed deserunt distinctio accusamus molestias eum repellendus sequi laboriosam.", "Games" },
+                    { 4, "Magni ut dignissimos consequatur aut culpa accusamus dolores magnam porro.", "Automotive & Baby" },
+                    { 5, "Id neque minus consequuntur aliquid illo aut dolorem.", "Beauty & Electronics" }
                 });
 
             migrationBuilder.InsertData(
@@ -564,16 +573,16 @@ namespace server.Migrations
                 columns: new[] { "Id", "Brand", "CreatedDate", "Description", "Name", "Price", "Sold", "StockQuantity", "UpdatedDate" },
                 values: new object[,]
                 {
-                    { 1, "Halvorson - Medhurst", new DateTime(2024, 11, 9, 20, 6, 21, 483, DateTimeKind.Local).AddTicks(1996), "The Nagasaki Lander is the trademarked name of several series of Nagasaki sport bikes, that started with the 1984 ABC800J", "Small Plastic Bike", 307.951519430068570m, 44, 14, new DateTime(2025, 3, 19, 7, 2, 29, 155, DateTimeKind.Local).AddTicks(4528) },
-                    { 2, "Mertz - Cole", new DateTime(2024, 4, 7, 8, 53, 29, 82, DateTimeKind.Local).AddTicks(3146), "The Football Is Good For Training And Recreational Purposes", "Handcrafted Plastic Shirt", 651.133525964928040m, 5, 87, new DateTime(2025, 3, 8, 15, 4, 31, 814, DateTimeKind.Local).AddTicks(255) },
-                    { 3, "Kshlerin, Blanda and Kautzer", new DateTime(2025, 2, 24, 21, 44, 31, 560, DateTimeKind.Local).AddTicks(6877), "The beautiful range of Apple Naturalé that has an exciting mix of natural ingredients. With the Goodness of 100% Natural Ingredients", "Unbranded Concrete Pizza", 945.254144795247640m, 9, 53, new DateTime(2025, 3, 4, 1, 52, 26, 29, DateTimeKind.Local).AddTicks(5691) },
-                    { 4, "Treutel - Lindgren", new DateTime(2024, 11, 14, 4, 22, 11, 101, DateTimeKind.Local).AddTicks(9363), "Ergonomic executive chair upholstered in bonded black leather and PVC padded seat and back for all-day comfort and support", "Tasty Cotton Pants", 151.625383271140780m, 16, 73, new DateTime(2025, 3, 9, 17, 43, 23, 291, DateTimeKind.Local).AddTicks(6225) },
-                    { 5, "Hilll and Sons", new DateTime(2024, 12, 15, 2, 49, 14, 198, DateTimeKind.Local).AddTicks(9615), "The beautiful range of Apple Naturalé that has an exciting mix of natural ingredients. With the Goodness of 100% Natural Ingredients", "Awesome Plastic Ball", 677.069507116227160m, 17, 22, new DateTime(2025, 3, 15, 11, 20, 19, 130, DateTimeKind.Local).AddTicks(2759) },
-                    { 6, "Schmidt - Rolfson", new DateTime(2024, 10, 20, 10, 19, 56, 931, DateTimeKind.Local).AddTicks(8944), "Carbonite web goalkeeper gloves are ergonomically designed to give easy fit", "Small Concrete Fish", 765.090559339335010m, 48, 16, new DateTime(2025, 3, 3, 2, 19, 51, 21, DateTimeKind.Local).AddTicks(3619) },
-                    { 7, "Padberg - O'Keefe", new DateTime(2024, 6, 10, 17, 30, 21, 765, DateTimeKind.Local).AddTicks(5151), "The beautiful range of Apple Naturalé that has an exciting mix of natural ingredients. With the Goodness of 100% Natural Ingredients", "Practical Metal Tuna", 328.515827021750710m, 21, 7, new DateTime(2025, 2, 26, 6, 23, 45, 396, DateTimeKind.Local).AddTicks(4554) },
-                    { 8, "Heller Inc", new DateTime(2025, 2, 23, 14, 24, 48, 101, DateTimeKind.Local).AddTicks(3643), "The beautiful range of Apple Naturalé that has an exciting mix of natural ingredients. With the Goodness of 100% Natural Ingredients", "Intelligent Fresh Towels", 405.391123623462670m, 23, 24, new DateTime(2025, 3, 15, 19, 34, 29, 126, DateTimeKind.Local).AddTicks(4240) },
-                    { 9, "Moen LLC", new DateTime(2024, 4, 26, 18, 26, 11, 271, DateTimeKind.Local).AddTicks(6281), "New ABC 13 9370, 13.3, 5th Gen CoreA5-8250U, 8GB RAM, 256GB SSD, power UHD Graphics, OS 10 Home, OS Office A & J 2016", "Rustic Metal Towels", 982.005050984841280m, 13, 39, new DateTime(2025, 3, 6, 2, 21, 47, 363, DateTimeKind.Local).AddTicks(513) },
-                    { 10, "Sporer - Fadel", new DateTime(2025, 2, 25, 1, 19, 17, 893, DateTimeKind.Local).AddTicks(2195), "The Football Is Good For Training And Recreational Purposes", "Ergonomic Steel Salad", 275.599877991119650m, 25, 4, new DateTime(2025, 3, 1, 0, 20, 4, 787, DateTimeKind.Local).AddTicks(5731) }
+                    { 1, "Mohr - Ernser", new DateTime(2024, 7, 30, 11, 23, 55, 40, DateTimeKind.Local).AddTicks(7897), "New range of formal shirts are designed keeping you in mind. With fits and styling that will make you stand apart", "Generic Rubber Fish", 852.200379965878120m, 22, 5, new DateTime(2025, 3, 1, 23, 30, 50, 924, DateTimeKind.Local).AddTicks(452) },
+                    { 2, "Becker Inc", new DateTime(2024, 9, 7, 7, 20, 19, 228, DateTimeKind.Local).AddTicks(2705), "Carbonite web goalkeeper gloves are ergonomically designed to give easy fit", "Licensed Wooden Gloves", 262.985668335473590m, 10, 67, new DateTime(2025, 3, 21, 11, 35, 8, 66, DateTimeKind.Local).AddTicks(4546) },
+                    { 3, "Tillman Group", new DateTime(2024, 11, 15, 19, 15, 55, 884, DateTimeKind.Local).AddTicks(8868), "The beautiful range of Apple Naturalé that has an exciting mix of natural ingredients. With the Goodness of 100% Natural Ingredients", "Intelligent Rubber Tuna", 74.7780295897698040m, 21, 45, new DateTime(2025, 3, 15, 19, 9, 33, 803, DateTimeKind.Local).AddTicks(3216) },
+                    { 4, "Hartmann LLC", new DateTime(2025, 3, 2, 18, 11, 22, 565, DateTimeKind.Local).AddTicks(3905), "Andy shoes are designed to keeping in mind durability as well as trends, the most stylish range of shoes & sandals", "Rustic Plastic Ball", 335.740566152668150m, 22, 68, new DateTime(2025, 3, 20, 9, 34, 12, 87, DateTimeKind.Local).AddTicks(366) },
+                    { 5, "Denesik, Hansen and Fritsch", new DateTime(2025, 2, 20, 5, 10, 17, 227, DateTimeKind.Local).AddTicks(670), "The Apollotech B340 is an affordable wireless mouse with reliable connectivity, 12 months battery life and modern design", "Practical Cotton Car", 110.299856652613090m, 9, 100, new DateTime(2025, 3, 15, 0, 4, 17, 471, DateTimeKind.Local).AddTicks(588) },
+                    { 6, "Beahan LLC", new DateTime(2024, 10, 8, 14, 47, 53, 952, DateTimeKind.Local).AddTicks(6540), "Boston's most advanced compression wear technology increases muscle oxygenation, stabilizes active muscles", "Unbranded Cotton Hat", 408.44407334398480m, 8, 93, new DateTime(2025, 3, 26, 0, 46, 16, 7, DateTimeKind.Local).AddTicks(3626) },
+                    { 7, "Ullrich - Parker", new DateTime(2024, 5, 13, 6, 35, 33, 143, DateTimeKind.Local).AddTicks(3193), "Ergonomic executive chair upholstered in bonded black leather and PVC padded seat and back for all-day comfort and support", "Handcrafted Fresh Keyboard", 782.49026648214190m, 29, 12, new DateTime(2025, 3, 4, 20, 28, 56, 135, DateTimeKind.Local).AddTicks(5908) },
+                    { 8, "Wiegand, Spencer and Glover", new DateTime(2025, 2, 1, 1, 41, 57, 844, DateTimeKind.Local).AddTicks(2806), "The slim & simple Maple Gaming Keyboard from Dev Byte comes with a sleek body and 7- Color RGB LED Back-lighting for smart functionality", "Generic Steel Ball", 935.047518042237040m, 13, 9, new DateTime(2025, 3, 17, 10, 24, 45, 648, DateTimeKind.Local).AddTicks(8023) },
+                    { 9, "Dibbert - Blanda", new DateTime(2025, 1, 30, 22, 56, 53, 788, DateTimeKind.Local).AddTicks(287), "The slim & simple Maple Gaming Keyboard from Dev Byte comes with a sleek body and 7- Color RGB LED Back-lighting for smart functionality", "Practical Cotton Keyboard", 777.169716620040910m, 0, 28, new DateTime(2025, 3, 18, 22, 49, 51, 479, DateTimeKind.Local).AddTicks(2531) },
+                    { 10, "Goldner, Herzog and Langworth", new DateTime(2024, 9, 24, 18, 33, 21, 39, DateTimeKind.Local).AddTicks(8098), "New ABC 13 9370, 13.3, 5th Gen CoreA5-8250U, 8GB RAM, 256GB SSD, power UHD Graphics, OS 10 Home, OS Office A & J 2016", "Handmade Wooden Bacon", 874.701987699915640m, 32, 87, new DateTime(2025, 2, 28, 2, 5, 17, 491, DateTimeKind.Local).AddTicks(1800) }
                 });
 
             migrationBuilder.InsertData(
@@ -581,26 +590,22 @@ namespace server.Migrations
                 columns: new[] { "CategoriesId", "ProductsId" },
                 values: new object[,]
                 {
-                    { 1, 8 },
-                    { 1, 9 },
+                    { 1, 2 },
+                    { 1, 3 },
+                    { 1, 4 },
+                    { 1, 5 },
+                    { 1, 10 },
                     { 2, 1 },
-                    { 2, 5 },
+                    { 2, 8 },
                     { 2, 9 },
-                    { 2, 10 },
-                    { 3, 4 },
-                    { 3, 5 },
+                    { 3, 2 },
                     { 3, 6 },
-                    { 3, 7 },
-                    { 3, 8 },
-                    { 3, 9 },
-                    { 3, 10 },
-                    { 4, 1 },
-                    { 4, 6 },
-                    { 4, 8 },
+                    { 4, 4 },
+                    { 4, 10 },
                     { 5, 2 },
-                    { 5, 3 },
-                    { 5, 4 },
-                    { 5, 6 }
+                    { 5, 7 },
+                    { 5, 8 },
+                    { 5, 9 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -624,11 +629,6 @@ namespace server.Migrations
                 name: "IX_AspNetUserLogins_UserId",
                 table: "AspNetUserLogins",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUserRoles_RoleId",
-                table: "AspNetUserRoles",
-                column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
@@ -744,6 +744,11 @@ namespace server.Migrations
                 name: "IX_ProductUser_WishListedByUsersId",
                 table: "ProductUser",
                 column: "WishListedByUsersId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserRoles_RoleId",
+                table: "UserRoles",
+                column: "RoleId");
         }
 
         /// <inheritdoc />
@@ -757,9 +762,6 @@ namespace server.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserLogins");
-
-            migrationBuilder.DropTable(
-                name: "AspNetUserRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
@@ -786,10 +788,7 @@ namespace server.Migrations
                 name: "ProductUser");
 
             migrationBuilder.DropTable(
-                name: "IdentityRole<int>");
-
-            migrationBuilder.DropTable(
-                name: "IdentityUser<int>");
+                name: "UserRoles");
 
             migrationBuilder.DropTable(
                 name: "Carts");
@@ -805,6 +804,12 @@ namespace server.Migrations
 
             migrationBuilder.DropTable(
                 name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Products");
