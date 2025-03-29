@@ -10,13 +10,13 @@ public class DeliveryService : IDeliveryService
     private readonly int _shopId = 5704602;
 
     public DeliveryService(
-        HttpClient httpClient,
+        IHttpClientFactory httpClientFactory,
         IConfiguration configuration,
         ILogger<DeliveryService> logger
     )
     {
         _logger = logger;
-        _httpClient = httpClient;
+        _httpClient = httpClientFactory.CreateClient();
         _token = configuration["DeliveryAPI:SecretKey"] ?? "null";
         _logger.LogInformation(
             $"DeliveryService initialized with token {_token} and shopId {_shopId}"
@@ -33,23 +33,27 @@ public class DeliveryService : IDeliveryService
 
     public async Task<string> GetProvincesAsync()
     {
-        var response = await _httpClient.GetAsync("master-data/province");
+        var response = await _httpClient.GetAsync("master-data/province").ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadAsStringAsync();
+        return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
     }
 
     public async Task<string> GetDistrictsAsync(int provinceId)
     {
-        var response = await _httpClient.GetAsync($"master-data/district?province_id={provinceId}");
+        var response = await _httpClient
+            .GetAsync($"master-data/district?province_id={provinceId}")
+            .ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadAsStringAsync();
+        return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
     }
 
     public async Task<string> GetWardsAsync(int districtId)
     {
-        var response = await _httpClient.GetAsync($"master-data/ward?district_id={districtId}");
+        var response = await _httpClient
+            .GetAsync($"master-data/ward?district_id={districtId}")
+            .ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadAsStringAsync();
+        return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
     }
 
     public async Task<string> GetAvailableServicesAsync(int fromDistrictId, int toDistrictId)
@@ -67,12 +71,11 @@ public class DeliveryService : IDeliveryService
             "application/json"
         );
 
-        var response = await _httpClient.PostAsync(
-            "v2/shipping-order/available-services",
-            jsonContent
-        );
+        var response = await _httpClient
+            .PostAsync("v2/shipping-order/available-services", jsonContent)
+            .ConfigureAwait(false);
 
-        var responseContent = await response.Content.ReadAsStringAsync();
+        var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -110,9 +113,11 @@ public class DeliveryService : IDeliveryService
             "application/json"
         );
 
-        var response = await _httpClient.PostAsync("v2/shipping-order/fee", jsonContent);
+        var response = await _httpClient
+            .PostAsync("v2/shipping-order/fee", jsonContent)
+            .ConfigureAwait(false);
 
-        var responseContent = await response.Content.ReadAsStringAsync();
+        var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
         {

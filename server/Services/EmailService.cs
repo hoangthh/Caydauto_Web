@@ -49,11 +49,11 @@ public class EmailService : IEmailSender
             mailMessage.To.Add(new MailAddress(email));
 
             // Gửi email không đồng bộ
-            await client.SendMailAsync(mailMessage);
+            await client.SendMailAsync(mailMessage).ConfigureAwait(false);
             // Trả về true nếu gửi thành công
             return true;
         }
-        catch (Exception ex)
+        catch
         {
             return false;
         }
@@ -81,7 +81,7 @@ public class EmailService : IEmailSender
                         </a>
                     </div>
                     <p style='font-size: 14px; color: #888; text-align: center;'>
-                        This link will expire in 5 minutes. If you didn’t request this, feel free to ignore this email.
+                        If you didn’t request this, feel free to ignore this email.
                     </p>
                 </div>
                 <!-- Footer -->

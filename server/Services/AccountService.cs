@@ -36,7 +36,7 @@ public class AccountService : IAccountService
 
     public async Task<RegisterResponseDTO> RegisterAsync(RegisterDTO request)
     {
-        var userRole = await _roleRepository.GetUserRole(); // Lấy vai trò người dùng từ repository
+        var userRole = await _roleRepository.GetUserRole().ConfigureAwait(false); // Lấy vai trò người dùng từ repository
         var user = new User
         {
             UserName = request.Email,
@@ -45,14 +45,13 @@ public class AccountService : IAccountService
             Role = userRole, // Lấy vai trò người dùng từ repository
         };
 
-        var result = await _userManager.CreateAsync(user, request.Password);
+        var result = await _userManager.CreateAsync(user, request.Password).ConfigureAwait(false);
         if (result.Succeeded)
         {
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
             var callbackUrl =
                 $"{_configuration["AppSettings:ServerUrl"]}/api/account/confirm-email?email={Uri.EscapeDataString(request.Email)}&token={Uri.EscapeDataString(token)}";
-            await _emailService.SendEmailAsync(request.Email, "Confirm your email", callbackUrl);
-            _logger.LogInformation($"This is the token: {token}");
+            await _emailService.SendEmailAsync(request.Email, "Confirm your email", callbackUrl).ConfigureAwait(false);
             return new RegisterResponseDTO
             {
                 IsSuccess = true,
@@ -71,7 +70,7 @@ public class AccountService : IAccountService
 
     private async Task SignInWithCookies(User user, bool rememberMe)
     {
-        var userWithRole = await _userRepository.GetUserWithRoleByIdAsync(user.Id); // Lấy tên vai trò của người dùng
+        var userWithRole = await _userRepository.GetUserWithRoleByIdAsync(user.Id).ConfigureAwait(false); // Lấy tên vai trò của người dùng
         var roleName = userWithRole != null ? userWithRole.Role!.Name : "Guest"; // Lấy tên vai trò của người dùng
         var claims = new List<Claim>
         {
@@ -90,7 +89,7 @@ public class AccountService : IAccountService
         };
 
         // Đăng nhập người dùng và lưu thông tin vào cookie
-        await _signinManager.SignInWithClaimsAsync(user, authProperties, claims);
+        await _signinManager.SignInWithClaimsAsync(user, authProperties, claims).ConfigureAwait(false);
     }
 
     public async Task<GoogleLoginResponse> GoogleAuthen(AuthenticateResult result)
@@ -125,10 +124,10 @@ public class AccountService : IAccountService
             };
 
         // Lấy role người dùng
-        var guestRole = await _roleRepository.GetUserRole();
+        var guestRole = await _roleRepository.GetUserRole().ConfigureAwait(false);
 
         // Kiểm tra xem người dùng đã tồn tại chưa
-        var existingUser = await _userManager.FindByEmailAsync(email);
+        var existingUser = await _userManager.FindByEmailAsync(email).ConfigureAwait(false);
         if (existingUser == null)
         {
             existingUser = CreateNewUser(
@@ -140,7 +139,7 @@ public class AccountService : IAccountService
                 
             );
             // Nếu người dùng chưa tồn tại, tạo người dùng mới
-            await _userManager.CreateAsync(existingUser);
+            await _userManager.CreateAsync(existingUser).ConfigureAwait(false);
         }
         else
         {
@@ -148,12 +147,12 @@ public class AccountService : IAccountService
             if (existingUser.ImageUrl != avatarUrl)
             {
                 existingUser.ImageUrl = avatarUrl ?? Constraint.Image.DefaultUserImageUrl; // Cập nhật ảnh đại diện nếu khác
-                await _userManager.UpdateAsync(existingUser);
+                await _userManager.UpdateAsync(existingUser).ConfigureAwait(false);
             }
             if (existingUser.EmailConfirmed == false)
             {
                 existingUser.EmailConfirmed = true; // Đánh dấu email đã được xác nhận
-                await _userManager.UpdateAsync(existingUser);
+                await _userManager.UpdateAsync(existingUser).ConfigureAwait(false);
             }
             if (existingUser.LockoutEnabled && existingUser.LockoutEnd != null && existingUser.LockoutEnd > DateTime.UtcNow)
             {
@@ -165,7 +164,7 @@ public class AccountService : IAccountService
                 };
             }
         }
-        await SignInWithCookies(existingUser, true); // Đăng nhập người dùng với cookie
+        await SignInWithCookies(existingUser, true).ConfigureAwait(false); // Đăng nhập người dùng với cookie
 
         var redirectUrl = $"{Constraint.Url.Client}/";
         return new GoogleLoginResponse
@@ -178,7 +177,7 @@ public class AccountService : IAccountService
 
     public async Task<LoginResponseDTO> LoginAsync(LoginDTO request)
     {
-        var user = await _userManager.FindByEmailAsync(request.Email);
+        var user = await _userManager.FindByEmailAsync(request.Email).ConfigureAwait(false);
         if (user == null)
             return new LoginResponseDTO
             {
@@ -198,13 +197,13 @@ public class AccountService : IAccountService
             request.Password,
             isPersistent: true,
             lockoutOnFailure: true
-        );
+        ).ConfigureAwait(false);
         if (user.EmailConfirmed == false && result.Succeeded)
         {
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
             var callbackUrl =
                 $"{_configuration["AppSettings:ServerUrl"]}/api/account/confirm-email?email={request.Email}&token={token}";
-            await _emailService.SendEmailAsync(request.Email, "Confirm your email", callbackUrl);
+            await _emailService.SendEmailAsync(request.Email, "Confirm your email", callbackUrl).ConfigureAwait(false);
             return new LoginResponseDTO
             {
                 IsSuccess = false,
@@ -221,23 +220,23 @@ public class AccountService : IAccountService
             };
 
         // Nếu đăng nhập thành công, tạo cookie cho người dùng
-        await SignInWithCookies(user, false); // Đăng nhập người dùng với cookie
+        await SignInWithCookies(user, false).ConfigureAwait(false); // Đăng nhập người dùng với cookie
         return new LoginResponseDTO { IsSuccess = true, Message = "Login successful." };
     }
 
     public async Task LogoutAsync()
     {
         // Đăng xuất người dùng và xóa cookie
-        await _signinManager.SignOutAsync();
+        await _signinManager.SignOutAsync().ConfigureAwait(false);
     }
 
     public async Task<bool> VerifyEmailAsync(string token, string email)
     {
-        var user = await _userManager.FindByEmailAsync(email);
+        var user = await _userManager.FindByEmailAsync(email).ConfigureAwait(false);
         if (user == null)
             return false;
         var decodedToken = Uri.UnescapeDataString(token); // Decode token từ URL
-        var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
+        var result = await _userManager.ConfirmEmailAsync(user, decodedToken).ConfigureAwait(false);
         if (!result.Succeeded)
             _logger.LogError(
                 "Email confirmation for token {token} failed for user {Email}: {Errors}",

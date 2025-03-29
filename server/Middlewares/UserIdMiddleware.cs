@@ -26,12 +26,12 @@ public class UserIdMiddleware
                     // Log warning: unable to parse user ID
                 }
             }
-            await _next(context);
+            await _next(context).ConfigureAwait(false);
         }
         catch
         {
             
-            await _next(context); // or handle the error appropriately
+            await _next(context).ConfigureAwait(false); // or handle the error appropriately
         }
     }
 }

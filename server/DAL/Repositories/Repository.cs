@@ -26,16 +26,16 @@ public class Repository<TEntity> : IRepository<TEntity>
         if (include != null)
             query = include(query);
 
-        int totalItems = await query.CountAsync();
+        int totalItems = await query.CountAsync().ConfigureAwait(false);
         List<TEntity> items;
 
         if (usePaging)
         {
-            items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync().ConfigureAwait(false);
         }
         else
         {
-            items = await query.ToListAsync();
+            items = await query.ToListAsync().ConfigureAwait(false);
             pageNumber = 1; // Khi không phân trang, pageNumber mặc định là 1
             pageSize = totalItems; // pageSize bằng tổng số bản ghi
         }
@@ -59,7 +59,7 @@ public class Repository<TEntity> : IRepository<TEntity>
         )[] filters
     )
     {
-        return await _entities.FilterByProperties(filters).ToListAsync();
+        return await _entities.FilterByProperties(filters).ToListAsync().ConfigureAwait(false);
     }
 
     public async Task<TEntity?> GetByIdAsync(
@@ -71,46 +71,46 @@ public class Repository<TEntity> : IRepository<TEntity>
 
         if(include == null)
         {
-            return await _entities.FindAsync(id);
+            return await _entities.FindAsync(id).ConfigureAwait(false);
         }
 
         query = include(query);
 
-        return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
+        return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id).ConfigureAwait(false);
     }
 
-    public async Task<TEntity?> AddAsync(TEntity entity)
+    public virtual async Task<TEntity?> AddAsync(TEntity entity)
     {
-        await _entities.AddAsync(entity);
-        var rowsAffected = await _context.SaveChangesAsync();
+        await _entities.AddAsync(entity).ConfigureAwait(false);
+        var rowsAffected = await _context.SaveChangesAsync().ConfigureAwait(false);
         return rowsAffected > 0 ? entity : null;
     }
 
     public async Task<IEnumerable<TEntity>?> AddRangeAsync(IEnumerable<TEntity> entities)
     {
-        await _entities.AddRangeAsync(entities);
-        var rowsAffected = await _context.SaveChangesAsync();
+        await _entities.AddRangeAsync(entities).ConfigureAwait(false);
+        var rowsAffected = await _context.SaveChangesAsync().ConfigureAwait(false);
         return rowsAffected > 0 ? entities : null;
     }
 
     public async Task<bool> UpdateAsync(TEntity entity)
     {
         _entities.Update(entity);
-        return await _context.SaveChangesAsync() > 0;
+        return await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var entity = await _entities.FindAsync(id);
+        var entity = await _entities.FindAsync(id).ConfigureAwait(false);
         if (entity == null)
             return false;
 
         _entities.Remove(entity);
-        return await _context.SaveChangesAsync() > 0;
+        return await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
     }
 
     public async Task<IDbContextTransaction> BeginTransactionAsync()
     {
-        return await _context.Database.BeginTransactionAsync();
+        return await _context.Database.BeginTransactionAsync().ConfigureAwait(false);
     }
 }

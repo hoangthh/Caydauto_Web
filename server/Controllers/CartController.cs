@@ -17,7 +17,7 @@ public class CartController : ControllerBase
     {
         try
         {
-            var cart = await _cartService.GetCart();
+            var cart = await _cartService.GetCart().ConfigureAwait(false);
             return Ok(cart);
         }
         catch (UnauthorizedAccessException ex)
@@ -33,7 +33,7 @@ public class CartController : ControllerBase
         {
             if (item == null)
                 return BadRequest(new { Message = "Item cannot be null" });
-            var result = await _cartService.AddToCart(item);
+            var result = await _cartService.AddToCart(item).ConfigureAwait(false);
             if (!result)
                 return BadRequest(new { Message = "Failed to add item to cart" });
             return Ok(new { Message = "Item added to cart successfully" });
@@ -53,7 +53,7 @@ public class CartController : ControllerBase
     {
         try
         {
-            var result = await _cartService.RemoveFromCart(cartItemId);
+            var result = await _cartService.RemoveFromCart(cartItemId).ConfigureAwait(false);
             if (!result)
                 return BadRequest(new { Message = "Failed to remove item from cart" });
             return Ok(new { Message = "Item removed from cart successfully" });
@@ -73,7 +73,7 @@ public class CartController : ControllerBase
     {
         try
         {
-            var result = await _cartService.ClearCart();
+            var result = await _cartService.ClearCart().ConfigureAwait(false);
             if (!result)
                 return BadRequest(new { Message = "Failed to clear cart" });
             return Ok(new { Message = "Cart cleared successfully" });
