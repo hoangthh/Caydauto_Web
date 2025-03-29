@@ -1,7 +1,8 @@
 import React from "react";
 import "./Product.scss";
-import product from "../../assets/product.svg";
+import productImg from "../../assets/product.svg";
 import { Button, styled, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
 
 const ProductName = styled(Typography)`
   margin-top: 5px;
@@ -17,6 +18,7 @@ const ProductSold = styled(Typography)`
 `;
 
 const BuyButton = styled(Button)`
+  width: 100%;
   background: white;
   color: black;
   text-transform: none;
@@ -29,14 +31,16 @@ const BuyButton = styled(Button)`
   }
 `;
 
-export const Product = () => {
+export const Product = ({ product }) => {
   return (
     <div className="product">
-      <img src={product} style={{ width: "100%" }} />
-      <ProductName>Đèn học Bakia</ProductName>
-      <ProductPrice>250.000đ</ProductPrice>
-      <ProductSold>280 sold</ProductSold>
-      <BuyButton variant="contained">Mua hàng</BuyButton>
+      <img src={productImg} style={{ width: "100%" }} />
+      <ProductName>{product.name}</ProductName>
+      <ProductPrice>{product.price}đ</ProductPrice>
+      <ProductSold>{product.sold} sold</ProductSold>
+      <Link to={`/products/${product.id}`}>
+        <BuyButton variant="contained">Mua hàng</BuyButton>
+      </Link>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./DetailPage.scss";
 import product from "../../assets/product.svg";
 import {
@@ -13,6 +13,8 @@ import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import RemoveCircleRoundedIcon from "@mui/icons-material/RemoveCircleRounded";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Product } from "../../components/Product/Product";
+import { fetchDetailProduct } from "../../mockData";
+import { useParams } from "react-router-dom";
 
 const ProductName = styled(Typography)`
   font-size: 20px;
@@ -26,13 +28,13 @@ const ProductPrice = styled(Typography)`
 `;
 
 const IncreaseQuantityButton = styled(AddCircleRoundedIcon)`
-  margin-right: 10px;
+  margin-left: 10px;
   color: pink;
   cursor: pointer;
 `;
 
 const DecreaseQuantityButton = styled(RemoveCircleRoundedIcon)`
-  margin-left: 10px;
+  margin-right: 10px;
   color: pink;
   cursor: pointer;
 `;
@@ -68,6 +70,23 @@ const SimilarProductHeader = styled(Typography)`
 `;
 
 export const DetailPage = () => {
+  const [quantity, setQuantity] = useState(1);
+
+  const { productId } = useParams();
+  const detailProduct = fetchDetailProduct(productId);
+
+  const handleDecreaseQuantity = () => {
+    if (quantity === 1) return;
+
+    setQuantity(quantity - 1);
+  };
+
+  const handleIncreaseQuantity = () => {
+    // if (quantity === 0) return;
+
+    setQuantity(quantity + 1);
+  };
+
   return (
     <div className="detail-page">
       {/* Main Product */}
@@ -81,9 +100,7 @@ export const DetailPage = () => {
         {/* Main Product Detail */}
         <div className="detail-page--product__detail">
           {/*Main Product Name */}
-          <ProductName>
-            Hộp đựng bút học sinh tiện lợi Line Field Kokuyo Cây Đầu To
-          </ProductName>
+          <ProductName>{detailProduct.name}</ProductName>
           {/*Main Product Name */}
 
           {/* Main Product Color */}
@@ -96,14 +113,14 @@ export const DetailPage = () => {
           {/* Main Product Color */}
 
           {/* Main Product Price */}
-          <ProductPrice>250.000đ</ProductPrice>
+          <ProductPrice>{detailProduct.price}đ</ProductPrice>
           {/* Main Product Price */}
 
           {/* Main Product Quantity */}
           <div className="detail-page--product__detail quantity">
-            <IncreaseQuantityButton />
-            <ProductQuantity>5</ProductQuantity>
-            <DecreaseQuantityButton />
+            <DecreaseQuantityButton onClick={handleDecreaseQuantity} />
+            <ProductQuantity>{quantity}</ProductQuantity>
+            <IncreaseQuantityButton onClick={handleIncreaseQuantity} />
           </div>
           {/* Main Product Quantity */}
 
@@ -121,11 +138,7 @@ export const DetailPage = () => {
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <ProductDescription>Chi tiết sản phẩm</ProductDescription>
             </AccordionSummary>
-            <AccordionDetails>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              Suspendisse malesuada lacus ex, sit amet blandit leo lobortis
-              eget.
-            </AccordionDetails>
+            <AccordionDetails>{detailProduct.description}</AccordionDetails>
           </DescriptionAccordion>
           {/* Main Product Description */}
         </div>
@@ -134,7 +147,7 @@ export const DetailPage = () => {
       {/* Main Product */}
 
       {/* Similar Product */}
-      <div className="detail-page--similar-product">
+      {/* <div className="detail-page--similar-product">
         <SimilarProductHeader>Sản phẩm tương tự</SimilarProductHeader>
         <div className="detail-page--similar-product product-wrapper">
           <div className="detail-page--similar-product product-item">
@@ -156,7 +169,7 @@ export const DetailPage = () => {
             <Product />
           </div>
         </div>
-      </div>
+      </div> */}
       {/* Similar Product */}
     </div>
   );

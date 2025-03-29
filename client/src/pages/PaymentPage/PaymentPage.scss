@@ -1,0 +1,23 @@
+.payment-page {
+  &--wrapper {
+    margin-top: 20px;
+    padding: 0 50px;
+
+    &__order-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    &__customer-info {
+      // display: flex;
+      // flex-direction: column;
+
+      &.item {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+      }
+    }
+  }
+}

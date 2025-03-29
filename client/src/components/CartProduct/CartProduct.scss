@@ -1,0 +1,33 @@
+.cart-product {
+  display: flex;
+
+  justify-content: space-between;
+
+  &--left {
+    display: flex;
+    align-items: center;
+
+    &__img {
+      width: 100px;
+      height: 100px;
+    }
+
+    &__info {
+      margin-left: 20px;
+    }
+  }
+
+  &--right {
+    display: flex;
+    align-items: center;
+
+    &__quantity {
+      display: flex;
+      align-items: center;
+    }
+
+    &__price {
+      margin-left: 20px;
+    }
+  }
+}

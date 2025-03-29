@@ -10,6 +10,7 @@ import introIcon4 from "../../assets/intro-icon-4.svg";
 import introIcon5 from "../../assets/intro-icon-5.svg";
 import intro from "../../assets/intro.svg";
 import distributor from "../../assets/distributor.svg";
+import { Link } from "react-router-dom";
 
 const BuyButton = styled(Button)`
   background: green;
@@ -56,9 +57,11 @@ export const HomePage = () => {
               <Typography>Tiktok: @caydauto.stationery</Typography>
             </div>
 
-            <BuyButton variant="contained">
-              Mua sắm ngay với Cây Đầu To
-            </BuyButton>
+            <Link to="/products">
+              <BuyButton variant="contained">
+                Mua sắm ngay với Cây Đầu To
+              </BuyButton>
+            </Link>
           </div>
           {/* Intro Info */}
         </div>
