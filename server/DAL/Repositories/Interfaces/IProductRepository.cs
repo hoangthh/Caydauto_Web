@@ -4,4 +4,5 @@ public interface IProductRepository : IRepository<Product>
     Task<decimal> GetProductPriceByIdAsync(int productId);
     Task<PagedResult<Product>> GetSimilarProductsAsync(int productId,List<int> categoriesId);
     Task<decimal> GetTotalPriceByProductsIdAsync((int productId, int quantity)[] productsId);
+    Task<List<string>> GetBrandsAsync();
 }

@@ -2,55 +2,156 @@ using Bogus;
 
 public static class SeedData
 {
-    public static List<Category> GetCategories(int count)
+    // Danh sách danh mục có sẵn
+    private static int ImagePerProduct = 10;
+    private static readonly List<string> Categories = new()
+    {
+        "Hộp bút - Túi bút",
+        "Vở Học Sinh Campus",
+        "Bút gel",
+        "Bút chì",
+        "Bút ghi nhớ",
+        "Dụng cụ tẩy",
+        "Bút brush",
+        "Băng keo",
+        "Dụng cụ hỗ trợ",
+    };
+
+    // Danh sách thương hiệu có sẵn
+    private static readonly List<string> Brands = new()
+    {
+        "Crayola",
+        "Pilot",
+        "Kokuyo",
+        "Marunman",
+        "Marvy",
+        "Zebra",
+        "Stabilo",
+        "Tombow",
+        "Sakura",
+        "Plus",
+    };
+
+    private static readonly List<string> Colors = new()
+    {
+        "Black",
+        "White",
+        "Gray",
+        "Orange",
+        "Yellow",
+        "Green",
+        "Blue",
+        "Purple",
+        "Pink",
+        "Red",
+        "Brown",
+    };
+
+    public static readonly Dictionary<string, (decimal Min, decimal Max)> PriceRanges = new()
+    {
+        { "Dưới 100.000", (10, 100) },
+        { "100.000 - 200.000", (100, 200) },
+        { "200.000 - 300.000", (200, 300) },
+        { "300.000 - 400.000", (300, 400) },
+        { "400.000 - 500.000", (400, 500) },
+        { "Trên 500.000", (500, 1000) },
+    };
+
+    public static List<Image> GetImages(int productCount)
     {
         int id = 1;
-        var faker = new Faker<Category>()
-            .RuleFor(c => c.Id, f => id++)
-            .RuleFor(c => c.Name, f => f.Commerce.Department())
-            .RuleFor(c => c.Description, f => f.Lorem.Sentence(5, 10));
-
-        return faker.Generate(count);
+        var faker = new Faker<Image>()
+            .RuleFor(i => i.Id, f => id++)
+            .RuleFor(i => i.Url, f => f.Image.PicsumUrl(width: 500, height: 500));
+        return faker.Generate(ImagePerProduct * productCount); // Giả sử mỗi sản phẩm có 10 hình ảnh
     }
 
-    public static (
-        List<Product> Products,
-        List<(int ProductId, int CategoryId)> Relationships
-    ) GetProducts(int count, List<Category> categories)
+    public static List<Category> GetCategories()
+    {
+        int id = 1;
+        return Categories
+            .Select(name => new Category
+            {
+                Id = id++,
+                Name = name,
+                Description = $"Danh mục {name} chứa các sản phẩm liên quan.",
+            })
+            .ToList();
+    }
+
+    public static List<Color> GetColors()
+    {
+        int id = 1;
+        return Colors.Select(name => new Color { Id = id++, Name = name }).ToList();
+    }
+
+    public static (List<Product>, List<(int, int)>, List<(int, int)>, List<(int, int)>) GetProducts(
+        int count,
+        List<Category> categories,
+        List<Color> colors,
+        List<Image> images
+    )
     {
         int id = 1;
         var random = new Random();
         var faker = new Faker<Product>()
             .RuleFor(p => p.Id, f => id++)
             .RuleFor(p => p.Name, f => f.Commerce.ProductName())
-            .RuleFor(p => p.Price, f => f.Random.Decimal(10, 1000))
+            .RuleFor(p => p.Brand, f => f.PickRandom(Brands)) // Chọn brand riêng biệt
+            .RuleFor(
+                p => p.Price,
+                f =>
+                {
+                    var range = f.PickRandom(PriceRanges.Values.ToList()); // Chọn ngẫu nhiên một khoảng giá từ PriceRanges
+                    return f.Random.Decimal(range.Min, range.Max); // Tạo giá ngẫu nhiên trong khoảng đã chọn
+                    // Chọn ngẫu nhiên một khoảng giá từ PriceRanges
+                }
+            )
             .RuleFor(p => p.Description, f => f.Commerce.ProductDescription())
-            .RuleFor(p => p.Brand, f => f.Company.CompanyName())
             .RuleFor(p => p.StockQuantity, f => f.Random.Int(0, 100))
             .RuleFor(p => p.Sold, f => f.Random.Int(0, 50))
             .RuleFor(p => p.CreatedDate, f => f.Date.Past(1))
             .RuleFor(p => p.UpdatedDate, f => f.Date.Recent(30));
 
         var products = faker.Generate(count);
-        var relationships = new List<(int ProductId, int CategoryId)>();
-
-        // Gán ngẫu nhiên 1-3 danh mục cho mỗi sản phẩm và lưu mối quan hệ
+        var relationshipsProductCategory = new List<(int ProductId, int CategoryId)>();
+        var relationshipsProductColor = new List<(int ProductId, int ColorId)>();
+        var relationshipsProductImage = new List<(int ProductId, int ImageId)>();
+        int countImage = ImagePerProduct;
+        var assignImages = images
+            .Take(countImage).ToList(); // Giả sử mỗi sản phẩm có 10 hình ảnh
+        // Gán danh mục cho từng sản phẩm
         foreach (var product in products)
         {
             var assignedCategories = categories
                 .OrderBy(c => random.Next())
                 .Take(random.Next(1, Math.Min(4, categories.Count)))
                 .ToList();
+            var assignColors = colors
+                .OrderBy(c => random.Next())
+                .Take(random.Next(1, Math.Min(4, colors.Count)))
+                .ToList();
 
             product.Categories = assignedCategories;
-
+            product.Colors = assignColors;
+            product.Images = assignImages;
+            // Gán danh mục cho sản phẩm
             // Lưu mối quan hệ vào danh sách
             foreach (var category in assignedCategories)
             {
-                relationships.Add((product.Id, category.Id));
+                relationshipsProductCategory.Add((product.Id, category.Id));
             }
+            foreach (var color in assignColors)
+            {
+                relationshipsProductColor.Add((product.Id, color.Id));
+            }
+            foreach (var image in assignImages)
+            {
+                relationshipsProductImage.Add((product.Id, image.Id));
+            }
+            countImage+=ImagePerProduct;
         }
 
-        return (products, relationships);
+        return (products, relationshipsProductCategory, relationshipsProductColor,  relationshipsProductImage);
     }
 }

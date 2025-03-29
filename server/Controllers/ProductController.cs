@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("api/[controller]")]
@@ -5,10 +6,47 @@ using Microsoft.AspNetCore.Mvc;
 public class ProductController : ControllerBase
 {
     private readonly IProductService _productService;
+    private readonly ICategoryService _categoryService;
+    private readonly IColorService _colorService;
 
-    public ProductController(IProductService productService)
+    public ProductController(
+        IProductService productService,
+        ICategoryService categoryService,
+        IColorService colorService
+    )
     {
         _productService = productService;
+        _categoryService = categoryService;
+        _colorService = colorService;
+    }
+
+    [HttpGet("filter")]
+    public async Task<IActionResult> GetFilter()
+    {
+        var categories = await _categoryService.GetAllCategoriesAsync().ConfigureAwait(false);
+        var colors = await _colorService.GetAllColorsAsync().ConfigureAwait(false);
+        var brands = await _productService.GetBrands().ConfigureAwait(false);
+        return Ok(
+            new
+            {
+                Categories = categories.Select(c => new { c.Id, c.Name }),
+                Colors = colors.Select(c => new
+                {
+                    c.Id,
+                    c.Name,
+                    c.HexCode,
+                }),
+                Brands = brands,
+                Prices = SeedData
+                    .PriceRanges.Select(p => new
+                    {
+                        Label = p.Key,
+                        Min = p.Value.Min * 1000,
+                        Max = p.Value.Max * 1000,
+                    })
+                    .ToList(),
+            }
+        );
     }
 
     [HttpGet("all")]
@@ -22,20 +60,24 @@ public class ProductController : ControllerBase
         return Ok(products);
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetProducts([FromQuery] ProductFilter filter)
+    [HttpPost]
+    public async Task<IActionResult> GetProducts([FromBody] ProductFilter filter)
     {
         var products = await _productService.GetProducts(filter).ConfigureAwait(false);
         return Ok(products);
     }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetProduct(int id)
     {
         var product = await _productService.GetProduct(id).ConfigureAwait(false);
         if (product == null)
-            return NotFound(new { Message = $"Product with the specified ID = {id} was not found." });
+            return NotFound(
+                new { Message = $"Product with the specified ID = {id} was not found." }
+            );
         return Ok(product);
     }
+
     [HttpGet("similar/{id}")]
     public async Task<IActionResult> GetSimilarProducts(int id)
     {

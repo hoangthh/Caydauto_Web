@@ -119,4 +119,9 @@ public class ProductService : IProductService
     {
         throw new NotImplementedException();
     }
+    public async Task<List<string>> GetBrands()
+    {
+        var brands = await _productRepository.GetBrandsAsync().ConfigureAwait(false);
+        return brands;
+    }
 }

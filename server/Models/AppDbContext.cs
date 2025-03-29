@@ -61,28 +61,78 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
+        int ProductCount = 10; // Số lượng sản phẩm mẫu
         // Tạo dữ liệu mẫu
-        var categories = SeedData.GetCategories(5); // 5 danh mục
-        var (products, relationships) = SeedData.GetProducts(10, categories); // 10 sản phẩm và mối quan hệ
+        var categories = SeedData.GetCategories();
+        var colors = SeedData.GetColors(); // Lấy danh sách màu sắc
+        var images = SeedData.GetImages(ProductCount); // Lấy danh sách hình ảnh
+        var (products, relationshipProductCategory, relationshipProductColor, relationshipProductImage) = // Lấy danh sách sản phẩm và các mối
+            SeedData.GetProducts(ProductCount, categories, colors, images); // 10 sản phẩm và mối quan hệ
 
         // Seed Categories (clear navigation property)
         foreach (var category in categories)
         {
             category.Products = null;
         }
-        modelBuilder.Entity<Category>().HasData(categories);
+        // Seed Colors (clear navigation property)
+        foreach (var color in colors)
+        {
+            color.Products = null;
+        }
+       
+        // Seed Images (clear navigation property)
 
+        modelBuilder.Entity<Color>().HasData(colors);
+        modelBuilder.Entity<Category>().HasData(categories);
         // Seed Products (clear navigation property)
         foreach (var product in products)
         {
             product.Categories = null;
         }
-        modelBuilder.Entity<Product>().HasData(products);
+        foreach (var product in products)
+        {
+            product.Colors = null;
+        }
+        foreach (var product in products)
+        {
+            product.Images = null; // Xóa navigation tránh lỗi
+        }
 
+        modelBuilder.Entity<Product>().HasData(products);
+        modelBuilder.Entity<Image>().HasData(images);
+        int imagesPerProduct = 10;
+        int productIdinit = 1;
+        int imageCount = 0;
+        foreach (var image in images)
+        {
+            image.Product = null; // Xóa navigation property
+            // Chỉ gán ProductId nếu chưa vượt quá số sản phẩm có sẵn
+            if (productIdinit <= ProductCount)
+            {
+                image.ProductId = productIdinit;
+            }
+            else
+            {
+                // Nếu đã vượt quá, gán cho sản phẩm cuối cùng (hoặc xử lý theo logic mong muốn)
+                image.ProductId = ProductCount;
+            }
+
+            imageCount++;
+            if (imageCount == imagesPerProduct)
+            {
+                imageCount = 0;
+                productIdinit++;
+            }
+        }
         // Seed the many-to-many relationship (CategoryProduct)
-        var productCategoryData = relationships
-            .Select(r => new { ProductsId = r.ProductId, CategoriesId = r.CategoryId })
+        var productCategoryData = relationshipProductCategory
+            .Select(r => new { ProductsId = r.Item1, CategoriesId = r.Item2 })
+            .ToList();
+        var productColorData = relationshipProductColor
+            .Select(r => new { ProductsId = r.Item1, ColorsId = r.Item2 })
+            .ToList();
+        var productImageData = relationshipProductImage
+            .Select(r => new { ProductsId = r.Item1, ImagesId = r.Item2 })
             .ToList();
         // Many-to-many: Product - Category
         modelBuilder
@@ -92,7 +142,11 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
             .UsingEntity(j => j.HasData(productCategoryData));
 
         // Many-to-many: Product - Color
-        modelBuilder.Entity<Product>().HasMany(p => p.Colors).WithMany(c => c.Products);
+        modelBuilder
+            .Entity<Product>()
+            .HasMany(navigationExpression: p => p.Colors)
+            .WithMany(c => c.Products)
+            .UsingEntity(j => j.HasData(productColorData));
 
         // Many-to-many: User - Product (WishList)
         modelBuilder.Entity<User>().HasMany(u => u.WishList).WithMany(p => p.WishListedByUsers);
@@ -111,7 +165,8 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
             .HasMany(p => p.Images)
             .WithOne(i => i.Product)
             .HasForeignKey(i => i.ProductId)
-            .OnDelete(DeleteBehavior.Cascade); // Khi xóa Product, xóa luôn Images
+            .OnDelete(DeleteBehavior.Cascade)
+            ; // Khi xóa Product, xóa luôn Images
 
         // One-to-many: Product - Comment
         modelBuilder
@@ -184,8 +239,28 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
         modelBuilder.Entity<IdentityUserRole<int>>().ToTable("UserRoles"); // Đặt tên cho bảng UserRoles
         modelBuilder.Entity<IdentityRole<int>>().ToTable("Roles"); // Đặt tên cho bảng Roles
         modelBuilder.Entity<IdentityUser<int>>().ToTable("Users"); // Đặt tên cho bảng Users
-        modelBuilder.Entity<Role>().HasData(new Role { Id = 1, Name = "Admin", NormalizedName = "ADMIN", Description = "Administrator role" });
-        modelBuilder.Entity<Role>().HasData(new Role { Id = 2, Name = "User", NormalizedName = "USER", Description = "User role" });
+        modelBuilder
+            .Entity<Role>()
+            .HasData(
+                new Role
+                {
+                    Id = 1,
+                    Name = "Admin",
+                    NormalizedName = "ADMIN",
+                    Description = "Administrator role",
+                }
+            );
+        modelBuilder
+            .Entity<Role>()
+            .HasData(
+                new Role
+                {
+                    Id = 2,
+                    Name = "User",
+                    NormalizedName = "USER",
+                    Description = "User role",
+                }
+            );
         // Index cho các trường thường xuyên được tìm kiếm
         modelBuilder.Entity<Product>().HasIndex(p => p.Name).IsUnique(false); // Index cho tên sản phẩm
 
