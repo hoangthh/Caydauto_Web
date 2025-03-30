@@ -45,7 +45,7 @@
     }
   }
 
-  &.color {
+  &.filter-color {
     height: 30px;
     flex-basis: 20%;
     &:checked::before {
@@ -53,37 +53,48 @@
     }
   }
 
-  &.white {
+  &.detail-color {
+    width: 30px;
+    height: 30px;
+    &:checked::before {
+      font-size: 20px;
+    }
+  }
+
+  &.White {
     background: white;
     &:checked::before {
       color: black;
     }
   }
-  &.gray {
+  &.Gray {
     background: gray;
   }
-  &.yellow {
+  &.Yellow {
     background: #e6d770;
   }
-  &.orange {
+  &.Orange {
     background: orange;
   }
-  &.black {
+  &.Black {
     background: black;
   }
-  &.red {
+  &.Red {
     background: red;
   }
-  &.blue {
+  &.Blue {
     background: blue;
   }
-  &.pink {
+  &.Pink {
     background: pink;
   }
-  &.green {
+  &.Green {
     background: green;
   }
-  &.brown {
+  &.Brown {
     background: brown;
+  }
+  &.Purple {
+    background: purple;
   }
 }
