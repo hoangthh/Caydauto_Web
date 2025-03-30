@@ -66,8 +66,13 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
         var categories = SeedData.GetCategories();
         var colors = SeedData.GetColors(); // Lấy danh sách màu sắc
         var images = SeedData.GetImages(ProductCount); // Lấy danh sách hình ảnh
-        var (products, relationshipProductCategory, relationshipProductColor, relationshipProductImage) = // Lấy danh sách sản phẩm và các mối
-            SeedData.GetProducts(ProductCount, categories, colors, images); // 10 sản phẩm và mối quan hệ
+        var (
+            products,
+            relationshipProductCategory,
+            relationshipProductColor,
+            relationshipProductImage
+        ) = // Lấy danh sách sản phẩm và các mối
+        SeedData.GetProducts(ProductCount, categories, colors, images); // 10 sản phẩm và mối quan hệ
 
         // Seed Categories (clear navigation property)
         foreach (var category in categories)
@@ -79,7 +84,7 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
         {
             color.Products = null;
         }
-       
+
         // Seed Images (clear navigation property)
 
         modelBuilder.Entity<Color>().HasData(colors);
@@ -165,8 +170,7 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
             .HasMany(p => p.Images)
             .WithOne(i => i.Product)
             .HasForeignKey(i => i.ProductId)
-            .OnDelete(DeleteBehavior.Cascade)
-            ; // Khi xóa Product, xóa luôn Images
+            .OnDelete(DeleteBehavior.Cascade); // Khi xóa Product, xóa luôn Images
 
         // One-to-many: Product - Comment
         modelBuilder
@@ -223,22 +227,9 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
             .HasForeignKey(u => u.RoleId)
             .OnDelete(DeleteBehavior.Restrict); // Khi xóa Role, không cho xóa User
 
-        modelBuilder
-            .Entity<IdentityUserRole<int>>()
-            .HasOne<IdentityUser<int>>()
-            .WithMany()
-            .HasForeignKey(ur => ur.UserId)
-            .OnDelete(DeleteBehavior.NoAction); // ⚡ Đổi từ Restrict -> NoAction
 
-        modelBuilder
-            .Entity<IdentityUserRole<int>>()
-            .HasOne<IdentityRole<int>>()
-            .WithMany()
-            .HasForeignKey(ur => ur.RoleId)
-            .OnDelete(DeleteBehavior.NoAction); // ⚡ Đổi từ Restrict -> NoAction
-        modelBuilder.Entity<IdentityUserRole<int>>().ToTable("UserRoles"); // Đặt tên cho bảng UserRoles
-        modelBuilder.Entity<IdentityRole<int>>().ToTable("Roles"); // Đặt tên cho bảng Roles
-        modelBuilder.Entity<IdentityUser<int>>().ToTable("Users"); // Đặt tên cho bảng Users
+        modelBuilder.Entity<Role>().ToTable("Roles"); // Đặt tên cho bảng Roles
+        modelBuilder.Entity<User>().ToTable("Users"); // Đặt tên cho bảng Users
         modelBuilder
             .Entity<Role>()
             .HasData(
@@ -261,6 +252,7 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
                     Description = "User role",
                 }
             );
+
         // Index cho các trường thường xuyên được tìm kiếm
         modelBuilder.Entity<Product>().HasIndex(p => p.Name).IsUnique(false); // Index cho tên sản phẩm
 

@@ -1,4 +1,5 @@
 using Bogus;
+using Microsoft.AspNetCore.Identity;
 
 public static class SeedData
 {
@@ -118,8 +119,7 @@ public static class SeedData
         var relationshipsProductColor = new List<(int ProductId, int ColorId)>();
         var relationshipsProductImage = new List<(int ProductId, int ImageId)>();
         int countImage = ImagePerProduct;
-        var assignImages = images
-            .Take(countImage).ToList(); // Giả sử mỗi sản phẩm có 10 hình ảnh
+        var assignImages = images.Take(countImage).ToList(); // Giả sử mỗi sản phẩm có 10 hình ảnh
         // Gán danh mục cho từng sản phẩm
         foreach (var product in products)
         {
@@ -149,9 +149,62 @@ public static class SeedData
             {
                 relationshipsProductImage.Add((product.Id, image.Id));
             }
-            countImage+=ImagePerProduct;
+            countImage += ImagePerProduct;
         }
 
-        return (products, relationshipsProductCategory, relationshipsProductColor,  relationshipsProductImage);
+        return (
+            products,
+            relationshipsProductCategory,
+            relationshipsProductColor,
+            relationshipsProductImage
+        );
+    }
+}
+
+public static class IdentityInitializer
+{
+    public static async Task InitAdminUser(IServiceProvider serviceProvider)
+    {
+        // Lấy UserManager và SignInManager từ service provider
+        var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
+        var signInManager = serviceProvider.GetRequiredService<SignInManager<User>>();
+
+        // Thông tin tài khoản admin
+        string adminEmail = "admin@example.com";
+        string adminPassword = "Admin@123";
+        string adminUserName = "admin";
+
+        // Kiểm tra xem tài khoản admin đã tồn tại chưa
+        var adminUser = await userManager.FindByEmailAsync(adminEmail).ConfigureAwait(false);
+        if (adminUser == null)
+        {
+            // Tạo tài khoản admin
+            adminUser = new User
+            {
+                FullName = "Mạch Gia Huy",
+                Gender = "Male",
+                UserName = adminUserName,
+                Email = adminEmail,
+                EmailConfirmed = true, // Bỏ qua xác nhận email
+                RoleId = 1,
+            };
+
+            var result = await userManager
+                .CreateAsync(adminUser, adminPassword)
+                .ConfigureAwait(false);
+            if (result.Succeeded)
+            {
+                // Gán vai trò Admin (nếu bạn có vai trò)
+                await userManager.AddToRoleAsync(adminUser, "Admin").ConfigureAwait(false);
+                Console.WriteLine("Tài khoản admin đã được tạo thành công!");
+            }
+            else
+            {
+                throw new Exception(
+                    "Không thể tạo tài khoản admin: "
+                        + string.Join(", ", result.Errors.Select(e => e.Description))
+                );
+            }
+        }
     }
 }

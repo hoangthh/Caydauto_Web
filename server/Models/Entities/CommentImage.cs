@@ -12,5 +12,5 @@ public class CommentImage
     public int CommentId { get; set; }
 
     // Navigation property
-    public Comment Comment { get; set; } = new Comment();
+    public Comment? Comment { get; set; }
 }

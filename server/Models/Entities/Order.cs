@@ -46,6 +46,6 @@ public class Order
 
     // Navigation properties
     public User? User { get; set; }
-    public Discount Discount { get; set; } = new Discount();
+    public Discount? Discount { get; set; }
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 }

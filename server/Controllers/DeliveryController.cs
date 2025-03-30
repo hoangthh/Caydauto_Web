@@ -30,16 +30,6 @@ public class DeliveryController : ControllerBase
         return Ok(await _deliveryService.GetWardsAsync(districtId).ConfigureAwait(false));
     }
 
-    [HttpGet("services/{fromDistrictId}/{toDistrictId}")]
-    public async Task<IActionResult> GetServices(int fromDistrictId, int toDistrictId)
-    {
-        return Ok(
-            await _deliveryService
-                .GetAvailableServicesAsync(fromDistrictId, toDistrictId)
-                .ConfigureAwait(false)
-        );
-    }
-
     [HttpGet("shipping-fee")]
     public async Task<IActionResult> GetShippingFee(
         int toDistrictId,
