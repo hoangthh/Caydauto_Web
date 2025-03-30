@@ -1,15 +1,9 @@
-import axios from "axios";
-
-const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL,
-  // withCredentials: true
-});
+import { axiosInstance } from "./axiosInstance";
 
 export const fetchProductsWithFilterByPagination = async () => {
   try {
     const response = await axiosInstance.get(`/api/Product/`);
-
-    return response.data.item;
+    return response.data.items;
   } catch (error) {
     console.log(error);
   }
@@ -18,6 +12,17 @@ export const fetchProductsWithFilterByPagination = async () => {
 export const fetchDetailProductById = async (productId) => {
   try {
     const response = await axiosInstance.get(`/api/Product/${productId}`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const fetchSimilarProductsById = async (productId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/api/Product/similar/${productId}`
+    );
     return response.data;
   } catch (error) {
     console.log(error);

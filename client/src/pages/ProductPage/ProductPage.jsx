@@ -1,18 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./ProductPage.scss";
 import { Filter } from "../../components/Filter/Filter";
 import { Product } from "../../components/Product/Product";
 import { Pagination, styled } from "@mui/material";
-import { mockProductList } from "../../mockData";
-// import { useFetchProducts } from "../../hooks/useFetchProducts";
+import { fetchProductsWithFilterByPagination } from "../../apis/product";
 
 const ProductPagination = styled(Pagination)`
   margin-top: 20px;
 `;
 
 export const ProductPage = () => {
-  // const productList = useFetchProducts()
-  const productList = mockProductList;
+  const [productList, setProductList] = useState([]);
+
+  useEffect(() => {
+    const fetchProductListWithFilterByPagination = async () => {
+      const productList = await fetchProductsWithFilterByPagination();
+      setProductList(productList);
+    };
+
+    productList && fetchProductListWithFilterByPagination();
+  }, []);
 
   return (
     <div className="product-page">
@@ -23,7 +30,7 @@ export const ProductPage = () => {
       <div className="product-page--product-wrapper">
         {/* Product List */}
         <div className="product-page--product-list">
-          {productList.length > 0 &&
+          {productList?.length > 0 &&
             productList.map((product) => (
               <div
                 className="product-page--product-list__product-item"

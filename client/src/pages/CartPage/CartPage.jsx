@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./CartPage.scss";
 import { Link } from "react-router-dom";
 import { Button, styled, Typography } from "@mui/material";
 import { CartProduct } from "../../components/CartProduct/CartProduct";
+import { fetchCartProducts } from "../../apis/cart";
 
 const CartPageHeader = styled(Typography)`
   font-weight: bold;
@@ -37,24 +38,34 @@ const ContinueBuyButton = styled(Button)`
 `;
 
 export const CartPage = () => {
+  const [cartProductList, setCartProductList] = useState([]);
+
+  useEffect(() => {
+    const fetchCartProductList = async () => {
+      const cartProductList = await fetchCartProducts();
+      setCartProductList(cartProductList);
+    };
+
+    fetchCartProductList();
+  }, []);
+
   return (
     <div className="cart-page">
       <CartPageHeader>GIỎ HÀNG</CartPageHeader>
 
       <div className="cart-page--main">
         <div className="cart-page--main__left">
-          <CartProduct />
-          <CartProduct />
-          <CartProduct />
-          <CartProduct />
-          <CartProduct />
-          <CartProduct />
+          {cartProductList?.length > 0 ? (
+            <CartProduct />
+          ) : (
+            "Chưa có sản phẩm trong giỏ hàng"
+          )}
         </div>
 
         <div className="cart-page--main__right">
           <div className="cart-page--main__right price">
             <TotalPriceHeader>Thành tiền</TotalPriceHeader>
-            <TotalPrice>200.000đ</TotalPrice>
+            <TotalPrice>{cartProductList?.totalPrice || 0}đ</TotalPrice>
           </div>
 
           <Link

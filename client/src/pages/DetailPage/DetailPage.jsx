@@ -5,6 +5,7 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  CircularProgress,
   Button,
   styled,
   Typography,
@@ -14,8 +15,11 @@ import RemoveCircleRoundedIcon from "@mui/icons-material/RemoveCircleRounded";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Product } from "../../components/Product/Product";
 import { useParams } from "react-router-dom";
-import { fetchDetailProductById } from "../../apis/product";
-import { fetchDetailProduct } from "../../mockData";
+import {
+  fetchDetailProductById,
+  fetchSimilarProductsById,
+} from "../../apis/product";
+// import { addProductToCart } from "../../apis/cart";
 
 const ProductName = styled(Typography)`
   font-size: 20px;
@@ -71,33 +75,49 @@ const SimilarProductHeader = styled(Typography)`
 `;
 
 export const DetailPage = () => {
+  const [isLoading, setIsLoading] = useState(true);
   const [detailProduct, setDetailProduct] = useState({});
-  const [color, setColor] = useState(null);
+  // const [color, setColor] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [similarProductList, setSimilarProductList] = useState([]);
 
   const { productId } = useParams();
 
   useEffect(() => {
     const fetchDetailProduct = async () => {
-      // const detailProduct = await fetchDetailProductById(productId);
-      const detailProduct = await fetchDetailProduct(productId);
+      setDetailProduct(true);
+      const detailProduct = await fetchDetailProductById(productId);
       setDetailProduct(detailProduct);
     };
 
-    detailProduct && fetchDetailProduct();
-  }, [detailProduct, productId]);
+    fetchDetailProduct();
+
+    const fetchSimilarProductList = async () => {
+      const similarProductList = await fetchSimilarProductsById(productId);
+      setSimilarProductList(similarProductList);
+    };
+
+    fetchSimilarProductList();
+
+    setIsLoading(false);
+  }, []);
 
   const handleDecreaseQuantity = () => {
     if (quantity === 1) return;
-
     setQuantity(quantity - 1);
   };
 
   const handleIncreaseQuantity = () => {
-    // if (quantity === 0) return;
-
     setQuantity(quantity + 1);
   };
+
+  const handleAddToCart = async () => {
+    // await addProductToCart({productId, color, quantity})
+  };
+
+  if (isLoading) return <CircularProgress />;
+
+  if (!detailProduct) return <Typography>Không có sản phẩm này</Typography>;
 
   return (
     <div className="detail-page">
@@ -120,13 +140,14 @@ export const DetailPage = () => {
             <input
               type="checkbox"
               className="input orange"
+              value="orange"
               onChange={(e) => {
-                console.log(e);
+                console.log(e.target.value);
               }}
             />
-            <input type="checkbox" className="input pink" />
-            <input type="checkbox" className="input red" />
-            <input type="checkbox" className="input black" />
+            <input type="checkbox" className="input pink" value="pink" />
+            <input type="checkbox" className="input red" value="orange" />
+            <input type="checkbox" className="input black" value="orange" />
           </div>
           {/* Main Product Color */}
 
@@ -144,7 +165,7 @@ export const DetailPage = () => {
 
           {/* Main Product Action */}
           <div className="detail-page--product__detail action">
-            <AddToCartButton variant="contained">
+            <AddToCartButton variant="contained" onClick={handleAddToCart}>
               Thêm vào giỏ hàng
             </AddToCartButton>
             <BuyButton variant="contained">Mua ngay</BuyButton>
@@ -165,29 +186,21 @@ export const DetailPage = () => {
       {/* Main Product */}
 
       {/* Similar Product */}
-      {/* <div className="detail-page--similar-product">
-        <SimilarProductHeader>Sản phẩm tương tự</SimilarProductHeader>
-        <div className="detail-page--similar-product product-wrapper">
-          <div className="detail-page--similar-product product-item">
-            <Product />
-          </div>
-          <div className="detail-page--similar-product product-item">
-            <Product />
-          </div>
-          <div className="detail-page--similar-product product-item">
-            <Product />
-          </div>
-          <div className="detail-page--similar-product product-item">
-            <Product />
-          </div>
-          <div className="detail-page--similar-product product-item">
-            <Product />
-          </div>
-          <div className="detail-page--similar-product product-item">
-            <Product />
+      {similarProductList?.length > 0 && (
+        <div className="detail-page--similar-product">
+          <SimilarProductHeader>Sản phẩm tương tự</SimilarProductHeader>
+          <div className="detail-page--similar-product product-wrapper">
+            {similarProductList.map((product) => (
+              <div
+                className="detail-page--similar-product product-item"
+                key={product.id}
+              >
+                <Product product={product} />
+              </div>
+            ))}
           </div>
         </div>
-      </div> */}
+      )}
       {/* Similar Product */}
     </div>
   );
