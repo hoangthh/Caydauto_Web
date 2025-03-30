@@ -41,22 +41,38 @@ public class ProductService : IProductService
 
     public async Task<ProductDetailGetDto?> GetProduct(int id)
     {
-        var product = await _productRepository.GetByIdAsync(
-            id,
-            q => q.IncludeMultiple(q => q.Categories, q => q.Colors, q => q.Images, q => q.Comments)
-        ).ConfigureAwait(false);
+        var product = await _productRepository
+            .GetByIdAsync(
+                id,
+                q =>
+                    q.IncludeMultiple(
+                        q => q.Categories,
+                        q => q.Colors,
+                        q => q.Images,
+                        q => q.Comments
+                    )
+            )
+            .ConfigureAwait(false);
         var productGetDto = _mapper.Map<ProductDetailGetDto>(product);
         return productGetDto;
     }
 
     public async Task<PagedResult<ProductAllGetDto>> GetProducts(int page = 1, int pageSize = 6)
     {
-        var product = await _productRepository.GetAllAsync(
-            page,
-            pageSize,
-            true,
-            q => q.IncludeMultiple(q => q.Categories, q => q.Colors, q => q.Images, q => q.Comments)
-        ).ConfigureAwait(false);
+        var product = await _productRepository
+            .GetAllAsync(
+                page,
+                pageSize,
+                true,
+                q =>
+                    q.IncludeMultiple(
+                        q => q.Categories,
+                        q => q.Colors,
+                        q => q.Images,
+                        q => q.Comments
+                    )
+            )
+            .ConfigureAwait(false);
         var productGetDto = _mapper.Map<IEnumerable<ProductAllGetDto>>(product.Items);
         return new PagedResult<ProductAllGetDto>
         {
@@ -69,34 +85,47 @@ public class ProductService : IProductService
 
     public async Task<PagedResult<ProductAllGetDto>> GetProducts(ProductFilter productFilter)
     {
-        var product = await _productRepository.GetAllAsync(
-            productFilter.Page,
-            productFilter.PageSize,
-            true,
-            q =>
-                q.IncludeMultiple(q => q.Categories, q => q.Colors, q => q.Images, q => q.Comments)
-                    .Where(p =>
-                        (
-                            string.IsNullOrEmpty(productFilter.Name)
-                            || p.Name.Contains(
-                                productFilter.Name,
-                                StringComparison.OrdinalIgnoreCase
+        var product = await _productRepository
+            .GetAllAsync(
+                productFilter.Page,
+                productFilter.PageSize,
+                true,
+                q =>
+                    q.IncludeMultiple(
+                            q => q.Categories,
+                            q => q.Colors,
+                            q => q.Images,
+                            q => q.Comments
+                        )
+                        .Where(p =>
+                            (
+                                string.IsNullOrEmpty(productFilter.Name)
+                                || p.Name.Contains(
+                                    productFilter.Name,
+                                    StringComparison.OrdinalIgnoreCase
+                                )
+                            )
+                            && (
+                                productFilter.Categories == null
+                                || !productFilter.Categories.Any()
+                                || p.Categories.Any(c => productFilter.Categories.Contains(c.Id))
+                            )
+                            && (productFilter.MinPrice == null || p.Price >= productFilter.MinPrice)
+                            && (productFilter.MaxPrice == null || p.Price <= productFilter.MaxPrice)
+                            && (
+                                productFilter.Colors == null
+                                || !productFilter.Colors.Any()
+                                || p.Colors.Any(c => productFilter.Colors.Contains(c.Id))
+                            )
+                            && (
+                                productFilter.Brands == null
+                                || !productFilter.Brands.Any()
+                                || productFilter.Brands.Contains(p.Brand)
                             )
                         )
-                        && (
-                            productFilter.Categories == null
-                            || p.Categories.Any(c => productFilter.Categories.Contains(c.Id))
-                        )
-                        && (productFilter.MinPrice == null || p.Price >= productFilter.MinPrice)
-                        && (productFilter.MaxPrice == null || p.Price <= productFilter.MaxPrice)
-                        && (
-                            productFilter.Colors == null
-                            || p.Colors.Any(c => productFilter.Colors.Contains(c.Id))
-                        )
-                        && (productFilter.Brands == null || productFilter.Brands.Contains(p.Brand))
-                    )
-                    .OrderByMultiple((productFilter.OrderBy, productFilter.IsDesc))
-        ).ConfigureAwait(false);
+                        .OrderByMultiple((productFilter.OrderBy, productFilter.IsDesc))
+            )
+            .ConfigureAwait(false);
 
         var productGetDto = _mapper.Map<IEnumerable<ProductAllGetDto>>(product.Items);
         return new PagedResult<ProductAllGetDto>
@@ -111,14 +140,18 @@ public class ProductService : IProductService
     public async Task<IEnumerable<ProductAllGetDto>> GetSimilarProducts(int id)
     {
         var categoriesId = await _categoryRepository.GetAllCategoriesAsync().ConfigureAwait(false);
-        var similarProducts = await _productRepository.GetSimilarProductsAsync(id, categoriesId.Select(c => c.Id).ToList()).ConfigureAwait(false);
+        var similarProducts = await _productRepository
+            .GetSimilarProductsAsync(id, categoriesId.Select(c => c.Id).ToList())
+            .ConfigureAwait(false);
         var productGetDto = _mapper.Map<IEnumerable<ProductAllGetDto>>(similarProducts.Items);
         return productGetDto;
     }
+
     public Task<bool> UpdateProduct(ProductPutDto productPutDto)
     {
         throw new NotImplementedException();
     }
+
     public async Task<List<string>> GetBrands()
     {
         var brands = await _productRepository.GetBrandsAsync().ConfigureAwait(false);

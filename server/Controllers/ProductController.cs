@@ -122,7 +122,7 @@ public class ProductFilter
 {
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 6;
-    public string? Name { get; set; }
+    public string? Name { get; set; } = string.Empty;
     public List<int>? Categories { get; set; }
     public decimal? MinPrice { get; set; }
     public decimal? MaxPrice { get; set; }
