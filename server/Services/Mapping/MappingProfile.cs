@@ -70,9 +70,15 @@ namespace server.Services.Mapping
             CreateMap<Color, ColorGetDto>()
                 .ForMember(
                     dest => dest.HexCode,
-                    opt => opt.MapFrom(src => new ColorConverter().ConvertFromString(src.Name))
+                    opt =>
+                        opt.MapFrom(src =>
+                            "#" + string.Format(
+                                "{0:x6}",
+                                System.Drawing.Color.FromName(src.Name).ToArgb() & 0x00FFFFFF
+                            )
+                        )
                 );
-            
+
             CreateMap<ColorCreateDto, Color>()
                 .ForMember(dest => dest.Products, opt => opt.Ignore())
                 .ForMember(dest => dest.Id, opt => opt.Ignore());

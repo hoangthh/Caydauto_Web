@@ -10,4 +10,5 @@ public interface IProductService
     public Task<ProductDetailGetDto> AddProduct(ProductCreateDto productPostDto);
     public Task<bool> UpdateProduct(ProductPutDto productPutDto);
     public Task<bool> DeleteProduct(int id);
+    public Task<List<string>> GetBrands();
 }

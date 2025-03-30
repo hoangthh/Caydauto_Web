@@ -69,4 +69,12 @@ public class ProductRepository(AppDbContext context)
 
         return totalPrice;
     }
+    public async Task<List<string>> GetBrandsAsync()
+    {
+        return await _entities
+            .AsNoTracking()
+            .Select(p => p.Brand)
+            .Distinct()
+            .ToListAsync().ConfigureAwait(false);
+    }
 }
