@@ -11,15 +11,21 @@ const ProductPagination = styled(Pagination)`
 
 export const ProductPage = () => {
   const [productList, setProductList] = useState([]);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
-    const fetchProductListWithFilterByPagination = async () => {
-      const productList = await fetchProductsWithFilterByPagination();
+    const fetchProductList = async () => {
+      const productList = await fetchProductsWithFilterByPagination(page, 6);
       setProductList(productList);
     };
 
-    productList && fetchProductListWithFilterByPagination();
-  }, []);
+    fetchProductList();
+  }, [page]);
+
+  const handleChange = (event, value) => {
+    console.log(value);
+    setPage(value);
+  };
 
   return (
     <div className="product-page">
@@ -30,8 +36,8 @@ export const ProductPage = () => {
       <div className="product-page--product-wrapper">
         {/* Product List */}
         <div className="product-page--product-list">
-          {productList?.length > 0 &&
-            productList.map((product) => (
+          {productList?.items?.length > 0 &&
+            productList.items.map((product) => (
               <div
                 className="product-page--product-list__product-item"
                 key={product.id}
@@ -43,7 +49,12 @@ export const ProductPage = () => {
         {/* Product List */}
 
         {/* Product Pagination */}
-        <ProductPagination count={10} hidePrevButton color="primary" />
+        <ProductPagination
+          count={productList.totalPages}
+          hidePrevButton
+          color="primary"
+          onChange={handleChange}
+        />
         {/* Product Pagination */}
       </div>
     </div>

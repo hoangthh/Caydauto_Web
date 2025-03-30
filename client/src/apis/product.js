@@ -1,9 +1,11 @@
 import { axiosInstance } from "./axiosInstance";
 
-export const fetchProductsWithFilterByPagination = async () => {
+export const fetchProductsWithFilterByPagination = async (page, pageSize) => {
   try {
-    const response = await axiosInstance.get(`/api/Product/`);
-    return response.data.items;
+    const response = await axiosInstance.get(
+      `/api/Product/all?page=${page}&pageSize=${pageSize}`
+    );
+    return response.data;
   } catch (error) {
     console.log(error);
   }

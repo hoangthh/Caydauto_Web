@@ -19,7 +19,7 @@ import {
   fetchDetailProductById,
   fetchSimilarProductsById,
 } from "../../apis/product";
-// import { addProductToCart } from "../../apis/cart";
+import { addProductToCart } from "../../apis/cart";
 
 const ProductName = styled(Typography)`
   font-size: 20px;
@@ -77,28 +77,28 @@ const SimilarProductHeader = styled(Typography)`
 export const DetailPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [detailProduct, setDetailProduct] = useState({});
-  // const [color, setColor] = useState(null);
+  const [colorList, setColorList] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [similarProductList, setSimilarProductList] = useState([]);
+  const [colorId, setColorId] = useState(null);
 
   const { productId } = useParams();
 
   useEffect(() => {
     const fetchDetailProduct = async () => {
-      setDetailProduct(true);
       const detailProduct = await fetchDetailProductById(productId);
       setDetailProduct(detailProduct);
+      setColorList(detailProduct.colors);
     };
-
-    fetchDetailProduct();
 
     const fetchSimilarProductList = async () => {
       const similarProductList = await fetchSimilarProductsById(productId);
       setSimilarProductList(similarProductList);
     };
 
+    setIsLoading(true);
+    fetchDetailProduct();
     fetchSimilarProductList();
-
     setIsLoading(false);
   }, []);
 
@@ -112,7 +112,8 @@ export const DetailPage = () => {
   };
 
   const handleAddToCart = async () => {
-    // await addProductToCart({productId, color, quantity})
+    const response = await addProductToCart({ productId, colorId, quantity });
+    console.log(response);
   };
 
   if (isLoading) return <CircularProgress />;
@@ -137,17 +138,19 @@ export const DetailPage = () => {
 
           {/* Main Product Color */}
           <div className="detail-page--product__detail color">
-            <input
-              type="checkbox"
-              className="input orange"
-              value="orange"
-              onChange={(e) => {
-                console.log(e.target.value);
-              }}
-            />
-            <input type="checkbox" className="input pink" value="pink" />
-            <input type="checkbox" className="input red" value="orange" />
-            <input type="checkbox" className="input black" value="orange" />
+            {colorList?.map((color) => (
+              <input
+                key={color.id}
+                type="checkbox"
+                className={`input detail-color ${color.name}`}
+                value={color.name}
+                checked={colorId === color.id}
+                onChange={(e) => {
+                  console.log(e.target.value);
+                  setColorId(color.id);
+                }}
+              />
+            ))}
           </div>
           {/* Main Product Color */}
 
