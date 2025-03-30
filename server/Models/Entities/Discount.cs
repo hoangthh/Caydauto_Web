@@ -17,4 +17,5 @@ public class Discount
 
     [StringLength(50, ErrorMessage = "Discount code cannot exceed 50 characters")]
     public string Code { get; set; } = string.Empty;
+    public int Quantity;
 }

@@ -71,7 +71,7 @@ public class AccountService : IAccountService
     private async Task SignInWithCookies(User user, bool rememberMe)
     {
         var userWithRole = await _userRepository.GetUserWithRoleByIdAsync(user.Id).ConfigureAwait(false); // Lấy tên vai trò của người dùng
-        var roleName = userWithRole != null ? userWithRole.Role!.Name : "Guest"; // Lấy tên vai trò của người dùng
+        var roleName = userWithRole != null ? userWithRole.Role!.Name : "User"; // Lấy tên vai trò của người dùng
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), // Thêm thông tin ID người dùng

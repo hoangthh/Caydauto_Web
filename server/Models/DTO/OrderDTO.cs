@@ -19,13 +19,12 @@ public class OrderGetDto
 
 public class OrderCreateDto
 {
-    [Required(ErrorMessage = "Shipping address is required")]
-    [StringLength(200, ErrorMessage = "Shipping address cannot exceed 200 characters")]
-    public string ShippingAddress { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Payment method is required")]
     [RegularExpression("COD|VnPay", ErrorMessage = "Payment method must be COD or VnPay")]
     public string PaymentMethod { get; set; } = "COD";
+    public string ShippingAddress { get; set; } = string.Empty;
+    public int toProvinceId { get; set; }
     public int toDistrictId { get; set; }
     public string toWardId { get; set; } = string.Empty;
     
@@ -54,7 +53,14 @@ public class OrderCreateDto
     // )]
     // public string OrderStatus { get; set; } = "Pending";
 
-    public int? DiscountId { get; set; }
+    public string? DiscountCode { get; set; }
 
     public List<OrderItemCreateDto> OrderItems { get; set; } = new List<OrderItemCreateDto>();
+}
+
+
+public class OrderResponse {
+    public bool IsSuccess;
+    public string? Message { get; set; }
+    public List<OrderGetDto>? OrderItems { get; set; }
 }

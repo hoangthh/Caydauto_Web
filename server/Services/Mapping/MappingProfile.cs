@@ -72,7 +72,8 @@ namespace server.Services.Mapping
                     dest => dest.HexCode,
                     opt =>
                         opt.MapFrom(src =>
-                            "#" + string.Format(
+                            "#"
+                            + string.Format(
                                 "{0:x6}",
                                 System.Drawing.Color.FromName(src.Name).ToArgb() & 0x00FFFFFF
                             )
@@ -143,7 +144,6 @@ namespace server.Services.Mapping
             CreateMap<CartItemCreateDto, CartItem>()
                 .ForMember(dest => dest.Product, opt => opt.Ignore())
                 .ForMember(dest => dest.Cart, opt => opt.Ignore())
-                .ForMember(dest => dest.CartId, opt => opt.Ignore())
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
             CreateMap<CartItemGetDto, CartItem>()
                 .ForMember(dest => dest.Product, opt => opt.Ignore())

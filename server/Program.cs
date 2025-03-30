@@ -5,20 +5,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddProjectServices(builder.Configuration);
 var app = builder.Build();
 
-// Seed Roles
-using (var scope = app.Services.CreateScope())
+if (args.Contains("seed"))
 {
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
-    var roles = new[] { "User", "Admin" };
-
-    foreach (var roleName in roles)
+    using (var scope = app.Services.CreateScope())
     {
-        if (!await roleManager.RoleExistsAsync(roleName).ConfigureAwait(false))
-        {
-            await roleManager.CreateAsync(new Role { Name = roleName }).ConfigureAwait(false);
-        }
+        await IdentityInitializer.InitAdminUser(scope.ServiceProvider).ConfigureAwait(false);
+        Console.WriteLine("Data seeding completed.");
+        return;
     }
 }
+
 // Sử dụng Swagger và Swagger UI trong pipeline
 
 // Middleware Pipeline

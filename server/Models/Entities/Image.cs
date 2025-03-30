@@ -11,5 +11,5 @@ public class Image
     public int ProductId { get; set; }
 
     // Navigation property
-    public Product Product { get; set; } = new Product();
+    public Product? Product { get; set; }
 }

@@ -16,9 +16,11 @@ public class CartRepository : ICartRepository
         return _dbSet
             .Include(c => c.CartItems)
             .ThenInclude(ci => ci.Product)
+            .ThenInclude(p => p.Images)
+            .Include(c => c.CartItems)
+            .ThenInclude(ci => ci.Color)
             .FirstOrDefaultAsync(c => c.UserId == userId);
     }
-
     public async Task<bool> AddToCart(int userId, CartItem cartItem)
     {
         var cart = await GetCartByUserId(userId).ConfigureAwait(false);

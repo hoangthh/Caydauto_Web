@@ -20,13 +20,13 @@ public class DiscountRepository : Repository<Discount>, IDiscountRepository
             .ToListAsync().ConfigureAwait(false);
     }
 
-    override public async Task<Discount?> AddAsync(Discount entity)
+    public override async Task<Discount?> AddAsync(Discount entity)
     {
         var existingDiscount = await _context.Discounts
             .FirstOrDefaultAsync(d => d.Code == entity.Code).ConfigureAwait(false);
         if (existingDiscount != null)
         {
-            existingDiscount.Value += entity.Value;
+            existingDiscount.Quantity += entity.Quantity;
             var result = await UpdateAsync(existingDiscount).ConfigureAwait(false);
             return existingDiscount;
         }

@@ -5,6 +5,7 @@ public class DiscountGetDto
     public int Id { get; set; }
     public string Type { get; set; } = "Percentage";
     public decimal Value { get; set; }
+    public int Quantity;
     public string Code { get; set; } = string.Empty;
 }
 
@@ -23,6 +24,10 @@ public class DiscountCreateDto
 
     [StringLength(50, ErrorMessage = "Discount code cannot exceed 50 characters")]
     public required string Code { get; set; }
+
+    [Required]
+    [Range(1, 1000)]
+    public int Quantity { get; set; }
 }
 
 public class DiscountPutDto

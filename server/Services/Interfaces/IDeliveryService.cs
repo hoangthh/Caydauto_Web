@@ -1,14 +1,12 @@
 public interface IDeliveryService
 {
-    Task<string> GetProvincesAsync();
-    Task<string> GetDistrictsAsync(int provinceId);
-    Task<string> GetWardsAsync(int districtId);
-    Task<string> GetAvailableServicesAsync(int fromDistrictId, int toDistrictId);
-    Task<string> GetShippingFeeAsync(
+    Task<List<Province>?> GetProvincesAsync();
+    Task<List<District>?> GetDistrictsAsync(int provinceId);
+    Task<List<Ward>?> GetWardsAsync(int districtId);
+    Task<int> GetShippingFeeAsync(
         int toDistrictId,
         string toWardCode,
         int insuranceValue,
-        int fromDistrictId = 1448 //Quận 6
-
+        int fromDistrictId = 1448
     );
 }
