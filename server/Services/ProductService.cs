@@ -98,30 +98,36 @@ public class ProductService : IProductService
                             q => q.Comments
                         )
                         .Where(p =>
-                            (
-                                string.IsNullOrEmpty(productFilter.Name)
-                                || p.Name.Contains(
-                                    productFilter.Name,
-                                    StringComparison.OrdinalIgnoreCase
+                            string.IsNullOrEmpty(productFilter.Name)
+                            || AlgorithmFunction.LevenshteinDistance(
+                                p.Name.RemoveDiacritics().ToLower(),
+                                productFilter.Name.RemoveDiacritics().ToLower()
+                            ) <= 2
+                                && (
+                                    productFilter.Categories == null
+                                    || !productFilter.Categories.Any()
+                                    || p.Categories.Any(c =>
+                                        productFilter.Categories.Contains(c.Id)
+                                    )
                                 )
-                            )
-                            && (
-                                productFilter.Categories == null
-                                || !productFilter.Categories.Any()
-                                || p.Categories.Any(c => productFilter.Categories.Contains(c.Id))
-                            )
-                            && (productFilter.MinPrice == null || p.Price >= productFilter.MinPrice)
-                            && (productFilter.MaxPrice == null || p.Price <= productFilter.MaxPrice)
-                            && (
-                                productFilter.Colors == null
-                                || !productFilter.Colors.Any()
-                                || p.Colors.Any(c => productFilter.Colors.Contains(c.Id))
-                            )
-                            && (
-                                productFilter.Brands == null
-                                || !productFilter.Brands.Any()
-                                || productFilter.Brands.Contains(p.Brand)
-                            )
+                                && (
+                                    productFilter.MinPrice == null
+                                    || p.Price >= productFilter.MinPrice
+                                )
+                                && (
+                                    productFilter.MaxPrice == null
+                                    || p.Price <= productFilter.MaxPrice
+                                )
+                                && (
+                                    productFilter.Colors == null
+                                    || !productFilter.Colors.Any()
+                                    || p.Colors.Any(c => productFilter.Colors.Contains(c.Id))
+                                )
+                                && (
+                                    productFilter.Brands == null
+                                    || !productFilter.Brands.Any()
+                                    || productFilter.Brands.Contains(p.Brand)
+                                )
                         )
                         .OrderByMultiple((productFilter.OrderBy, productFilter.IsDesc))
             )
