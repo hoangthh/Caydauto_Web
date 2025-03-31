@@ -301,7 +301,7 @@ public static class ExpressionHelper
 
     public static IQueryable<T> IncludeMultiple<T>(
         this IQueryable<T> query,
-        params Expression<Func<T, object>>[] includes
+        params Expression<Func<T, object?>>[] includes
     )
         where T : class
     {

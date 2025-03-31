@@ -18,6 +18,14 @@ public class ProductRepository(AppDbContext context)
             .ConfigureAwait(false);
     }
 
+    public async Task<List<Product>> GetByIdsAsync(IEnumerable<int> productIds)
+    {
+        return await _context
+            .Products.Where(p => productIds.Contains(p.Id))
+            .ToListAsync()
+            .ConfigureAwait(false);
+    }
+
     public async Task<decimal> GetProductPriceByIdAsync(int productId)
     {
         var product = await GetByIdAsync(productId).ConfigureAwait(false);
@@ -111,5 +119,14 @@ public class ProductRepository(AppDbContext context)
             }
         }
         return productsNotQualified;
+    }
+
+    public async Task<Dictionary<int, decimal>> GetProductPriceByIdsAsync(int[] productIds)
+    {
+        var product = await _entities
+            .Where(p => productIds.Contains(p.Id))
+            .ToArrayAsync()
+            .ConfigureAwait(false);
+        return product.Select(p => new { p.Id, p.Price }).ToDictionary(p => p.Id, p => p.Price);
     }
 }
