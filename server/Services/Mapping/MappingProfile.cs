@@ -158,11 +158,8 @@ namespace server.Services.Mapping
                 .ForMember(
                     dest => dest.OrderItems,
                     opt => opt.MapFrom(src => src.OrderItems ?? new List<OrderItem>())
-                )
-                .ForMember(
-                    dest => dest.TotalPrice,
-                    opt => opt.MapFrom(src => src.OrderItems.Sum(oi => oi.Quantity * oi.UnitPrice))
                 );
+               
             CreateMap<OrderItem, OrderItemGetDto>()
                 .ForMember(dest => dest.Product, opt => opt.MapFrom(src => src.Product))
                 .ForMember(dest => dest.Color, opt => opt.MapFrom(src => src.Color));
