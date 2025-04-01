@@ -51,7 +51,7 @@ public class OrderService : IOrderService
             var totalPrice = await _productRepository
                 .GetTotalPriceByProductsIdAsync(productIdQuantity)
                 .ConfigureAwait(false);
-            var totalPriceAfterDiscount = totalPrice;
+
             // Tính phí vận chuyển (DeliveryFee)
             var deliveryFee = await _deliveryService
                 .GetShippingFeeAsync(
@@ -61,46 +61,12 @@ public class OrderService : IOrderService
                 )
                 .ConfigureAwait(false);
 
-            // Xử lý mã giảm giá (nếu có) - chỉ tính toán, chưa trừ Quantity
-            Discount? discount = null;
-            decimal discountAmount = 0;
-            if (!string.IsNullOrEmpty(order.DiscountCode))
-            {
-                discount = await _discountRepository
-                    .GetDiscountByCodeAsync(order.DiscountCode)
+            // Áp dụng mã giảm giá
+            var (totalPriceAfterDiscount, updatedDeliveryFee, discountAmount) =
+                await ApplyDiscountAsync(totalPrice, deliveryFee, order.DiscountCode)
                     .ConfigureAwait(false);
 
-                if (discount == null || discount.Quantity <= 0)
-                {
-                    return new OrderResponse
-                    {
-                        IsSuccess = false,
-                        Message = "Discount code is not valid",
-                    };
-                }
-
-                string discountType = discount.Type;
-                switch (discountType.ToUpper())
-                {
-                    case "PERCENTAGE":
-                        totalPriceAfterDiscount = totalPrice * (1 - discount.Value / 100);
-                        discountAmount = totalPrice - totalPriceAfterDiscount;
-                        break;
-                    case "FIXEDAMOUNT":
-                        totalPriceAfterDiscount = totalPrice - discount.Value;
-                        discountAmount = totalPriceAfterDiscount - totalPrice;
-                        break;
-                    case "SHIPPINGPERCENTAGE":
-                        deliveryFee = (int)
-                            Math.Round(
-                                deliveryFee * (1 - discount.Value / 100),
-                                MidpointRounding.AwayFromZero
-                            );
-                        break;
-                    default:
-                        break;
-                }
-            }
+            // Lấy địa chỉ giao hàng
             var addressResult = await _addressService
                 .GetAddress(
                     order.ShippingAddress,
@@ -113,24 +79,31 @@ public class OrderService : IOrderService
             {
                 return new OrderResponse { IsSuccess = false, Message = addressResult.Message };
             }
+
+            // Lấy giá sản phẩm
             var productsPrice = await _productRepository
                 .GetProductPriceByIdsAsync(order.OrderItems.Select(o => o.ProductId).ToArray())
                 .ConfigureAwait(false);
+
+            // Tạo đơn hàng
             var orderEntity = new Order
             {
                 UserId = userId,
                 OrderDate = DateTime.Now,
-                OrderStatus = "Pending", // Trạng thái ban đầu
+                OrderStatus = "Pending",
                 TotalPrice = totalPrice,
                 TotalPriceAfterDiscount = totalPriceAfterDiscount,
-                DeliveryFee = deliveryFee,
-                DiscountId = discount == null ? null : discount.Id, // Lưu mã giảm giá để sử dụng sau
+                DeliveryFee = updatedDeliveryFee,
+                DiscountId = string.IsNullOrEmpty(order.DiscountCode)
+                    ? null
+                    : (
+                        await _discountRepository
+                            .GetDiscountByCodeAsync(order.DiscountCode)
+                            .ConfigureAwait(false)
+                    )?.Id,
                 ShippingAddress = addressResult.Message,
                 DeliveryDiscount =
-                    discount == null ? 0
-                    : discount.Type.ToUpper() == "SHIPPINGPERCENTAGE"
-                        ? (int)Math.Round(deliveryFee * discount.Value / 100)
-                    : 0,
+                    updatedDeliveryFee != deliveryFee ? deliveryFee - updatedDeliveryFee : 0,
                 DiscountAmount = discountAmount,
                 OrderItems = order
                     .OrderItems.Select(oi => new OrderItem
@@ -141,12 +114,10 @@ public class OrderService : IOrderService
                         UnitPrice = productsPrice[oi.ProductId],
                     })
                     .ToList(),
-                // Các thuộc tính khác của Order
             };
 
-            // Lưu đơn hàng vào database
+            // Lưu đơn hàng
             await _orderRepository.AddAsync(orderEntity).ConfigureAwait(false);
-
             await transaction.CommitAsync().ConfigureAwait(false);
 
             return new OrderResponse
@@ -167,13 +138,14 @@ public class OrderService : IOrderService
         }
     }
 
-    public async Task<OrderGetDto> GetOrderAsync(int orderId)
+    public async Task<OrderGetDto?> GetOrderAsync(int orderId)
     {
         var order = await _orderRepository
             .GetByIdAsync(orderId, _orderRepository.OrderNavigate())
             .ConfigureAwait(false);
-        var orderGetDto = _mapper.Map<OrderGetDto>(order);
-        return orderGetDto;
+        if (order == null)
+            return null;
+        return MapToOrderGetDto(order);
     }
 
     public async Task<List<OrderGetDto>> GetOrdersAsync(int pageNumber, int pageSize)
@@ -181,8 +153,7 @@ public class OrderService : IOrderService
         var orders = await _orderRepository
             .GetAllAsync(pageNumber, pageSize, true, _orderRepository.OrderNavigate())
             .ConfigureAwait(false);
-        var orderGetDtos = _mapper.Map<List<OrderGetDto>>(orders);
-        return orderGetDtos;
+        return MapToOrderGetDtos(orders.Items);
     }
 
     public async Task<OrderResponse> UpdateOrderAsync(int orderId, string newStatus)
@@ -205,7 +176,7 @@ public class OrderService : IOrderService
             if (newStatus.ToUpper() == "PROCESSING" && order.OrderStatus.ToUpper() != "PROCESSING")
             {
                 // Lấy danh sách sản phẩm và số lượng từ OrderItems
-                (int ProductId, int Quantity)[] productIdQuantity = order
+                var productIdQuantity = order
                     .OrderItems.Select(oi => (oi.ProductId, oi.Quantity))
                     .ToArray();
 
@@ -225,29 +196,12 @@ public class OrderService : IOrderService
                 }
 
                 // Cập nhật StockQuantity và Sold
-                var productIds = productIdQuantity.Select(x => x.ProductId).ToList();
-                var products = await _productRepository
-                    .GetByIdsAsync(productIds)
+                var updateResult = await UpdateProductQuantitiesAsync(
+                        productIdQuantity,
+                        isCancellation: false
+                    )
                     .ConfigureAwait(false);
-
-                // Tạo dictionary để tra cứu nhanh số lượng từ productIdQuantity
-                var quantityDict = productIdQuantity.ToDictionary(
-                    x => x.ProductId,
-                    x => x.Quantity
-                );
-                // Cập nhật StockQuantity và Sold cho tất cả sản phẩm
-                foreach (var product in products)
-                {
-                    if (quantityDict.TryGetValue(product.Id, out int quantity))
-                    {
-                        product.StockQuantity -= quantity;
-                        product.Sold += quantity;
-                    }
-                }
-                var result = await _productRepository
-                    .UpdateRangeAsync(products)
-                    .ConfigureAwait(false);
-                if (!result)
+                if (!updateResult)
                 {
                     return new OrderResponse
                     {
@@ -255,7 +209,9 @@ public class OrderService : IOrderService
                         Message = "Failed to update product stock quantity and sold",
                     };
                 }
-                if (order.DiscountId != null && order.DiscountId != 0)
+
+                // Trừ Discount.Quantity nếu có mã giảm giá
+                if (order.DiscountId.HasValue)
                 {
                     var discount = await _discountRepository
                         .GetByIdAsync(order.DiscountId.Value)
@@ -297,6 +253,182 @@ public class OrderService : IOrderService
             {
                 IsSuccess = false,
                 Message = $"Failed to update order: {ex.Message}",
+            };
+        }
+    }
+
+    private async Task<(
+        decimal TotalPriceAfterDiscount,
+        int DeliveryFee,
+        decimal DiscountAmount
+    )> ApplyDiscountAsync(decimal totalPrice, int deliveryFee, string discountCode)
+    {
+        decimal totalPriceAfterDiscount = totalPrice;
+        decimal discountAmount = 0;
+
+        if (string.IsNullOrEmpty(discountCode))
+        {
+            return (totalPriceAfterDiscount, deliveryFee, discountAmount);
+        }
+
+        var discount = await _discountRepository
+            .GetDiscountByCodeAsync(discountCode)
+            .ConfigureAwait(false);
+
+        if (discount == null || discount.Quantity <= 0)
+        {
+            throw new Exception("Discount code is not valid");
+        }
+
+        switch (discount.Type.ToUpper())
+        {
+            case "PERCENTAGE":
+                totalPriceAfterDiscount = totalPrice * (1 - discount.Value / 100);
+                discountAmount = totalPrice - totalPriceAfterDiscount;
+                break;
+            case "FIXEDAMOUNT":
+                totalPriceAfterDiscount = totalPrice - discount.Value;
+                discountAmount = totalPrice - totalPriceAfterDiscount;
+                break;
+            case "SHIPPINGPERCENTAGE":
+                deliveryFee = (int)
+                    Math.Round(
+                        deliveryFee * (1 - discount.Value / 100),
+                        MidpointRounding.AwayFromZero
+                    );
+                break;
+        }
+
+        return (totalPriceAfterDiscount, deliveryFee, discountAmount);
+    }
+
+    private async Task<bool> UpdateProductQuantitiesAsync(
+        IEnumerable<(int ProductId, int Quantity)> productIdQuantity,
+        bool isCancellation = false
+    )
+    {
+        var productIds = productIdQuantity.Select(x => x.ProductId).ToList();
+        var products = await _productRepository.GetByIdsAsync(productIds).ConfigureAwait(false);
+
+        var quantityDict = productIdQuantity.ToDictionary(x => x.ProductId, x => x.Quantity);
+
+        foreach (var product in products)
+        {
+            if (quantityDict.TryGetValue(product.Id, out int quantity))
+            {
+                if (isCancellation)
+                {
+                    product.StockQuantity += quantity;
+                    product.Sold -= quantity;
+                }
+                else
+                {
+                    product.StockQuantity -= quantity;
+                    product.Sold += quantity;
+                }
+            }
+        }
+
+        return await _productRepository.UpdateRangeAsync(products).ConfigureAwait(false);
+    }
+
+    private OrderGetDto MapToOrderGetDto(Order order)
+    {
+        return _mapper.Map<OrderGetDto>(order);
+    }
+
+    private List<OrderGetDto> MapToOrderGetDtos(IEnumerable<Order> orders)
+    {
+        return _mapper.Map<List<OrderGetDto>>(orders);
+    }
+
+    public async Task<OrderResponse> CancelOrderAsync(int orderId)
+    {
+        using var transaction = await _orderRepository
+            .BeginTransactionAsync()
+            .ConfigureAwait(false);
+        try
+        {
+            // Lấy đơn hàng từ database
+            var order = await _orderRepository
+                .GetByIdAsync(orderId, _orderRepository.OrderNavigate())
+                .ConfigureAwait(false);
+            if (order == null)
+            {
+                return new OrderResponse { IsSuccess = false, Message = "Order not found" };
+            }
+
+            // Kiểm tra trạng thái đơn hàng
+            var currentStatus = order.OrderStatus.ToUpper();
+            if (currentStatus != "PENDING" && currentStatus != "PROCESSING")
+            {
+                return new OrderResponse
+                {
+                    IsSuccess = false,
+                    Message = "Cannot cancel order. Order must be in Pending or Processing status.",
+                };
+            }
+
+            // Nếu trạng thái là Processing, hoàn lại số lượng sản phẩm
+            if (currentStatus == "PROCESSING")
+            {
+                var productIdQuantity = order
+                    .OrderItems.Select(oi => (oi.ProductId, oi.Quantity))
+                    .ToArray();
+
+                var updateResult = await UpdateProductQuantitiesAsync(
+                        productIdQuantity,
+                        isCancellation: true
+                    )
+                    .ConfigureAwait(false);
+                if (!updateResult)
+                {
+                    return new OrderResponse
+                    {
+                        IsSuccess = false,
+                        Message = "Failed to restore product stock quantity and sold",
+                    };
+                }
+            }
+
+            // Hoàn lại Discount.Quantity nếu có mã giảm giá
+            if (order.DiscountId.HasValue)
+            {
+                var discount = await _discountRepository
+                    .GetByIdAsync(order.DiscountId.Value)
+                    .ConfigureAwait(false);
+
+                if (discount != null)
+                {
+                    discount.Quantity++;
+                    await _discountRepository.UpdateAsync(discount).ConfigureAwait(false);
+                }
+                else
+                {
+                    return new OrderResponse { IsSuccess = false, Message = "Discount not found" };
+                }
+            }
+
+            // Cập nhật trạng thái đơn hàng thành Cancelled
+            order.OrderStatus = "Cancelled";
+            await _orderRepository.UpdateAsync(order).ConfigureAwait(false);
+
+            await transaction.CommitAsync().ConfigureAwait(false);
+
+            return new OrderResponse
+            {
+                IsSuccess = true,
+                Message = "Order cancelled successfully",
+                OrderId = order.Id,
+            };
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync().ConfigureAwait(false);
+            return new OrderResponse
+            {
+                IsSuccess = false,
+                Message = $"Failed to cancel order: {ex.Message}",
             };
         }
     }

@@ -6,6 +6,6 @@ public interface IOrderService
 {
     Task<OrderResponse> CreateOrderAsync(OrderCreateDto order);
     Task<OrderResponse> UpdateOrderAsync(int orderId, string newStatus);
-    Task<OrderGetDto> GetOrderAsync(int orderId);
+    Task<OrderGetDto?> GetOrderAsync(int orderId);
     Task<List<OrderGetDto>> GetOrdersAsync(int pageNumber, int pageSize);
 }
