@@ -55,11 +55,11 @@ export const CartPage = () => {
 
       <div className="cart-page--main">
         <div className="cart-page--main__left">
-          {cartProductList?.length > 0 ? (
-            <CartProduct />
-          ) : (
-            "Chưa có sản phẩm trong giỏ hàng"
-          )}
+          {cartProductList?.cartItems?.length > 0
+            ? cartProductList.cartItems.map((cartItem) => (
+                <CartProduct cartItem={cartItem} key={cartItem.id} />
+              ))
+            : "Chưa có sản phẩm trong giỏ hàng"}
         </div>
 
         <div className="cart-page--main__right">

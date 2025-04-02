@@ -1,6 +1,6 @@
 import React from "react";
 import "./CartProduct.scss";
-import product from "../../assets/product.svg";
+import productImg from "../../assets/product.svg";
 import { styled, Typography } from "@mui/material";
 import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import RemoveCircleRoundedIcon from "@mui/icons-material/RemoveCircleRounded";
@@ -9,9 +9,6 @@ const ProductName = styled(Typography)`
   font-weight: bold;
 `;
 const ProductColor = styled(Typography)``;
-const ProductPrice = styled(Typography)`
-  font-weight: bold;
-`;
 
 const IncreaseQuantityButton = styled(AddCircleRoundedIcon)`
   margin-right: 10px;
@@ -27,14 +24,22 @@ const DecreaseQuantityButton = styled(RemoveCircleRoundedIcon)`
 
 const ProductQuantity = styled(Typography)``;
 
-export const CartProduct = ({ showQuantity = true }) => {
+const ProductPrice = styled(Typography)`
+  font-weight: bold;
+  font-size: 18px;
+`;
+
+export const CartProduct = ({ showQuantity = true, cartItem }) => {
   return (
     <div className="cart-product">
       <div className="cart-product--left">
-        <img src={product} className="cart-product--left__img" />
+        <img
+          src={cartItem.product.imageUrl || productImg}
+          className="cart-product--left__img"
+        />
         <div className="cart-product--left__info">
-          <ProductName>Tên sản phẩm</ProductName>
-          <ProductColor>Hồng</ProductColor>
+          <ProductName>{cartItem.product.name}</ProductName>
+          <ProductColor>{cartItem.color.name}</ProductColor>
         </div>
       </div>
       <div className="cart-product--right">
@@ -42,14 +47,14 @@ export const CartProduct = ({ showQuantity = true }) => {
         {showQuantity && (
           <div className="cart-product--right__quantity">
             <IncreaseQuantityButton />
-            <ProductQuantity>5</ProductQuantity>
+            <ProductQuantity>{cartItem.quantity}</ProductQuantity>
             <DecreaseQuantityButton />
           </div>
         )}
 
         {/* Main Product Price */}
         <div className="cart-product--right__price">
-          <ProductPrice>250.000đ</ProductPrice>
+          <ProductPrice>{cartItem.product.price}đ</ProductPrice>
         </div>
       </div>
     </div>
