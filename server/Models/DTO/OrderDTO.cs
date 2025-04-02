@@ -12,6 +12,7 @@ public class OrderGetDto
     public decimal DeliveryDiscount { get; set; }
     public decimal TotalPrice { get; set; }
     public decimal TotalPriceAfterDiscount { get; set; }
+    public int? TransactionId {get; set;    }
     public int? DiscountId { get; set; }
     public string OrderStatus { get; set; } = "Pending";
     public List<OrderItemGetDto> OrderItems { get; set; } = new List<OrderItemGetDto>();

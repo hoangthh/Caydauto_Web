@@ -44,6 +44,7 @@ public class Order
         ErrorMessage = "Invalid order status"
     )]
     public string OrderStatus { get; set; } = "Pending";
+    public int? TransactionId {get; set;}
 
     public int? DiscountId { get; set; }
 
