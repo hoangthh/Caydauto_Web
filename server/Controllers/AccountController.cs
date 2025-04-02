@@ -8,12 +8,28 @@ using Microsoft.AspNetCore.Mvc;
 public class AccountController : ControllerBase
 {
     private readonly IAccountService _accountService;
+    private readonly ICurrentUserService _currentUserService;
     private readonly ILogger<AccountController> _logger;
 
-    public AccountController(IAccountService accountService, ILogger<AccountController> logger)
+    public AccountController(
+        IAccountService accountService,
+        ILogger<AccountController> logger,
+        ICurrentUserService currentUserService
+    )
     {
         _logger = logger;
         _accountService = accountService;
+        _currentUserService = currentUserService;
+    }
+
+    [HttpGet("state")]
+    public IActionResult GetState()
+    {
+        if (_currentUserService.UserId != null)
+        {
+            return Ok("User had logged in");
+        }
+        return Unauthorized("User had not logged in");
     }
 
     [HttpPost("register")]
@@ -74,7 +90,9 @@ public class AccountController : ControllerBase
     {
         _logger.LogInformation("Google authentication started.");
         // Lấy thông tin xác thực từ Google
-        var info = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme).ConfigureAwait(false);
+        var info = await HttpContext
+            .AuthenticateAsync(GoogleDefaults.AuthenticationScheme)
+            .ConfigureAwait(false);
         if (!info.Succeeded)
             return Redirect(Constraint.Url.Client); // Chuyển hướng về trang đăng nhập nếu không thành công
         var result = await _accountService.GoogleAuthen(info).ConfigureAwait(false); // Gọi phương thức GoogleAuthen trong AccountService\

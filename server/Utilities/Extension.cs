@@ -84,11 +84,50 @@ public static class StringExtensions
 
     public static string RemoveDiacritics(this string text)
     {
-        var normalized = text.Normalize(NormalizationForm.FormD);
-        var chars = normalized.Where(c =>
-            CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark
-        );
-        return new string(chars.ToArray()).Normalize(NormalizationForm.FormC);
+        if (string.IsNullOrEmpty(text))
+            return text;
+
+        return string.Concat(
+                text.Normalize(NormalizationForm.FormD)
+                    .Where(c =>
+                        CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark
+                    )
+            )
+            .Normalize(NormalizationForm.FormC);
+    }
+}
+
+public static class AlgorithmFunction
+{
+    public static int LevenshteinDistance(string s, string t)
+    {
+        if (string.IsNullOrEmpty(s))
+            return t?.Length ?? 0;
+        if (string.IsNullOrEmpty(t))
+            return s.Length;
+
+        int m = s.Length,
+            n = t.Length;
+        int[,] dp = new int[m + 1, n + 1];
+
+        for (int i = 0; i <= m; i++)
+            dp[i, 0] = i;
+        for (int j = 0; j <= n; j++)
+            dp[0, j] = j;
+
+        for (int i = 1; i <= m; i++)
+        {
+            for (int j = 1; j <= n; j++)
+            {
+                int cost = s[i - 1] == t[j - 1] ? 0 : 1;
+                dp[i, j] = Math.Min(
+                    Math.Min(dp[i - 1, j] + 1, dp[i, j - 1] + 1),
+                    dp[i - 1, j - 1] + cost
+                );
+            }
+        }
+
+        return dp[m, n];
     }
 }
 
@@ -262,7 +301,7 @@ public static class ExpressionHelper
 
     public static IQueryable<T> IncludeMultiple<T>(
         this IQueryable<T> query,
-        params Expression<Func<T, object>>[] includes
+        params Expression<Func<T, object?>>[] includes
     )
         where T : class
     {

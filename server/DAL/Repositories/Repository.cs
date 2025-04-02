@@ -31,7 +31,11 @@ public class Repository<TEntity> : IRepository<TEntity>
 
         if (usePaging)
         {
-            items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync().ConfigureAwait(false);
+            items = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync()
+                .ConfigureAwait(false);
         }
         else
         {
@@ -69,14 +73,16 @@ public class Repository<TEntity> : IRepository<TEntity>
     {
         IQueryable<TEntity> query = _entities.AsQueryable();
 
-        if(include == null)
+        if (include == null)
         {
             return await _entities.FindAsync(id).ConfigureAwait(false);
         }
 
         query = include(query);
 
-        return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id).ConfigureAwait(false);
+        return await query
+            .FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id)
+            .ConfigureAwait(false);
     }
 
     public virtual async Task<TEntity?> AddAsync(TEntity entity)
@@ -96,6 +102,12 @@ public class Repository<TEntity> : IRepository<TEntity>
     public async Task<bool> UpdateAsync(TEntity entity)
     {
         _entities.Update(entity);
+        return await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
+    }
+
+    public async Task<bool> UpdateRangeAsync(IEnumerable<TEntity> entities)
+    {
+        _entities.UpdateRange(entities);
         return await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
     }
 

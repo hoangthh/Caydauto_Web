@@ -1,7 +1,14 @@
 using System.Threading.Tasks;
 using Microsoft.Identity.Client;
 
-public interface IAddressService { }
+public interface IAddressService { 
+    Task<(bool Success, string Message)> GetAddress(
+        string shippingAddress,
+        int provinceId,
+        int districtId,
+        string WardCode
+    );
+}
 
 public class AddressService : IAddressService
 {

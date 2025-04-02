@@ -1,13 +1,8 @@
-public interface IOrderRepository : IRepository<Order> {
+using Microsoft.EntityFrameworkCore;
 
-}
-
-public class OrderRepository : Repository<Order>, IOrderRepository
+public interface IOrderRepository : IRepository<Order>
 {
-    public OrderRepository(AppDbContext context) : base(context)
-    {
-    }
-
-    
-    
+    Func<IQueryable<Order>, IQueryable<Order>> OrderNavigate();
 }
+
+

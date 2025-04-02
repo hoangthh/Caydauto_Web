@@ -28,6 +28,7 @@ public interface IRepository<TEntity>
     Task<TEntity?> AddAsync(TEntity entity); // Trả về null nếu thất bại
     Task<IEnumerable<TEntity>?> AddRangeAsync(IEnumerable<TEntity> entities); // Trả về null nếu thất bại
     Task<bool> UpdateAsync(TEntity entity);
+    Task<bool> UpdateRangeAsync(IEnumerable<TEntity> entities);
     Task<bool> DeleteAsync(int id);
     Task<IDbContextTransaction> BeginTransactionAsync();
 }

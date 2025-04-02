@@ -18,6 +18,14 @@ public class ProductRepository(AppDbContext context)
             .ConfigureAwait(false);
     }
 
+    public async Task<List<Product>> GetByIdsAsync(IEnumerable<int> productIds)
+    {
+        return await _context
+            .Products.Where(p => productIds.Contains(p.Id))
+            .ToListAsync()
+            .ConfigureAwait(false);
+    }
+
     public async Task<decimal> GetProductPriceByIdAsync(int productId)
     {
         var product = await GetByIdAsync(productId).ConfigureAwait(false);
@@ -47,27 +55,31 @@ public class ProductRepository(AppDbContext context)
     }
 
     public async Task<decimal> GetTotalPriceByProductsIdAsync(
-        (int productId, int quantity)[] productsId
+        (int ProductId, int Quantity)[] productsId
     )
     {
-        Dictionary<int, decimal> productPrices = new();
-        var totalPrice = 0m;
-        List<Tuple<int, decimal>> products = await _entities
-            .AsNoTracking()
-            .Where(p => productsId.Select(p => p.productId).Contains(p.Id))
-            .Select(p => Tuple.Create(p.Id, p.Price))
-            .ToListAsync()
-            .ConfigureAwait(false);
-        foreach (var product in products)
-        {
-            productPrices.Add(product.Item1, product.Item2);
-        }
+        // Tạo dictionary từ productsId để tra cứu nhanh số lượng
+        var quantityDict = productsId.ToDictionary(p => p.ProductId, p => p.Quantity);
 
-        foreach (var product in productsId)
+        // Lấy giá sản phẩm từ database
+        var productPrices = await _entities
+            .AsNoTracking()
+            .Where(p => productsId.Select(x => x.ProductId).Contains(p.Id))
+            .Select(p => new { p.Id, p.Price })
+            .ToDictionaryAsync(p => p.Id, p => p.Price)
+            .ConfigureAwait(false);
+
+        // Tính tổng giá
+        decimal totalPrice = 0m;
+        foreach (var productId in quantityDict.Keys)
         {
-            if (productPrices.ContainsKey(product.productId))
+            if (productPrices.TryGetValue(productId, out var price))
             {
-                totalPrice += productPrices[product.productId] * product.quantity;
+                totalPrice += price * quantityDict[productId];
+            }
+            else
+            {
+                throw new Exception($"Product with ID {productId} not found.");
             }
         }
 
@@ -88,28 +100,53 @@ public class ProductRepository(AppDbContext context)
         (int productId, int quantity)[] productsId
     )
     {
-        Dictionary<int, (string, int)> productQuantities = new();
-        Tuple<int, string, int>[] products = await _entities
+        // Tạo dictionary từ productsId để tra cứu nhanh số lượng
+        var quantityDict = productsId.ToDictionary(p => p.productId, p => p.quantity);
+        var missingProducts = quantityDict
+            .Keys.Except(productsId.Select(p => p.productId))
+            .ToList();
+        if (missingProducts.Any())
+        {
+            throw new Exception(
+                $"Products with IDs {string.Join(", ", missingProducts)} not found."
+            );
+        }
+        // Lấy thông tin sản phẩm từ database
+        var products = await _entities
             .AsNoTracking()
-            .Where(p => productsId.Select(p => p.productId).Contains(p.Id))
-            .Select(p => Tuple.Create(p.Id, p.Name, p.StockQuantity))
-            .ToArrayAsync()
-            .ConfigureAwait(false);
-        foreach (var product in products)
-        {
-            productQuantities.Add(product.Item1, (product.Item2, product.Item3));
-        }
-        var productsNotQualified = new List<string>();
-        foreach (var product in productsId)
-        {
-            if (
-                productQuantities.ContainsKey(product.productId)
-                && productQuantities[product.productId].Item2 < product.quantity
-            )
+            .Where(p => productsId.Select(x => x.productId).Contains(p.Id))
+            .Select(p => new
             {
-                productsNotQualified.Add(productQuantities[product.productId].Item1);
-            }
+                p.Id,
+                p.Name,
+                p.StockQuantity,
+            })
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        // Kiểm tra số lượng và trả về danh sách sản phẩm không đủ
+        return products
+            .Where(p => quantityDict.ContainsKey(p.Id) && p.StockQuantity < quantityDict[p.Id])
+            .Select(p => p.Name)
+            .ToList();
+    }
+
+    public async Task<Dictionary<int, decimal>> GetProductPriceByIdsAsync(int[] productIds)
+    {
+        var prices = await _entities
+            .AsNoTracking()
+            .Where(p => productIds.Contains(p.Id))
+            .Select(p => new { p.Id, p.Price })
+            .ToDictionaryAsync(p => p.Id, p => p.Price)
+            .ConfigureAwait(false);
+
+        // Kiểm tra xem có sản phẩm nào không tìm thấy không
+        var missingIds = productIds.Except(prices.Keys).ToList();
+        if (missingIds.Any())
+        {
+            throw new Exception($"Products with IDs {string.Join(", ", missingIds)} not found.");
         }
-        return productsNotQualified;
+
+        return prices;
     }
 }
