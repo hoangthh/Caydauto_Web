@@ -6,6 +6,7 @@ import titleLogo from "../../assets/title-logo.svg";
 import { Button, styled, TextField, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../apis/auth";
+import { useAuth } from "../../contexts/AuthContext";
 
 const LoginHeader = styled(Typography)`
   font-weight: bold;
@@ -37,6 +38,7 @@ export const LoginPage = () => {
   });
 
   const navigate = useNavigate();
+  const { setIsAuthenticated } = useAuth();
 
   const handleChange = (e) => {
     setLoginForm({
@@ -47,7 +49,10 @@ export const LoginPage = () => {
 
   const handleLogin = async () => {
     const response = await login(loginForm);
-    if (response?.isSuccess) navigate("/");
+    if (response?.isSuccess) {
+      setIsAuthenticated(true);
+      navigate("/");
+    }
     console.log(response);
   };
 
