@@ -5,9 +5,16 @@ import titleLogo from "../../assets/title-logo.svg";
 import favorIcon from "../../assets/favor-icon.svg";
 import cartIcon from "../../assets/cart-icon.svg";
 import profileIcon from "../../assets/profile-icon.svg";
-import { InputAdornment, styled, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  InputAdornment,
+  styled,
+  TextField,
+  Typography,
+} from "@mui/material";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 const SearchInput = styled(TextField)`
   width: 100%;
@@ -32,8 +39,8 @@ const navbarItemList = [
 ];
 
 export const Navbar = () => {
-  // const [activeNavbarItem, setActiveNavbarItem] = useState("home");
   const location = useLocation();
+  const { isAuthenticated } = useAuth();
 
   return (
     <div className="navbar">
@@ -69,24 +76,38 @@ export const Navbar = () => {
 
         {/* Actions */}
         <div className="navbar--activity__actions">
+          {isAuthenticated ? (
+            <>
+              <Link to="/favor">
+                <img
+                  src={favorIcon}
+                  className="navbar--activity__actions img"
+                />
+              </Link>
+              <Link to="/cart">
+                <img src={cartIcon} className="navbar--activity__actions img" />
+              </Link>
+              <Link to="/profile">
+                <img
+                  src={profileIcon}
+                  className="navbar--activity__actions img"
+                />
+              </Link>
+            </>
+          ) : (
+            <>
+              <Button component="a" href="/login" variant="contained">
+                Đăng nhập
+              </Button>
+              <Button component="a" href="/register" variant="contained">
+                Đăng ký
+              </Button>
+            </>
+          )}
           {/* Before Login */}
           {/* <div>Đăng nhập</div>
         <div>Đăng ký</div> */}
           {/* After Login */}
-          <>
-            <Link to="/favor">
-              <img src={favorIcon} className="navbar--activity__actions img" />
-            </Link>
-            <Link to="/cart">
-              <img src={cartIcon} className="navbar--activity__actions img" />
-            </Link>
-            <Link to="/profile">
-              <img
-                src={profileIcon}
-                className="navbar--activity__actions img"
-              />
-            </Link>
-          </>
         </div>
         {/* Actions */}
       </div>

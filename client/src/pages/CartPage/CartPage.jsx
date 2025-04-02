@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./CartPage.scss";
 import { Link } from "react-router-dom";
-import { Button, styled, Typography } from "@mui/material";
+import { Button, Divider, styled, Typography } from "@mui/material";
 import { CartProduct } from "../../components/CartProduct/CartProduct";
 import { fetchCartProducts } from "../../apis/cart";
 
@@ -57,7 +57,10 @@ export const CartPage = () => {
         <div className="cart-page--main__left">
           {cartProductList?.cartItems?.length > 0
             ? cartProductList.cartItems.map((cartItem) => (
-                <CartProduct cartItem={cartItem} key={cartItem.id} />
+                <>
+                  <CartProduct cartItem={cartItem} key={cartItem.id} />
+                  <Divider />
+                </>
               ))
             : "Chưa có sản phẩm trong giỏ hàng"}
         </div>
@@ -70,6 +73,7 @@ export const CartPage = () => {
 
           <Link
             to="/payment"
+            state={{ a: "a" }}
             style={{ color: "white", textDecoration: "none" }}
           >
             <PaymentButton variant="contained">Thanh toán</PaymentButton>

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "./Filter.scss";
-import { styled, Typography } from "@mui/material";
+import { Slider, styled, Typography } from "@mui/material";
 import { fetchFilter } from "../../apis/filter";
+import { convertNumberToPrice } from "../../helpers/string";
 
 const FilterHeader = styled(Typography)`
   font-size: 25px;
@@ -16,31 +17,47 @@ const FilterSubHeader = styled(Typography)`
 
 const FilterItem = styled(Typography)``;
 
-export const Filter = () => {
+const MIN_PRICE_DEFAULT = 0;
+const MAX_PRICE_DEFAULT = 500000;
+const STEP_PRICE = 100000;
+const MIN_PRICE_DISTANCE = 50000;
+
+export const Filter = ({ onFilterChange }) => {
   const [categoryList, setCategoryList] = useState([]);
   const [brandList, setBrandList] = useState([]);
-  const [priceList, setPriceList] = useState([]);
   const [colorList, setColorList] = useState([]);
+
+  const [valuePrice, setValuePrice] = React.useState([
+    MIN_PRICE_DEFAULT,
+    MAX_PRICE_DEFAULT,
+  ]);
 
   const [filters, setFilters] = useState({
     categories: [],
     brands: [],
     colors: [],
-    prices: [],
-    minPrice: 0,
-    maxPrice: 0,
+    minPrice: MIN_PRICE_DEFAULT,
+    maxPrice: MAX_PRICE_DEFAULT,
   });
+
+  const minPriceDistance = MIN_PRICE_DISTANCE;
 
   useEffect(() => {
     const fetchFilterList = async () => {
       const filter = await fetchFilter();
       setCategoryList(filter.categories);
       setBrandList(filter.brands);
-      setPriceList(filter.prices);
       setColorList(filter.colors);
     };
     fetchFilterList();
   }, []);
+
+  // Gửi filters ra ngoài khi nó thay đổi
+  useEffect(() => {
+    if (onFilterChange) {
+      onFilterChange(filters);
+    }
+  }, [filters, onFilterChange]);
 
   const handleChange = (event, filterValue, flag) => {
     setFilters((prevFilters) => {
@@ -79,7 +96,29 @@ export const Filter = () => {
     });
   };
 
-  console.log(filters);
+  const handlePriceChange = (event, newValue, activeThumb) => {
+    if (activeThumb === 0) {
+      setValuePrice([
+        Math.min(newValue[0], valuePrice[1] - minPriceDistance),
+        valuePrice[1],
+      ]);
+      setFilters({
+        ...filters,
+        minPrice: newValue[0],
+        maxPrice: newValue[1],
+      });
+    } else {
+      setValuePrice([
+        valuePrice[0],
+        Math.max(newValue[1], valuePrice[0] + minPriceDistance),
+      ]);
+    }
+  };
+
+  const valueLabelFormat = (value) => {
+    return convertNumberToPrice(value);
+  };
+
   return (
     <div className="filter">
       <FilterHeader>Lọc sản phẩm</FilterHeader>
@@ -124,17 +163,16 @@ export const Filter = () => {
       <FilterSubHeader>Giá</FilterSubHeader>
 
       <div className="filter--price">
-        {priceList.map((price, index) => (
-          <div className="filter--price__item" key={index}>
-            <FilterItem>{price.label}</FilterItem>
-            <input
-              type="checkbox"
-              className="input"
-              name="prices"
-              onChange={(event) => handleChange(event, price, "price")}
-            />
-          </div>
-        ))}
+        <Slider
+          value={valuePrice}
+          onChange={handlePriceChange}
+          valueLabelFormat={valueLabelFormat}
+          valueLabelDisplay="auto"
+          disableSwap
+          min={MIN_PRICE_DEFAULT}
+          step={STEP_PRICE}
+          max={MAX_PRICE_DEFAULT}
+        />
       </div>
 
       <FilterSubHeader>Màu</FilterSubHeader>

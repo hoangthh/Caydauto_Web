@@ -4,16 +4,23 @@ import {
   AccordionSummary,
   Divider,
   FormControlLabel,
+  InputLabel,
   Radio,
   RadioGroup,
   styled,
   TextField,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import "./PaymentPage.scss";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { CartProduct } from "../../components/CartProduct/CartProduct";
+import {
+  fetchDistricts,
+  fetchProvinces,
+  fetchWards,
+} from "../../apis/delivery";
+import { LocationSelect } from "../../components/LocationSelect/LocationSelect";
 
 const PaymentPageHeader = styled(Typography)`
   font-weight: bold;
@@ -42,6 +49,82 @@ const user = {
 };
 
 export const PaymentPage = () => {
+  const [provinceList, setProvinceList] = useState([]);
+  const [districtList, setDistrictList] = useState([]);
+  const [wardList, setWardList] = useState([]);
+
+  const [location, setLocation] = useState({
+    provinceId: null,
+    districtId: null,
+    wardCode: null,
+    provinceName: "",
+    districtName: "",
+    wardName: "",
+  });
+  const [paymentMethod, setPaymentMethod] = useState("COD");
+
+  const address =
+    location.provinceName +
+    (location.provinceName && ", ") +
+    location.districtName +
+    (location.districtName && ", ") +
+    location.wardName;
+
+  const fetchLocationData = useCallback(
+    async (fetchFunction, setState, param = null) => {
+      const data = await fetchFunction(param);
+      setState(data);
+    },
+    []
+  );
+
+  useEffect(() => {
+    fetchLocationData(fetchProvinces, setProvinceList);
+  }, [fetchLocationData]);
+
+  useEffect(() => {
+    if (location.provinceId) {
+      fetchLocationData(fetchDistricts, setDistrictList, location.provinceId);
+      const selectedProvince = provinceList.find(
+        (p) => p.provinceId === location.provinceId
+      );
+      setLocation((prev) => ({
+        ...prev,
+        provinceName: selectedProvince ? selectedProvince.provinceName : "",
+      }));
+    }
+  }, [location.provinceId, fetchLocationData, provinceList]);
+
+  useEffect(() => {
+    if (location.districtId) {
+      fetchLocationData(fetchWards, setWardList, location.districtId);
+      const selectedDistrict = districtList.find(
+        (d) => d.districtID === location.districtId
+      );
+      setLocation((prev) => ({
+        ...prev,
+        districtName: selectedDistrict ? selectedDistrict.districtName : "",
+      }));
+    }
+  }, [location.districtId, fetchLocationData, districtList]);
+
+  useEffect(() => {
+    if (location.wardCode) {
+      const selectedWard = wardList.find(
+        (w) => w.wardCode === location.wardCode
+      );
+      setLocation((prev) => ({
+        ...prev,
+        wardName: selectedWard ? selectedWard.wardName : "",
+      }));
+    }
+  }, [location.wardCode, wardList]);
+  const handleLocationChange = (key, value) => {
+    setLocation((prev) => ({ ...prev, [key]: value }));
+  };
+
+  console.log({ location, paymentMethod });
+
   return (
     <div className="payment-page">
       <PaymentPageHeader>Thông tin giao hàng</PaymentPageHeader>
@@ -52,13 +135,7 @@ export const PaymentPage = () => {
             <AccordionHeader>Thông tin đơn hàng</AccordionHeader>
           </AccordionSummary>
           <AccordionDetails>
-            <div className="payment-page--wrapper__order-list">
-              <CartProduct showQuantity={false} />
-              <Divider />
-              <CartProduct showQuantity={false} />
-              <Divider />
-              <CartProduct showQuantity={false} />
-            </div>
+            <div className="payment-page--wrapper__order-list"></div>
           </AccordionDetails>
         </Accordion>
 
@@ -81,10 +158,44 @@ export const PaymentPage = () => {
                 <Typography>{user.phone}</Typography>
               </div>
 
+              <InputLabel id="address">Địa chỉ giao hàng</InputLabel>
               <CustomerAddressInput
-                placeholder="Nhập địa chỉ giao hàng"
-                label="Địa chỉ giao hàng"
+                id="address"
+                value={address}
+                aria-readonly
               />
+
+              <div className="payment-page--wrapper__customer-info item location">
+                <LocationSelect
+                  label="Tỉnh/ Thành phố"
+                  value={location.provinceId}
+                  onChange={(value) =>
+                    handleLocationChange("provinceId", value)
+                  }
+                  options={provinceList}
+                  valueKey="provinceId"
+                  labelKey="provinceName"
+                />
+
+                <LocationSelect
+                  label="Huyện/ Thị xã"
+                  value={location.districtId}
+                  onChange={(value) =>
+                    handleLocationChange("districtId", value)
+                  }
+                  options={districtList}
+                  valueKey="districtID"
+                  labelKey="districtName"
+                />
+                <LocationSelect
+                  label="Quận/ Phường"
+                  value={location.wardCode}
+                  onChange={(value) => handleLocationChange("wardCode", value)}
+                  options={wardList}
+                  valueKey="wardCode"
+                  labelKey="wardName"
+                />
+              </div>
             </div>
           </AccordionDetails>
         </Accordion>
@@ -95,28 +206,24 @@ export const PaymentPage = () => {
           </AccordionSummary>
           <AccordionDetails>
             <RadioGroup
-              aria-labelledby="demo-radio-buttons-group-label"
-              defaultValue="cod"
+              aria-labelledby="payment-method"
+              defaultValue="COD"
               name="radio-buttons-group"
+              onChange={(e) => setPaymentMethod(e.target.value)}
             >
               <FormControlLabel
-                value="cod"
+                value="COD"
                 control={<Radio />}
                 label="Thanh toán khi nhận hàng"
               />
               <Divider />
               <FormControlLabel
-                value="vnpay"
+                value="VnPay"
                 control={<Radio />}
                 label="Chuyển khoản qua VNPAY"
               />
             </RadioGroup>
           </AccordionDetails>
-        </Accordion>
-
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}></AccordionSummary>
-          <AccordionDetails></AccordionDetails>
         </Accordion>
       </div>
     </div>
