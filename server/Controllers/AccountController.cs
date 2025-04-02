@@ -23,11 +23,11 @@ public class AccountController : ControllerBase
     }
 
     [HttpGet("state")]
-    public IActionResult GetState()
+    public async Task<IActionResult> GetState()
     {
         if (_currentUserService.UserId != null)
         {
-            return Ok("User had logged in");
+            return Ok(await _currentUserService.GetUser().ConfigureAwait(false));
         }
         return Unauthorized("User had not logged in");
     }
