@@ -159,7 +159,7 @@ namespace server.Services.Mapping
                     dest => dest.OrderItems,
                     opt => opt.MapFrom(src => src.OrderItems ?? new List<OrderItem>())
                 );
-               
+
             CreateMap<OrderItem, OrderItemGetDto>()
                 .ForMember(dest => dest.Product, opt => opt.MapFrom(src => src.Product))
                 .ForMember(dest => dest.Color, opt => opt.MapFrom(src => src.Color));
@@ -179,6 +179,15 @@ namespace server.Services.Mapping
                 .ForMember(dest => dest.OrderId, opt => opt.Ignore())
                 .ForMember(dest => dest.Color, opt => opt.Ignore())
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
+        }
+
+        public void WishListMapping()
+        {
+            CreateMap<Product, WishListItemDto>()
+                .ForMember(
+                    dest => dest.ImageUrl,
+                    opt => opt.MapFrom(src => src.Images.FirstOrDefault()!.Url)
+                );
         }
     }
 }

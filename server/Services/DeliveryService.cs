@@ -105,15 +105,6 @@ public class DeliveryService : IDeliveryService
     {
         try
         {
-            const string cacheKey = "Districts";
-            // Kiểm tra dữ liệu trong cache
-            var cachedData = await _cache.GetStringAsync(cacheKey).ConfigureAwait(false);
-            if (!string.IsNullOrEmpty(cachedData))
-            {
-                var filterData = JsonSerializer.Deserialize<List<District>>(cachedData);
-                return filterData;
-            }
-            // Thêm headers nếu cần
 
 
             var response = await _httpClient
@@ -142,7 +133,6 @@ public class DeliveryService : IDeliveryService
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(30),
             };
             var district = JsonSerializer.Serialize(apiResponse.Data);
-            await _cache.SetStringAsync(cacheKey, district, options).ConfigureAwait(false);
             return apiResponse.Data;
         }
         catch (HttpRequestException ex)
@@ -166,17 +156,6 @@ public class DeliveryService : IDeliveryService
     {
         try
         {
-            const string cacheKey = "Wards";
-            // Kiểm tra dữ liệu trong cache
-            var cachedData = await _cache.GetStringAsync(cacheKey).ConfigureAwait(false);
-            if (!string.IsNullOrEmpty(cachedData))
-            {
-                var filterData = JsonSerializer.Deserialize<List<Ward>>(cachedData);
-                return filterData;
-            }
-            // Thêm headers nếu cần
-
-
             var response = await _httpClient
                 .GetAsync($"master-data/ward?district_id={districtId}")
                 .ConfigureAwait(false);
@@ -203,7 +182,6 @@ public class DeliveryService : IDeliveryService
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(30),
             };
             var ward = JsonSerializer.Serialize(apiResponse.Data);
-            await _cache.SetStringAsync(cacheKey, ward, options).ConfigureAwait(false);
             return apiResponse.Data;
         }
         catch (HttpRequestException ex)

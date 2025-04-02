@@ -18,18 +18,20 @@ if (args.Contains("seed"))
 // Sử dụng Swagger và Swagger UI trong pipeline
 
 // Middleware Pipeline
+
+//app.UseMiddleware<EnableRewindableBodyStartup>();
 app.UseStaticFiles();
-app.UseRouting();
 app.UseCors("CorsPolicy");
+app.UseRouting();
 app.UseSession(); // Before authentication
 app.UseAuthentication(); // Must come before custom middleware and authorization
-app.UseUserIdMiddleware(); // Assuming this depends on authenticated user
 app.UseAuthorization();
+app.UseUserIdMiddleware(); // Assuming this depends on authenticated user
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-    c.RoutePrefix = string.Empty; // Swagger UI at root
+    c.RoutePrefix = "swagger"; // Đặt Swagger UI tại /swagger
 });
 app.MapControllers();
 

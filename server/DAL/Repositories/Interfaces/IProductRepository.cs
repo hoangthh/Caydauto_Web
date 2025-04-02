@@ -10,4 +10,5 @@ public interface IProductRepository : IRepository<Product>
     Task<List<Product>> GetByIdsAsync(IEnumerable<int> productIds);
     Task<IEnumerable<string>> CheckQuantityProducts((int productId, int quantity)[] productsId);
     Task<Dictionary<int, decimal>> GetProductPriceByIdsAsync(int[] productIds);
+    //IQueryable<Product> BuildQuery(ProductFilter filter);
 }

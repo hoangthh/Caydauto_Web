@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using AutoMapper;
 
 public class ProductService : IProductService
@@ -10,7 +8,10 @@ public class ProductService : IProductService
     //private readonly IRepository<Color> _colorRepository;
     private readonly FileService _fileService;
     private readonly ICategoryRepository _categoryRepository;
+    private readonly IWishListService _wishListService;
+    private readonly ILogger<ProductService> _logger;
     private readonly IMapper _mapper;
+    private readonly ICurrentUserService _currentUserService;
 
     public ProductService(
         IProductRepository productRepository,
@@ -18,7 +19,10 @@ public class ProductService : IProductService
         //IRepository<Color> colorRepository,
         FileService fileService,
         ICategoryRepository categoryRepository,
-        IMapper mapper
+        IMapper mapper,
+        IWishListService wishListService,
+        ICurrentUserService currentUserService,
+        ILogger<ProductService> logger
     )
     {
         _productRepository = productRepository;
@@ -27,6 +31,9 @@ public class ProductService : IProductService
         _fileService = fileService;
         _categoryRepository = categoryRepository;
         _mapper = mapper;
+        _wishListService = wishListService;
+        _currentUserService = currentUserService;
+        _logger = logger;
     }
 
     public Task<ProductDetailGetDto> AddProduct(ProductCreateDto productPostDto)
@@ -74,6 +81,7 @@ public class ProductService : IProductService
             )
             .ConfigureAwait(false);
         var productGetDto = _mapper.Map<IEnumerable<ProductAllGetDto>>(product.Items);
+        await MarkWishListForProductsAsync(productGetDto.ToList()).ConfigureAwait(false);
         return new PagedResult<ProductAllGetDto>
         {
             Items = productGetDto,
@@ -98,45 +106,40 @@ public class ProductService : IProductService
                             q => q.Comments
                         )
                         .Where(p =>
-                            string.IsNullOrEmpty(productFilter.Name)
-                            || AlgorithmFunction.LevenshteinDistance(
-                                p.Name.RemoveDiacritics().ToLower(),
-                                productFilter.Name.RemoveDiacritics().ToLower()
-                            ) <= 2
-                                && (
-                                    productFilter.Categories == null
-                                    || !productFilter.Categories.Any()
-                                    || p.Categories.Any(c =>
-                                        productFilter.Categories.Contains(c.Id)
-                                    )
-                                )
-                                && (
-                                    productFilter.MinPrice == null
-                                    || p.Price >= productFilter.MinPrice
-                                )
-                                && (
-                                    productFilter.MaxPrice == null
-                                    || p.Price <= productFilter.MaxPrice
-                                )
-                                && (
-                                    productFilter.Colors == null
-                                    || !productFilter.Colors.Any()
-                                    || p.Colors.Any(c => productFilter.Colors.Contains(c.Id))
-                                )
-                                && (
-                                    productFilter.Brands == null
-                                    || !productFilter.Brands.Any()
-                                    || productFilter.Brands.Contains(p.Brand)
-                                )
+                            (
+                                string.IsNullOrEmpty(productFilter.Name)
+                                || AlgorithmFunction.LevenshteinDistance(
+                                    p.Name.RemoveDiacritics().ToLower(),
+                                    productFilter.Name.RemoveDiacritics().ToLower()
+                                ) <= 2
+                            )
+                            && (
+                                productFilter.Categories == null
+                                || !productFilter.Categories.Any()
+                                || p.Categories.Any(c => productFilter.Categories.Contains(c.Id))
+                            )
+                            && (productFilter.MinPrice == null || p.Price >= productFilter.MinPrice)
+                            && (productFilter.MaxPrice == null || p.Price <= productFilter.MaxPrice)
+                            && (
+                                productFilter.Colors == null
+                                || !productFilter.Colors.Any()
+                                || p.Colors.Any(c => productFilter.Colors.Contains(c.Id))
+                            )
+                            && (
+                                productFilter.Brands == null
+                                || !productFilter.Brands.Any()
+                                || productFilter.Brands.Contains(p.Brand)
+                            )
                         )
                         .OrderByMultiple((productFilter.OrderBy, productFilter.IsDesc))
             )
             .ConfigureAwait(false);
 
-        var productGetDto = _mapper.Map<IEnumerable<ProductAllGetDto>>(product.Items);
+        var productGetDto1 = _mapper.Map<IEnumerable<ProductAllGetDto>>(product.Items);
+        await MarkWishListForProductsAsync(productGetDto1.ToList()).ConfigureAwait(false);
         return new PagedResult<ProductAllGetDto>
         {
-            Items = productGetDto,
+            Items = productGetDto1,
             TotalItems = product.TotalItems,
             PageNumber = product.PageNumber,
             PageSize = product.PageSize,
@@ -150,6 +153,7 @@ public class ProductService : IProductService
             .GetSimilarProductsAsync(id, categoriesId.Select(c => c.Id).ToList())
             .ConfigureAwait(false);
         var productGetDto = _mapper.Map<IEnumerable<ProductAllGetDto>>(similarProducts.Items);
+        await MarkWishListForProductsAsync(productGetDto.ToList()).ConfigureAwait(false);
         return productGetDto;
     }
 
@@ -162,5 +166,16 @@ public class ProductService : IProductService
     {
         var brands = await _productRepository.GetBrandsAsync().ConfigureAwait(false);
         return brands;
+    }
+
+    private async Task MarkWishListForProductsAsync(List<ProductAllGetDto> products)
+    {
+        var userId = _currentUserService.UserId;
+        if (userId.HasValue && products != null && products.Any())
+        {
+            await _wishListService
+                .MarkProductsWishList(userId.Value, products)
+                .ConfigureAwait(false);
+        }
     }
 }

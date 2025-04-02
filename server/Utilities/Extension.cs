@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Scrutor;
@@ -345,7 +344,7 @@ public static class ServiceExtensions
     )
     {
         ConfigureCors(services);
-        services.AddControllers();
+        services.AddControllers().AddJsonOptions(options => { });
         ConfigureAutoMapper(services);
         ConfigureAuthentication(services);
         ConfigureRedis(services);
@@ -463,7 +462,7 @@ public static class ServiceExtensions
             })
             .AddCookie(options =>
             {
-                options.Cookie.Name = "ShUEHApplication-Cookies-Authentication"; // Tên của cookie
+                options.Cookie.Name = "CayDauToCookies"; // Tên của cookie
                 options.Cookie.HttpOnly = true; // Cookie chỉ có thể truy cập qua HTTP
                 options.Cookie.IsEssential = true; // Đảm bảo cookie được gửi ngay cả khi người dùng chưa đồng ý
                 options.Cookie.SameSite = SameSiteMode.Unspecified;
