@@ -26,3 +26,14 @@ export const register = async ({ fullName, email, password }) => {
     console.log(error);
   }
 };
+
+export const checkAuthenticated = async () => {
+  try {
+    const response = await axiosInstance.get(`/api/Account/state`);
+
+    return response;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};

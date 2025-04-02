@@ -30,3 +30,30 @@ export const fetchSimilarProductsById = async (productId) => {
     console.log(error);
   }
 };
+
+export const fetchFilterProducts = async ({
+  page,
+  pageSize,
+  categories,
+  brands,
+  minPrice,
+  maxPrice,
+  colors,
+  orderBy,
+}) => {
+  try {
+    const response = await axiosInstance.post(`/api/Product`, {
+      page,
+      pageSize,
+      categories,
+      brands,
+      minPrice,
+      maxPrice,
+      colors,
+      orderBy,
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

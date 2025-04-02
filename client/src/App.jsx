@@ -10,27 +10,36 @@ import { NewsPage } from "./pages/NewsPage/NewsPage";
 import { SupportPage } from "./pages/SupportPage/SupportPage";
 import { LoginPage } from "./pages/LoginPage/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage/RegisterPage";
+import { PrivateRoutes } from "./routes/PrivateRoutes";
+import { AuthProvider } from "./contexts/AuthContext"; // Import AuthProvider
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<MainLayout />}>
-          <Route index element={<HomePage />} />
-          <Route path="products" element={<ProductPage />} />
-          <Route path="products/:productId" element={<DetailPage />} />
-          <Route path="cart" element={<CartPage />} />
-          <Route path="payment" element={<PaymentPage />} />
-          <Route path="news" element={<NewsPage />} />
-          <Route path="support" element={<SupportPage />} />
-        </Route>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route element={<PrivateRoutes />}>
+            <Route element={<MainLayout />}>
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/payment" element={<PaymentPage />} />
+            </Route>
+          </Route>
 
-        <Route path="/" element={<EmptyLayout />}>
-          <Route path="login" element={<LoginPage />} />
-          <Route path="register" element={<RegisterPage />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/products" element={<ProductPage />} />
+            <Route path="/products/:productId" element={<DetailPage />} />
+            <Route path="/news" element={<NewsPage />} />
+            <Route path="/support" element={<SupportPage />} />
+          </Route>
+
+          <Route element={<EmptyLayout />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
