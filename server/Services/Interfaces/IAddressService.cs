@@ -1,7 +1,8 @@
 using System.Threading.Tasks;
 using Microsoft.Identity.Client;
 
-public interface IAddressService { 
+public interface IAddressService
+{
     Task<(bool Success, string Message)> GetAddress(
         string shippingAddress,
         int provinceId,
@@ -29,7 +30,7 @@ public class AddressService : IAddressService
         var provinces = await _deliveryService.GetProvincesAsync().ConfigureAwait(false);
         if (provinces == null)
             return (false, "Can't get provinces");
-        var province = provinces.FirstOrDefault(p => p.ProvinceId == provinceId);
+        var province = provinces.FirstOrDefault(p => p.ProvinceID == provinceId);
         if (province == null)
             return (false, "Not Exist this province");
         var districts = await _deliveryService.GetDistrictsAsync(provinceId).ConfigureAwait(false);
