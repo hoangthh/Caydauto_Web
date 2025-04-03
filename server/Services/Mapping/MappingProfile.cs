@@ -11,6 +11,7 @@ namespace server.Services.Mapping
             ProductMapping();
             UserMapping();
             CartMapping();
+            OrderMapping();
             CartItemMapping();
         }
 
@@ -155,10 +156,7 @@ namespace server.Services.Mapping
         public void OrderMapping()
         {
             CreateMap<Order, OrderGetDto>()
-                .ForMember(
-                    dest => dest.OrderItems,
-                    opt => opt.MapFrom(src => src.OrderItems ?? new List<OrderItem>())
-                );
+                .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems));
 
             CreateMap<OrderItem, OrderItemGetDto>()
                 .ForMember(dest => dest.Product, opt => opt.MapFrom(src => src.Product))
