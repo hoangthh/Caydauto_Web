@@ -1,30 +1,18 @@
 import { axiosInstance } from "./axiosInstance";
 
-export const fetchProvinces = async () => {
+export const fetchShippingFee = async ({
+  toDistrictId,
+  toWardCode,
+  insuranceValue,
+}) => {
   try {
-    const response = await axiosInstance.get(`/api/Delivery/provinces`);
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-export const fetchDistricts = async (provinceId) => {
-  try {
-    const response = await axiosInstance.get(
-      `/api/Delivery/districts/${provinceId}`
-    );
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-export const fetchWards = async (districtId) => {
-  try {
-    const response = await axiosInstance.get(
-      `/api/Delivery/wards/${districtId}`
-    );
+    const response = await axiosInstance.get(`/api/Delivery/shipping-fee`, {
+      params: {
+        toDistrictId,
+        toWardCode,
+        insuranceValue,
+      },
+    });
     return response.data;
   } catch (error) {
     console.log(error);

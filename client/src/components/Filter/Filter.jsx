@@ -40,8 +40,6 @@ export const Filter = ({ onFilterChange }) => {
     maxPrice: MAX_PRICE_DEFAULT,
   });
 
-  const minPriceDistance = MIN_PRICE_DISTANCE;
-
   useEffect(() => {
     const fetchFilterList = async () => {
       const filter = await fetchFilter();
@@ -97,22 +95,24 @@ export const Filter = ({ onFilterChange }) => {
   };
 
   const handlePriceChange = (event, newValue, activeThumb) => {
-    if (activeThumb === 0) {
-      setValuePrice([
-        Math.min(newValue[0], valuePrice[1] - minPriceDistance),
-        valuePrice[1],
-      ]);
-      setFilters({
-        ...filters,
-        minPrice: newValue[0],
-        maxPrice: newValue[1],
-      });
-    } else {
-      setValuePrice([
-        valuePrice[0],
-        Math.max(newValue[1], valuePrice[0] + minPriceDistance),
-      ]);
-    }
+    const newMinPrice =
+      activeThumb === 0
+        ? Math.min(newValue[0], valuePrice[1] - MIN_PRICE_DISTANCE)
+        : valuePrice[0];
+
+    const newMaxPrice =
+      activeThumb === 1
+        ? Math.max(newValue[1], valuePrice[0] + MIN_PRICE_DISTANCE)
+        : valuePrice[1];
+
+    setValuePrice([newMinPrice, newMaxPrice]);
+
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      minPrice: newMinPrice,
+      maxPrice: newMaxPrice,
+    }));
+    console.log(filters);
   };
 
   const valueLabelFormat = (value) => {

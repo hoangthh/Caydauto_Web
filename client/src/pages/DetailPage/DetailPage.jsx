@@ -155,7 +155,7 @@ export const DetailPage = () => {
           {/* Main Product Color */}
 
           {/* Main Product Price */}
-          <ProductPrice>{detailProduct.price}đ</ProductPrice>
+          <ProductPrice>{parseInt(detailProduct.price)}đ</ProductPrice>
           {/* Main Product Price */}
 
           {/* Main Product Quantity */}
