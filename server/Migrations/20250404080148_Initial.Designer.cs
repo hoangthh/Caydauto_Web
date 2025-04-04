@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250401100850_Initial")]
+    [Migration("20250404080148_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -170,72 +170,72 @@ namespace server.Migrations
                     b.HasData(
                         new
                         {
-                            CategoriesId = 6,
+                            CategoriesId = 4,
                             ProductsId = 1
+                        },
+                        new
+                        {
+                            CategoriesId = 2,
+                            ProductsId = 1
+                        },
+                        new
+                        {
+                            CategoriesId = 9,
+                            ProductsId = 1
+                        },
+                        new
+                        {
+                            CategoriesId = 3,
+                            ProductsId = 2
+                        },
+                        new
+                        {
+                            CategoriesId = 5,
+                            ProductsId = 2
+                        },
+                        new
+                        {
+                            CategoriesId = 4,
+                            ProductsId = 3
+                        },
+                        new
+                        {
+                            CategoriesId = 1,
+                            ProductsId = 3
                         },
                         new
                         {
                             CategoriesId = 8,
-                            ProductsId = 1
-                        },
-                        new
-                        {
-                            CategoriesId = 9,
-                            ProductsId = 1
-                        },
-                        new
-                        {
-                            CategoriesId = 9,
-                            ProductsId = 2
-                        },
-                        new
-                        {
-                            CategoriesId = 3,
-                            ProductsId = 2
-                        },
-                        new
-                        {
-                            CategoriesId = 5,
-                            ProductsId = 2
-                        },
-                        new
-                        {
-                            CategoriesId = 3,
                             ProductsId = 3
                         },
                         new
                         {
-                            CategoriesId = 5,
-                            ProductsId = 3
-                        },
-                        new
-                        {
-                            CategoriesId = 4,
+                            CategoriesId = 8,
                             ProductsId = 4
                         },
                         new
                         {
-                            CategoriesId = 9,
+                            CategoriesId = 8,
                             ProductsId = 5
                         },
                         new
                         {
-                            CategoriesId = 4,
+                            CategoriesId = 5,
+                            ProductsId = 5
+                        },
+                        new
+                        {
+                            CategoriesId = 9,
                             ProductsId = 6
                         },
                         new
                         {
-                            CategoriesId = 1,
+                            CategoriesId = 8,
                             ProductsId = 6
                         },
                         new
                         {
-                            CategoriesId = 6,
-                            ProductsId = 6
-                        },
-                        new
-                        {
-                            CategoriesId = 1,
+                            CategoriesId = 5,
                             ProductsId = 7
                         },
                         new
@@ -250,7 +250,7 @@ namespace server.Migrations
                         },
                         new
                         {
-                            CategoriesId = 6,
+                            CategoriesId = 1,
                             ProductsId = 8
                         },
                         new
@@ -260,17 +260,22 @@ namespace server.Migrations
                         },
                         new
                         {
-                            CategoriesId = 6,
+                            CategoriesId = 4,
+                            ProductsId = 9
+                        },
+                        new
+                        {
+                            CategoriesId = 7,
                             ProductsId = 10
                         },
                         new
                         {
-                            CategoriesId = 5,
+                            CategoriesId = 2,
                             ProductsId = 10
                         },
                         new
                         {
-                            CategoriesId = 8,
+                            CategoriesId = 1,
                             ProductsId = 10
                         });
                 });
@@ -367,22 +372,32 @@ namespace server.Migrations
                     b.HasData(
                         new
                         {
-                            ColorsId = 6,
+                            ColorsId = 7,
                             ProductsId = 1
                         },
                         new
                         {
-                            ColorsId = 1,
+                            ColorsId = 10,
+                            ProductsId = 1
+                        },
+                        new
+                        {
+                            ColorsId = 4,
+                            ProductsId = 1
+                        },
+                        new
+                        {
+                            ColorsId = 3,
                             ProductsId = 2
                         },
                         new
                         {
-                            ColorsId = 7,
-                            ProductsId = 3
+                            ColorsId = 4,
+                            ProductsId = 2
                         },
                         new
                         {
-                            ColorsId = 8,
+                            ColorsId = 9,
                             ProductsId = 3
                         },
                         new
@@ -392,22 +407,12 @@ namespace server.Migrations
                         },
                         new
                         {
-                            ColorsId = 5,
-                            ProductsId = 4
-                        },
-                        new
-                        {
-                            ColorsId = 11,
-                            ProductsId = 4
-                        },
-                        new
-                        {
-                            ColorsId = 5,
-                            ProductsId = 5
-                        },
-                        new
-                        {
                             ColorsId = 6,
+                            ProductsId = 4
+                        },
+                        new
+                        {
+                            ColorsId = 1,
                             ProductsId = 5
                         },
                         new
@@ -417,13 +422,18 @@ namespace server.Migrations
                         },
                         new
                         {
-                            ColorsId = 6,
-                            ProductsId = 6
+                            ColorsId = 5,
+                            ProductsId = 5
                         },
                         new
                         {
                             ColorsId = 3,
                             ProductsId = 6
+                        },
+                        new
+                        {
+                            ColorsId = 10,
+                            ProductsId = 7
                         },
                         new
                         {
@@ -433,36 +443,46 @@ namespace server.Migrations
                         new
                         {
                             ColorsId = 9,
-                            ProductsId = 7
+                            ProductsId = 8
                         },
                         new
                         {
-                            ColorsId = 5,
-                            ProductsId = 7
+                            ColorsId = 3,
+                            ProductsId = 8
+                        },
+                        new
+                        {
+                            ColorsId = 1,
+                            ProductsId = 8
                         },
                         new
                         {
                             ColorsId = 11,
-                            ProductsId = 8
-                        },
-                        new
-                        {
-                            ColorsId = 10,
-                            ProductsId = 8
-                        },
-                        new
-                        {
-                            ColorsId = 9,
-                            ProductsId = 8
-                        },
-                        new
-                        {
-                            ColorsId = 5,
                             ProductsId = 9
                         },
                         new
                         {
                             ColorsId = 3,
+                            ProductsId = 9
+                        },
+                        new
+                        {
+                            ColorsId = 10,
+                            ProductsId = 9
+                        },
+                        new
+                        {
+                            ColorsId = 9,
+                            ProductsId = 10
+                        },
+                        new
+                        {
+                            ColorsId = 11,
+                            ProductsId = 10
+                        },
+                        new
+                        {
+                            ColorsId = 1,
                             ProductsId = 10
                         });
                 });
@@ -538,8 +558,8 @@ namespace server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -573,601 +593,601 @@ namespace server.Migrations
                         {
                             Id = 1,
                             ProductId = 1,
-                            Url = "https://picsum.photos/500/500/?image=0"
+                            Url = "https://picsum.photos/500/500/?image=542"
                         },
                         new
                         {
                             Id = 2,
                             ProductId = 1,
-                            Url = "https://picsum.photos/500/500/?image=1000"
+                            Url = "https://picsum.photos/500/500/?image=526"
                         },
                         new
                         {
                             Id = 3,
                             ProductId = 1,
-                            Url = "https://picsum.photos/500/500/?image=126"
+                            Url = "https://picsum.photos/500/500/?image=60"
                         },
                         new
                         {
                             Id = 4,
                             ProductId = 1,
-                            Url = "https://picsum.photos/500/500/?image=60"
+                            Url = "https://picsum.photos/500/500/?image=284"
                         },
                         new
                         {
                             Id = 5,
                             ProductId = 1,
-                            Url = "https://picsum.photos/500/500/?image=559"
+                            Url = "https://picsum.photos/500/500/?image=311"
                         },
                         new
                         {
                             Id = 6,
                             ProductId = 1,
-                            Url = "https://picsum.photos/500/500/?image=225"
+                            Url = "https://picsum.photos/500/500/?image=261"
                         },
                         new
                         {
                             Id = 7,
                             ProductId = 1,
-                            Url = "https://picsum.photos/500/500/?image=171"
+                            Url = "https://picsum.photos/500/500/?image=866"
                         },
                         new
                         {
                             Id = 8,
                             ProductId = 1,
-                            Url = "https://picsum.photos/500/500/?image=27"
+                            Url = "https://picsum.photos/500/500/?image=758"
                         },
                         new
                         {
                             Id = 9,
                             ProductId = 1,
-                            Url = "https://picsum.photos/500/500/?image=239"
+                            Url = "https://picsum.photos/500/500/?image=904"
                         },
                         new
                         {
                             Id = 10,
                             ProductId = 1,
-                            Url = "https://picsum.photos/500/500/?image=292"
+                            Url = "https://picsum.photos/500/500/?image=1050"
                         },
                         new
                         {
                             Id = 11,
                             ProductId = 2,
-                            Url = "https://picsum.photos/500/500/?image=417"
+                            Url = "https://picsum.photos/500/500/?image=653"
                         },
                         new
                         {
                             Id = 12,
                             ProductId = 2,
-                            Url = "https://picsum.photos/500/500/?image=188"
+                            Url = "https://picsum.photos/500/500/?image=512"
                         },
                         new
                         {
                             Id = 13,
                             ProductId = 2,
-                            Url = "https://picsum.photos/500/500/?image=315"
+                            Url = "https://picsum.photos/500/500/?image=680"
                         },
                         new
                         {
                             Id = 14,
                             ProductId = 2,
-                            Url = "https://picsum.photos/500/500/?image=247"
+                            Url = "https://picsum.photos/500/500/?image=255"
                         },
                         new
                         {
                             Id = 15,
                             ProductId = 2,
-                            Url = "https://picsum.photos/500/500/?image=858"
+                            Url = "https://picsum.photos/500/500/?image=839"
                         },
                         new
                         {
                             Id = 16,
                             ProductId = 2,
-                            Url = "https://picsum.photos/500/500/?image=104"
+                            Url = "https://picsum.photos/500/500/?image=193"
                         },
                         new
                         {
                             Id = 17,
                             ProductId = 2,
-                            Url = "https://picsum.photos/500/500/?image=284"
+                            Url = "https://picsum.photos/500/500/?image=444"
                         },
                         new
                         {
                             Id = 18,
                             ProductId = 2,
-                            Url = "https://picsum.photos/500/500/?image=463"
+                            Url = "https://picsum.photos/500/500/?image=682"
                         },
                         new
                         {
                             Id = 19,
                             ProductId = 2,
-                            Url = "https://picsum.photos/500/500/?image=1077"
+                            Url = "https://picsum.photos/500/500/?image=157"
                         },
                         new
                         {
                             Id = 20,
                             ProductId = 2,
-                            Url = "https://picsum.photos/500/500/?image=187"
+                            Url = "https://picsum.photos/500/500/?image=1013"
                         },
                         new
                         {
                             Id = 21,
                             ProductId = 3,
-                            Url = "https://picsum.photos/500/500/?image=647"
+                            Url = "https://picsum.photos/500/500/?image=793"
                         },
                         new
                         {
                             Id = 22,
                             ProductId = 3,
-                            Url = "https://picsum.photos/500/500/?image=912"
+                            Url = "https://picsum.photos/500/500/?image=132"
                         },
                         new
                         {
                             Id = 23,
                             ProductId = 3,
-                            Url = "https://picsum.photos/500/500/?image=324"
+                            Url = "https://picsum.photos/500/500/?image=1035"
                         },
                         new
                         {
                             Id = 24,
                             ProductId = 3,
-                            Url = "https://picsum.photos/500/500/?image=872"
+                            Url = "https://picsum.photos/500/500/?image=1000"
                         },
                         new
                         {
                             Id = 25,
                             ProductId = 3,
-                            Url = "https://picsum.photos/500/500/?image=949"
+                            Url = "https://picsum.photos/500/500/?image=594"
                         },
                         new
                         {
                             Id = 26,
                             ProductId = 3,
-                            Url = "https://picsum.photos/500/500/?image=307"
+                            Url = "https://picsum.photos/500/500/?image=420"
                         },
                         new
                         {
                             Id = 27,
                             ProductId = 3,
-                            Url = "https://picsum.photos/500/500/?image=434"
+                            Url = "https://picsum.photos/500/500/?image=207"
                         },
                         new
                         {
                             Id = 28,
                             ProductId = 3,
-                            Url = "https://picsum.photos/500/500/?image=608"
+                            Url = "https://picsum.photos/500/500/?image=401"
                         },
                         new
                         {
                             Id = 29,
                             ProductId = 3,
-                            Url = "https://picsum.photos/500/500/?image=323"
+                            Url = "https://picsum.photos/500/500/?image=41"
                         },
                         new
                         {
                             Id = 30,
                             ProductId = 3,
-                            Url = "https://picsum.photos/500/500/?image=189"
+                            Url = "https://picsum.photos/500/500/?image=37"
                         },
                         new
                         {
                             Id = 31,
                             ProductId = 4,
-                            Url = "https://picsum.photos/500/500/?image=472"
+                            Url = "https://picsum.photos/500/500/?image=129"
                         },
                         new
                         {
                             Id = 32,
                             ProductId = 4,
-                            Url = "https://picsum.photos/500/500/?image=776"
+                            Url = "https://picsum.photos/500/500/?image=931"
                         },
                         new
                         {
                             Id = 33,
                             ProductId = 4,
-                            Url = "https://picsum.photos/500/500/?image=805"
+                            Url = "https://picsum.photos/500/500/?image=322"
                         },
                         new
                         {
                             Id = 34,
                             ProductId = 4,
-                            Url = "https://picsum.photos/500/500/?image=304"
+                            Url = "https://picsum.photos/500/500/?image=699"
                         },
                         new
                         {
                             Id = 35,
                             ProductId = 4,
-                            Url = "https://picsum.photos/500/500/?image=979"
+                            Url = "https://picsum.photos/500/500/?image=674"
                         },
                         new
                         {
                             Id = 36,
                             ProductId = 4,
-                            Url = "https://picsum.photos/500/500/?image=286"
+                            Url = "https://picsum.photos/500/500/?image=738"
                         },
                         new
                         {
                             Id = 37,
                             ProductId = 4,
-                            Url = "https://picsum.photos/500/500/?image=356"
+                            Url = "https://picsum.photos/500/500/?image=243"
                         },
                         new
                         {
                             Id = 38,
                             ProductId = 4,
-                            Url = "https://picsum.photos/500/500/?image=732"
+                            Url = "https://picsum.photos/500/500/?image=943"
                         },
                         new
                         {
                             Id = 39,
                             ProductId = 4,
-                            Url = "https://picsum.photos/500/500/?image=268"
+                            Url = "https://picsum.photos/500/500/?image=616"
                         },
                         new
                         {
                             Id = 40,
                             ProductId = 4,
-                            Url = "https://picsum.photos/500/500/?image=764"
+                            Url = "https://picsum.photos/500/500/?image=689"
                         },
                         new
                         {
                             Id = 41,
                             ProductId = 5,
-                            Url = "https://picsum.photos/500/500/?image=624"
+                            Url = "https://picsum.photos/500/500/?image=339"
                         },
                         new
                         {
                             Id = 42,
                             ProductId = 5,
-                            Url = "https://picsum.photos/500/500/?image=761"
+                            Url = "https://picsum.photos/500/500/?image=61"
                         },
                         new
                         {
                             Id = 43,
                             ProductId = 5,
-                            Url = "https://picsum.photos/500/500/?image=1019"
+                            Url = "https://picsum.photos/500/500/?image=393"
                         },
                         new
                         {
                             Id = 44,
                             ProductId = 5,
-                            Url = "https://picsum.photos/500/500/?image=655"
+                            Url = "https://picsum.photos/500/500/?image=396"
                         },
                         new
                         {
                             Id = 45,
                             ProductId = 5,
-                            Url = "https://picsum.photos/500/500/?image=303"
+                            Url = "https://picsum.photos/500/500/?image=181"
                         },
                         new
                         {
                             Id = 46,
                             ProductId = 5,
-                            Url = "https://picsum.photos/500/500/?image=54"
+                            Url = "https://picsum.photos/500/500/?image=938"
                         },
                         new
                         {
                             Id = 47,
                             ProductId = 5,
-                            Url = "https://picsum.photos/500/500/?image=843"
+                            Url = "https://picsum.photos/500/500/?image=189"
                         },
                         new
                         {
                             Id = 48,
                             ProductId = 5,
-                            Url = "https://picsum.photos/500/500/?image=674"
+                            Url = "https://picsum.photos/500/500/?image=753"
                         },
                         new
                         {
                             Id = 49,
                             ProductId = 5,
-                            Url = "https://picsum.photos/500/500/?image=679"
+                            Url = "https://picsum.photos/500/500/?image=652"
                         },
                         new
                         {
                             Id = 50,
                             ProductId = 5,
-                            Url = "https://picsum.photos/500/500/?image=771"
+                            Url = "https://picsum.photos/500/500/?image=100"
                         },
                         new
                         {
                             Id = 51,
                             ProductId = 6,
-                            Url = "https://picsum.photos/500/500/?image=857"
+                            Url = "https://picsum.photos/500/500/?image=608"
                         },
                         new
                         {
                             Id = 52,
                             ProductId = 6,
-                            Url = "https://picsum.photos/500/500/?image=339"
+                            Url = "https://picsum.photos/500/500/?image=45"
                         },
                         new
                         {
                             Id = 53,
                             ProductId = 6,
-                            Url = "https://picsum.photos/500/500/?image=613"
+                            Url = "https://picsum.photos/500/500/?image=467"
                         },
                         new
                         {
                             Id = 54,
                             ProductId = 6,
-                            Url = "https://picsum.photos/500/500/?image=254"
+                            Url = "https://picsum.photos/500/500/?image=58"
                         },
                         new
                         {
                             Id = 55,
                             ProductId = 6,
-                            Url = "https://picsum.photos/500/500/?image=439"
+                            Url = "https://picsum.photos/500/500/?image=407"
                         },
                         new
                         {
                             Id = 56,
                             ProductId = 6,
-                            Url = "https://picsum.photos/500/500/?image=171"
+                            Url = "https://picsum.photos/500/500/?image=1035"
                         },
                         new
                         {
                             Id = 57,
                             ProductId = 6,
-                            Url = "https://picsum.photos/500/500/?image=15"
+                            Url = "https://picsum.photos/500/500/?image=125"
                         },
                         new
                         {
                             Id = 58,
                             ProductId = 6,
-                            Url = "https://picsum.photos/500/500/?image=485"
+                            Url = "https://picsum.photos/500/500/?image=949"
                         },
                         new
                         {
                             Id = 59,
                             ProductId = 6,
-                            Url = "https://picsum.photos/500/500/?image=572"
+                            Url = "https://picsum.photos/500/500/?image=58"
                         },
                         new
                         {
                             Id = 60,
                             ProductId = 6,
-                            Url = "https://picsum.photos/500/500/?image=982"
+                            Url = "https://picsum.photos/500/500/?image=977"
                         },
                         new
                         {
                             Id = 61,
                             ProductId = 7,
-                            Url = "https://picsum.photos/500/500/?image=1077"
+                            Url = "https://picsum.photos/500/500/?image=691"
                         },
                         new
                         {
                             Id = 62,
                             ProductId = 7,
-                            Url = "https://picsum.photos/500/500/?image=10"
+                            Url = "https://picsum.photos/500/500/?image=13"
                         },
                         new
                         {
                             Id = 63,
                             ProductId = 7,
-                            Url = "https://picsum.photos/500/500/?image=1061"
+                            Url = "https://picsum.photos/500/500/?image=575"
                         },
                         new
                         {
                             Id = 64,
                             ProductId = 7,
-                            Url = "https://picsum.photos/500/500/?image=437"
+                            Url = "https://picsum.photos/500/500/?image=258"
                         },
                         new
                         {
                             Id = 65,
                             ProductId = 7,
-                            Url = "https://picsum.photos/500/500/?image=2"
+                            Url = "https://picsum.photos/500/500/?image=988"
                         },
                         new
                         {
                             Id = 66,
                             ProductId = 7,
-                            Url = "https://picsum.photos/500/500/?image=87"
+                            Url = "https://picsum.photos/500/500/?image=163"
                         },
                         new
                         {
                             Id = 67,
                             ProductId = 7,
-                            Url = "https://picsum.photos/500/500/?image=184"
+                            Url = "https://picsum.photos/500/500/?image=499"
                         },
                         new
                         {
                             Id = 68,
                             ProductId = 7,
-                            Url = "https://picsum.photos/500/500/?image=462"
+                            Url = "https://picsum.photos/500/500/?image=689"
                         },
                         new
                         {
                             Id = 69,
                             ProductId = 7,
-                            Url = "https://picsum.photos/500/500/?image=285"
+                            Url = "https://picsum.photos/500/500/?image=191"
                         },
                         new
                         {
                             Id = 70,
                             ProductId = 7,
-                            Url = "https://picsum.photos/500/500/?image=581"
+                            Url = "https://picsum.photos/500/500/?image=460"
                         },
                         new
                         {
                             Id = 71,
                             ProductId = 8,
-                            Url = "https://picsum.photos/500/500/?image=992"
+                            Url = "https://picsum.photos/500/500/?image=393"
                         },
                         new
                         {
                             Id = 72,
                             ProductId = 8,
-                            Url = "https://picsum.photos/500/500/?image=176"
+                            Url = "https://picsum.photos/500/500/?image=88"
                         },
                         new
                         {
                             Id = 73,
                             ProductId = 8,
-                            Url = "https://picsum.photos/500/500/?image=459"
+                            Url = "https://picsum.photos/500/500/?image=840"
                         },
                         new
                         {
                             Id = 74,
                             ProductId = 8,
-                            Url = "https://picsum.photos/500/500/?image=512"
+                            Url = "https://picsum.photos/500/500/?image=411"
                         },
                         new
                         {
                             Id = 75,
                             ProductId = 8,
-                            Url = "https://picsum.photos/500/500/?image=16"
+                            Url = "https://picsum.photos/500/500/?image=609"
                         },
                         new
                         {
                             Id = 76,
                             ProductId = 8,
-                            Url = "https://picsum.photos/500/500/?image=168"
+                            Url = "https://picsum.photos/500/500/?image=939"
                         },
                         new
                         {
                             Id = 77,
                             ProductId = 8,
-                            Url = "https://picsum.photos/500/500/?image=305"
+                            Url = "https://picsum.photos/500/500/?image=549"
                         },
                         new
                         {
                             Id = 78,
                             ProductId = 8,
-                            Url = "https://picsum.photos/500/500/?image=453"
+                            Url = "https://picsum.photos/500/500/?image=1009"
                         },
                         new
                         {
                             Id = 79,
                             ProductId = 8,
-                            Url = "https://picsum.photos/500/500/?image=1033"
+                            Url = "https://picsum.photos/500/500/?image=702"
                         },
                         new
                         {
                             Id = 80,
                             ProductId = 8,
-                            Url = "https://picsum.photos/500/500/?image=417"
+                            Url = "https://picsum.photos/500/500/?image=967"
                         },
                         new
                         {
                             Id = 81,
                             ProductId = 9,
-                            Url = "https://picsum.photos/500/500/?image=508"
+                            Url = "https://picsum.photos/500/500/?image=928"
                         },
                         new
                         {
                             Id = 82,
                             ProductId = 9,
-                            Url = "https://picsum.photos/500/500/?image=782"
+                            Url = "https://picsum.photos/500/500/?image=840"
                         },
                         new
                         {
                             Id = 83,
                             ProductId = 9,
-                            Url = "https://picsum.photos/500/500/?image=634"
+                            Url = "https://picsum.photos/500/500/?image=133"
                         },
                         new
                         {
                             Id = 84,
                             ProductId = 9,
-                            Url = "https://picsum.photos/500/500/?image=931"
+                            Url = "https://picsum.photos/500/500/?image=1028"
                         },
                         new
                         {
                             Id = 85,
                             ProductId = 9,
-                            Url = "https://picsum.photos/500/500/?image=1036"
+                            Url = "https://picsum.photos/500/500/?image=149"
                         },
                         new
                         {
                             Id = 86,
                             ProductId = 9,
-                            Url = "https://picsum.photos/500/500/?image=355"
+                            Url = "https://picsum.photos/500/500/?image=651"
                         },
                         new
                         {
                             Id = 87,
                             ProductId = 9,
-                            Url = "https://picsum.photos/500/500/?image=868"
+                            Url = "https://picsum.photos/500/500/?image=667"
                         },
                         new
                         {
                             Id = 88,
                             ProductId = 9,
-                            Url = "https://picsum.photos/500/500/?image=956"
+                            Url = "https://picsum.photos/500/500/?image=211"
                         },
                         new
                         {
                             Id = 89,
                             ProductId = 9,
-                            Url = "https://picsum.photos/500/500/?image=399"
+                            Url = "https://picsum.photos/500/500/?image=521"
                         },
                         new
                         {
                             Id = 90,
                             ProductId = 9,
-                            Url = "https://picsum.photos/500/500/?image=361"
+                            Url = "https://picsum.photos/500/500/?image=814"
                         },
                         new
                         {
                             Id = 91,
                             ProductId = 10,
-                            Url = "https://picsum.photos/500/500/?image=628"
+                            Url = "https://picsum.photos/500/500/?image=957"
                         },
                         new
                         {
                             Id = 92,
                             ProductId = 10,
-                            Url = "https://picsum.photos/500/500/?image=861"
+                            Url = "https://picsum.photos/500/500/?image=813"
                         },
                         new
                         {
                             Id = 93,
                             ProductId = 10,
-                            Url = "https://picsum.photos/500/500/?image=410"
+                            Url = "https://picsum.photos/500/500/?image=833"
                         },
                         new
                         {
                             Id = 94,
                             ProductId = 10,
-                            Url = "https://picsum.photos/500/500/?image=417"
+                            Url = "https://picsum.photos/500/500/?image=982"
                         },
                         new
                         {
                             Id = 95,
                             ProductId = 10,
-                            Url = "https://picsum.photos/500/500/?image=668"
+                            Url = "https://picsum.photos/500/500/?image=20"
                         },
                         new
                         {
                             Id = 96,
                             ProductId = 10,
-                            Url = "https://picsum.photos/500/500/?image=438"
+                            Url = "https://picsum.photos/500/500/?image=597"
                         },
                         new
                         {
                             Id = 97,
                             ProductId = 10,
-                            Url = "https://picsum.photos/500/500/?image=875"
+                            Url = "https://picsum.photos/500/500/?image=1045"
                         },
                         new
                         {
                             Id = 98,
                             ProductId = 10,
-                            Url = "https://picsum.photos/500/500/?image=160"
+                            Url = "https://picsum.photos/500/500/?image=670"
                         },
                         new
                         {
                             Id = 99,
                             ProductId = 10,
-                            Url = "https://picsum.photos/500/500/?image=853"
+                            Url = "https://picsum.photos/500/500/?image=626"
                         },
                         new
                         {
                             Id = 100,
                             ProductId = 10,
-                            Url = "https://picsum.photos/500/500/?image=601"
+                            Url = "https://picsum.photos/500/500/?image=461"
                         });
                 });
 
@@ -1310,8 +1330,8 @@ namespace server.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("TotalPrice")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("TotalPriceAfterDiscount")
                         .HasColumnType("decimal(18,2)");
@@ -1353,8 +1373,8 @@ namespace server.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("UnitPrice")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("UnitPrice")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -1393,8 +1413,8 @@ namespace server.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
 
                     b.Property<int>("Sold")
                         .HasColumnType("int");
@@ -1415,122 +1435,122 @@ namespace server.Migrations
                         new
                         {
                             Id = 1,
-                            Brand = "Zebra",
-                            CreatedDate = new DateTime(2024, 6, 6, 14, 6, 19, 517, DateTimeKind.Local).AddTicks(59),
+                            Brand = "Marunman",
+                            CreatedDate = new DateTime(2024, 10, 9, 15, 15, 28, 244, DateTimeKind.Local).AddTicks(5057),
                             Description = "Ergonomic executive chair upholstered in bonded black leather and PVC padded seat and back for all-day comfort and support",
-                            Name = "Generic Soft Car",
-                            Price = 451.596219672537900m,
-                            Sold = 19,
-                            StockQuantity = 14,
-                            UpdatedDate = new DateTime(2025, 3, 28, 2, 39, 22, 758, DateTimeKind.Local).AddTicks(1742)
+                            Name = "Handcrafted Steel Tuna",
+                            Price = 74027,
+                            Sold = 5,
+                            StockQuantity = 86,
+                            UpdatedDate = new DateTime(2025, 3, 27, 18, 38, 39, 776, DateTimeKind.Local).AddTicks(9619)
                         },
                         new
                         {
                             Id = 2,
-                            Brand = "Tombow",
-                            CreatedDate = new DateTime(2024, 10, 23, 19, 13, 42, 629, DateTimeKind.Local).AddTicks(2169),
-                            Description = "The beautiful range of Apple Naturalé that has an exciting mix of natural ingredients. With the Goodness of 100% Natural Ingredients",
-                            Name = "Incredible Metal Bike",
-                            Price = 396.400895159891500m,
-                            Sold = 20,
-                            StockQuantity = 71,
-                            UpdatedDate = new DateTime(2025, 3, 30, 9, 18, 34, 44, DateTimeKind.Local).AddTicks(4987)
+                            Brand = "Sakura",
+                            CreatedDate = new DateTime(2025, 2, 21, 18, 28, 11, 192, DateTimeKind.Local).AddTicks(5941),
+                            Description = "The Nagasaki Lander is the trademarked name of several series of Nagasaki sport bikes, that started with the 1984 ABC800J",
+                            Name = "Fantastic Granite Mouse",
+                            Price = 413582,
+                            Sold = 16,
+                            StockQuantity = 68,
+                            UpdatedDate = new DateTime(2025, 3, 24, 3, 20, 28, 976, DateTimeKind.Local).AddTicks(1937)
                         },
                         new
                         {
                             Id = 3,
-                            Brand = "Stabilo",
-                            CreatedDate = new DateTime(2024, 11, 17, 2, 0, 9, 900, DateTimeKind.Local).AddTicks(821),
-                            Description = "The Football Is Good For Training And Recreational Purposes",
-                            Name = "Sleek Frozen Pants",
-                            Price = 713.887338665028000m,
-                            Sold = 14,
-                            StockQuantity = 18,
-                            UpdatedDate = new DateTime(2025, 3, 26, 13, 4, 6, 376, DateTimeKind.Local).AddTicks(5037)
+                            Brand = "Plus",
+                            CreatedDate = new DateTime(2024, 9, 23, 15, 3, 40, 636, DateTimeKind.Local).AddTicks(7981),
+                            Description = "The Nagasaki Lander is the trademarked name of several series of Nagasaki sport bikes, that started with the 1984 ABC800J",
+                            Name = "Intelligent Soft Chips",
+                            Price = 28021,
+                            Sold = 29,
+                            StockQuantity = 14,
+                            UpdatedDate = new DateTime(2025, 3, 22, 1, 26, 20, 324, DateTimeKind.Local).AddTicks(6893)
                         },
                         new
                         {
                             Id = 4,
-                            Brand = "Sakura",
-                            CreatedDate = new DateTime(2025, 2, 22, 16, 49, 22, 938, DateTimeKind.Local).AddTicks(1859),
-                            Description = "The automobile layout consists of a front-engine design, with transaxle-type transmissions mounted at the rear of the engine and four wheel drive",
-                            Name = "Licensed Rubber Shoes",
-                            Price = 473.48093813546500m,
-                            Sold = 15,
-                            StockQuantity = 97,
-                            UpdatedDate = new DateTime(2025, 3, 30, 2, 2, 5, 721, DateTimeKind.Local).AddTicks(2879)
+                            Brand = "Marunman",
+                            CreatedDate = new DateTime(2025, 3, 2, 22, 54, 24, 689, DateTimeKind.Local).AddTicks(3541),
+                            Description = "New ABC 13 9370, 13.3, 5th Gen CoreA5-8250U, 8GB RAM, 256GB SSD, power UHD Graphics, OS 10 Home, OS Office A & J 2016",
+                            Name = "Intelligent Plastic Fish",
+                            Price = 208178,
+                            Sold = 16,
+                            StockQuantity = 11,
+                            UpdatedDate = new DateTime(2025, 3, 21, 5, 20, 5, 36, DateTimeKind.Local).AddTicks(8721)
                         },
                         new
                         {
                             Id = 5,
-                            Brand = "Zebra",
-                            CreatedDate = new DateTime(2024, 12, 2, 6, 2, 46, 305, DateTimeKind.Local).AddTicks(105),
-                            Description = "Carbonite web goalkeeper gloves are ergonomically designed to give easy fit",
-                            Name = "Awesome Granite Fish",
-                            Price = 677.868806659363000m,
-                            Sold = 5,
-                            StockQuantity = 0,
-                            UpdatedDate = new DateTime(2025, 3, 21, 3, 5, 50, 689, DateTimeKind.Local).AddTicks(2480)
+                            Brand = "Marvy",
+                            CreatedDate = new DateTime(2025, 2, 28, 11, 11, 48, 489, DateTimeKind.Local).AddTicks(8328),
+                            Description = "The Apollotech B340 is an affordable wireless mouse with reliable connectivity, 12 months battery life and modern design",
+                            Name = "Unbranded Granite Cheese",
+                            Price = 533196,
+                            Sold = 3,
+                            StockQuantity = 30,
+                            UpdatedDate = new DateTime(2025, 4, 3, 14, 4, 6, 776, DateTimeKind.Local).AddTicks(6817)
                         },
                         new
                         {
                             Id = 6,
-                            Brand = "Kokuyo",
-                            CreatedDate = new DateTime(2024, 9, 13, 23, 11, 41, 30, DateTimeKind.Local).AddTicks(6443),
-                            Description = "New range of formal shirts are designed keeping you in mind. With fits and styling that will make you stand apart",
-                            Name = "Small Steel Keyboard",
-                            Price = 427.732963022223100m,
-                            Sold = 14,
-                            StockQuantity = 42,
-                            UpdatedDate = new DateTime(2025, 3, 22, 10, 41, 58, 18, DateTimeKind.Local).AddTicks(7603)
+                            Brand = "Pilot",
+                            CreatedDate = new DateTime(2024, 6, 27, 1, 16, 50, 689, DateTimeKind.Local).AddTicks(6606),
+                            Description = "The Apollotech B340 is an affordable wireless mouse with reliable connectivity, 12 months battery life and modern design",
+                            Name = "Intelligent Soft Keyboard",
+                            Price = 178682,
+                            Sold = 17,
+                            StockQuantity = 82,
+                            UpdatedDate = new DateTime(2025, 3, 8, 14, 37, 25, 707, DateTimeKind.Local).AddTicks(9371)
                         },
                         new
                         {
                             Id = 7,
-                            Brand = "Marvy",
-                            CreatedDate = new DateTime(2024, 11, 25, 21, 15, 23, 167, DateTimeKind.Local).AddTicks(794),
-                            Description = "New ABC 13 9370, 13.3, 5th Gen CoreA5-8250U, 8GB RAM, 256GB SSD, power UHD Graphics, OS 10 Home, OS Office A & J 2016",
-                            Name = "Handmade Granite Salad",
-                            Price = 31.188464638099480m,
-                            Sold = 25,
-                            StockQuantity = 60,
-                            UpdatedDate = new DateTime(2025, 3, 29, 20, 18, 27, 914, DateTimeKind.Local).AddTicks(7383)
+                            Brand = "Crayola",
+                            CreatedDate = new DateTime(2024, 11, 4, 6, 49, 48, 706, DateTimeKind.Local).AddTicks(5921),
+                            Description = "New range of formal shirts are designed keeping you in mind. With fits and styling that will make you stand apart",
+                            Name = "Licensed Rubber Shirt",
+                            Price = 26544,
+                            Sold = 8,
+                            StockQuantity = 35,
+                            UpdatedDate = new DateTime(2025, 4, 2, 1, 16, 57, 359, DateTimeKind.Local).AddTicks(7559)
                         },
                         new
                         {
                             Id = 8,
-                            Brand = "Tombow",
-                            CreatedDate = new DateTime(2024, 10, 24, 4, 26, 51, 895, DateTimeKind.Local).AddTicks(6561),
-                            Description = "The beautiful range of Apple Naturalé that has an exciting mix of natural ingredients. With the Goodness of 100% Natural Ingredients",
-                            Name = "Unbranded Fresh Gloves",
-                            Price = 479.270785582693800m,
-                            Sold = 14,
-                            StockQuantity = 74,
-                            UpdatedDate = new DateTime(2025, 3, 21, 14, 33, 53, 513, DateTimeKind.Local).AddTicks(9297)
+                            Brand = "Sakura",
+                            CreatedDate = new DateTime(2025, 3, 17, 8, 17, 50, 331, DateTimeKind.Local).AddTicks(5301),
+                            Description = "Carbonite web goalkeeper gloves are ergonomically designed to give easy fit",
+                            Name = "Generic Fresh Pants",
+                            Price = 290349,
+                            Sold = 21,
+                            StockQuantity = 48,
+                            UpdatedDate = new DateTime(2025, 3, 31, 12, 13, 19, 968, DateTimeKind.Local).AddTicks(1456)
                         },
                         new
                         {
                             Id = 9,
-                            Brand = "Zebra",
-                            CreatedDate = new DateTime(2024, 5, 31, 10, 23, 8, 635, DateTimeKind.Local).AddTicks(6027),
+                            Brand = "Marunman",
+                            CreatedDate = new DateTime(2024, 11, 11, 0, 27, 35, 51, DateTimeKind.Local).AddTicks(2668),
                             Description = "New range of formal shirts are designed keeping you in mind. With fits and styling that will make you stand apart",
-                            Name = "Fantastic Rubber Bike",
-                            Price = 406.9031865307050700m,
-                            Sold = 4,
-                            StockQuantity = 40,
-                            UpdatedDate = new DateTime(2025, 3, 20, 7, 52, 9, 504, DateTimeKind.Local).AddTicks(788)
+                            Name = "Sleek Wooden Soap",
+                            Price = 251146,
+                            Sold = 30,
+                            StockQuantity = 6,
+                            UpdatedDate = new DateTime(2025, 3, 16, 16, 53, 19, 515, DateTimeKind.Local).AddTicks(9500)
                         },
                         new
                         {
                             Id = 10,
-                            Brand = "Crayola",
-                            CreatedDate = new DateTime(2025, 2, 19, 18, 21, 30, 461, DateTimeKind.Local).AddTicks(7642),
-                            Description = "Ergonomic executive chair upholstered in bonded black leather and PVC padded seat and back for all-day comfort and support",
-                            Name = "Awesome Soft Tuna",
-                            Price = 324.682047772196100m,
-                            Sold = 10,
-                            StockQuantity = 32,
-                            UpdatedDate = new DateTime(2025, 3, 27, 18, 23, 40, 343, DateTimeKind.Local).AddTicks(5384)
+                            Brand = "Stabilo",
+                            CreatedDate = new DateTime(2024, 9, 28, 9, 37, 35, 669, DateTimeKind.Local).AddTicks(7031),
+                            Description = "New range of formal shirts are designed keeping you in mind. With fits and styling that will make you stand apart",
+                            Name = "Gorgeous Steel Tuna",
+                            Price = 229721,
+                            Sold = 32,
+                            StockQuantity = 42,
+                            UpdatedDate = new DateTime(2025, 3, 24, 2, 53, 52, 450, DateTimeKind.Local).AddTicks(2326)
                         });
                 });
 

@@ -12,8 +12,7 @@ public class Discount
     public string Type { get; set; } = "Percentage";
 
     [Required(ErrorMessage = "Discount value is required")]
-    [Range(0, double.MaxValue, ErrorMessage = "Discount value must be greater than or equal to 0")]
-    public decimal Value { get; set; } = 0;
+    public int Value { get; set; } = 0;
 
     [StringLength(50, ErrorMessage = "Discount code cannot exceed 50 characters")]
     public string Code { get; set; } = string.Empty;

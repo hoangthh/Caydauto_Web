@@ -7,13 +7,13 @@ public class OrderItemGetDto
     public ColorGetDto Color { get; set; } = new ColorGetDto();
     public OrderItemProdutGetDto Product { get; set; } = new OrderItemProdutGetDto();
     public int Quantity { get; set; }
-    public decimal UnitPrice { get; set; }
+    public int UnitPrice { get; set; }
 }
 public class OrderItemProdutGetDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public decimal Price { get; set; }
+    public int Price { get; set; }
     public string ImageUrl { get; set; } = Constraint.Image.DefaultProductImageUrl;
 }
 public class OrderItemCreateDto

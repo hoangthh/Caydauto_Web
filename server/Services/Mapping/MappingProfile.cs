@@ -13,6 +13,7 @@ namespace server.Services.Mapping
             CartMapping();
             OrderMapping();
             CartItemMapping();
+            WishListMapping();
         }
 
         public void ProductMapping()

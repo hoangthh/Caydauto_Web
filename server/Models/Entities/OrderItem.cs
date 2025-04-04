@@ -18,11 +18,10 @@ public class OrderItem
     public int Quantity { get; set; }
 
     [Required(ErrorMessage = "Unit price is required")]
-    [Range(0, double.MaxValue, ErrorMessage = "Unit price must be greater than or equal to 0")]
-    public decimal UnitPrice { get; set; }
+    public int UnitPrice { get; set; }
     
     // Navigation properties
-    public Order Order { get; set; } = new Order();
-    public Product Product { get; set; } = new Product();
-    public Color Color { get; set; } = new Color();
+    public Order Order { get; set; } = null!;
+    public Product Product { get; set; } = null!;
+    public Color Color { get; set; } = null!;
 }

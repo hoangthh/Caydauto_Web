@@ -77,12 +77,12 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
         // Seed Categories (clear navigation property)
         foreach (var category in categories)
         {
-            category.Products = null;
+            category.Products = null!;
         }
         // Seed Colors (clear navigation property)
         foreach (var color in colors)
         {
-            color.Products = null;
+            color.Products = null!;
         }
 
         // Seed Images (clear navigation property)
@@ -92,15 +92,15 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
         // Seed Products (clear navigation property)
         foreach (var product in products)
         {
-            product.Categories = null;
+            product.Categories = null!;
         }
         foreach (var product in products)
         {
-            product.Colors = null;
+            product.Colors = null!;
         }
         foreach (var product in products)
         {
-            product.Images = null; // Xóa navigation tránh lỗi
+            product.Images = null!; // Xóa navigation tránh lỗi
         }
 
         modelBuilder.Entity<Product>().HasData(products);
