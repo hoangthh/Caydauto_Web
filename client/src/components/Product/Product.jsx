@@ -36,7 +36,7 @@ export const Product = ({ product }) => {
     <div className="product">
       <img src={productImg} style={{ width: "100%" }} />
       <ProductName>{product.name}</ProductName>
-      <ProductPrice>{product.price}đ</ProductPrice>
+      <ProductPrice>{parseInt(product.price)}đ</ProductPrice>
       <ProductSold>{product.sold} sold</ProductSold>
       <Link to={`/products/${product.id}`}>
         <BuyButton variant="contained">Mua hàng</BuyButton>

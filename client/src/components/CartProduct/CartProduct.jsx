@@ -11,13 +11,13 @@ const ProductName = styled(Typography)`
 const ProductColor = styled(Typography)``;
 
 const IncreaseQuantityButton = styled(AddCircleRoundedIcon)`
-  margin-right: 10px;
+  margin-left: 10px;
   color: pink;
   cursor: pointer;
 `;
 
 const DecreaseQuantityButton = styled(RemoveCircleRoundedIcon)`
-  margin-left: 10px;
+  margin-right: 10px;
   color: pink;
   cursor: pointer;
 `;
@@ -46,9 +46,9 @@ export const CartProduct = ({ showQuantity = true, cartItem }) => {
         {/* Main Product Quantity */}
         {showQuantity && (
           <div className="cart-product--right__quantity">
-            <IncreaseQuantityButton />
-            <ProductQuantity>{cartItem.quantity}</ProductQuantity>
             <DecreaseQuantityButton />
+            <ProductQuantity>{cartItem.quantity}</ProductQuantity>
+            <IncreaseQuantityButton />
           </div>
         )}
 

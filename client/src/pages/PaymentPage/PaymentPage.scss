@@ -1,26 +1,48 @@
 .payment-page {
-  &--wrapper {
+  &--main {
+    display: flex;
+    gap: 50px;
     margin-top: 20px;
-    padding: 0 50px;
 
-    &__order-list {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+    &__left {
+      flex: 1;
+      &__order-list {
+        display: flex;
+        flex-direction: column;
+      }
+
+      &.customer-info {
+        // display: flex;
+        // flex-direction: column;
+
+        &.item {
+          display: flex;
+          flex-direction: row;
+          gap: 5px;
+
+          &.location {
+            margin-top: 10px;
+          }
+        }
+      }
     }
 
-    &__customer-info {
-      // display: flex;
-      // flex-direction: column;
+    &__right {
+      flex-basis: 25%;
 
-      &.item {
+      &.order,
+      &.shipping,
+      &.price {
         display: flex;
-        flex-direction: row;
-        gap: 5px;
+        justify-content: space-between;
+      }
 
-        &.location {
-          margin-top: 10px;
-        }
+      &.shipping {
+        margin-top: 5px;
+      }
+
+      &.price {
+        margin-top: 10px;
       }
     }
   }
