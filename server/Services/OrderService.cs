@@ -37,7 +37,7 @@ public class OrderService : IOrderService
             return new OrderResponse { IsSuccess = false, Message = "User is not logged in" };
         }
 
-        if(order == null || order.OrderItems == null || !order.OrderItems.Any())
+        if (order == null || order.OrderItems == null || !order.OrderItems.Any())
         {
             return new OrderResponse { IsSuccess = false, Message = "Invalid order data" };
         }
@@ -59,11 +59,7 @@ public class OrderService : IOrderService
 
             // Tính phí vận chuyển (DeliveryFee)
             var deliveryFee = await _deliveryService
-                .GetShippingFeeAsync(
-                    order.ToDistrictId,
-                    order.ToWardId,
-                    totalPrice
-                )
+                .GetShippingFeeAsync(order.ToDistrictId, order.ToWardId, totalPrice)
                 .ConfigureAwait(false);
 
             // Áp dụng mã giảm giá
@@ -296,8 +292,7 @@ public class OrderService : IOrderService
                 discountAmount = totalPrice - totalPriceAfterDiscount;
                 break;
             case "SHIPPINGPERCENTAGE":
-                deliveryFee = 
-                        deliveryFee * (1 - discount.Value / 100);
+                deliveryFee = deliveryFee * (1 - discount.Value / 100);
                 break;
         }
 
@@ -332,6 +327,27 @@ public class OrderService : IOrderService
         }
 
         return await _productRepository.UpdateRangeAsync(products).ConfigureAwait(false);
+    }
+
+    public Task<List<OrderGetDto>> GetOrdersByUserIdAsync(int pageNumber, int pageSize)
+    {
+        var currentUserId = _currentUserService.UserId;
+        if (currentUserId == null)
+        {
+            throw new UnauthorizedAccessException("You do not have permission to access this user's orders.");
+        }
+        // Lấy danh sách đơn hàng của người dùng hiện tại
+        return _orderRepository
+            .GetAllAsync(
+                pageNumber,
+                pageSize,
+                true,
+                _orderRepository.OrderNavigate(o => o.UserId == currentUserId)
+            )
+            .ContinueWith(
+                t => MapToOrderGetDtos(t.Result.Items),
+                TaskContinuationOptions.OnlyOnRanToCompletion
+            );
     }
 
     private OrderGetDto MapToOrderGetDto(Order order)

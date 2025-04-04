@@ -22,6 +22,25 @@ public class AccountController : ControllerBase
         _currentUserService = currentUserService;
     }
 
+    [Authorize]
+    [HttpGet("profile")]
+    public async Task<IActionResult> GetProfile()
+    {
+        var user = await _accountService.GetUserProfileAsync().ConfigureAwait(false);
+        if (user == null)
+            return NotFound("User not found");
+        return Ok(user);
+    }
+
+    [HttpGet("profile/{id}")]
+    public async Task<IActionResult> GetProfileById(int id)
+    {
+        var user = await _accountService.GetUserByIdAsync(id).ConfigureAwait(false);
+        if (user == null)
+            return NotFound("User not found");
+        return Ok(user);
+    }
+
     [HttpGet("state")]
     public async Task<IActionResult> GetState()
     {

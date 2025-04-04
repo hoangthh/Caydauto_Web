@@ -5,8 +5,8 @@ public class DiscountGetDto
     public int Id { get; set; }
     public string Type { get; set; } = "Percentage";
     public int Value { get; set; }
-    public int Quantity;
     public string Code { get; set; } = string.Empty;
+    public int Quantity;
 }
 
 public class DiscountCreateDto

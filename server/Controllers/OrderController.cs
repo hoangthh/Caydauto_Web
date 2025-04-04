@@ -14,6 +14,15 @@ public class OrderController : ControllerBase
         _orderService = orderService;
     }
 
+    [HttpGet("user")]
+    public async Task<IActionResult> GetOrdersByUserId([FromQuery] int pageNumber, int pageSize)
+    {
+        var orders = await _orderService
+            .GetOrdersByUserIdAsync(pageNumber, pageSize)
+            .ConfigureAwait(false);
+        return Ok(orders);
+    }
+
     [HttpGet("all")]
     public async Task<IActionResult> GetAllOrders([FromQuery] int pageNumber, int pageSize)
     {
