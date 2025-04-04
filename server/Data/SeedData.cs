@@ -48,14 +48,14 @@ public static class SeedData
         "Brown",
     };
 
-    public static readonly Dictionary<string, (decimal Min, decimal Max)> PriceRanges = new()
+    public static readonly Dictionary<string, (int Min, int Max)> PriceRanges = new()
     {
-        { "Dưới 100.000", (10, 100) },
-        { "100.000 - 200.000", (100, 200) },
-        { "200.000 - 300.000", (200, 300) },
-        { "300.000 - 400.000", (300, 400) },
-        { "400.000 - 500.000", (400, 500) },
-        { "Trên 500.000", (500, 1000) },
+        { "Dưới 100.000", (10000, 100000) },
+        { "100.000 - 200.000", (100000, 200000) },
+        { "200.000 - 300.000", (200000, 300000) },
+        { "300.000 - 400.000", (300000, 400000) },
+        { "400.000 - 500.000", (400000, 500000) },
+        { "Trên 500.000", (500000, 1000000) },
     };
 
     public static List<Image> GetImages(int productCount)
@@ -104,7 +104,7 @@ public static class SeedData
                 f =>
                 {
                     var range = f.PickRandom(PriceRanges.Values.ToList()); // Chọn ngẫu nhiên một khoảng giá từ PriceRanges
-                    return f.Random.Decimal(range.Min, range.Max); // Tạo giá ngẫu nhiên trong khoảng đã chọn
+                    return f.Random.Int(range.Min, range.Max); // Tạo giá ngẫu nhiên trong khoảng đã chọn
                     // Chọn ngẫu nhiên một khoảng giá từ PriceRanges
                 }
             )

@@ -37,6 +37,11 @@ public class OrderService : IOrderService
             return new OrderResponse { IsSuccess = false, Message = "User is not logged in" };
         }
 
+        if(order == null || order.OrderItems == null || !order.OrderItems.Any())
+        {
+            return new OrderResponse { IsSuccess = false, Message = "Invalid order data" };
+        }
+
         using var transaction = await _orderRepository
             .BeginTransactionAsync()
             .ConfigureAwait(false);
@@ -57,7 +62,7 @@ public class OrderService : IOrderService
                 .GetShippingFeeAsync(
                     order.ToDistrictId,
                     order.ToWardId,
-                    (int)Math.Round(totalPrice, MidpointRounding.AwayFromZero)
+                    totalPrice
                 )
                 .ConfigureAwait(false);
 
@@ -291,11 +296,8 @@ public class OrderService : IOrderService
                 discountAmount = totalPrice - totalPriceAfterDiscount;
                 break;
             case "SHIPPINGPERCENTAGE":
-                deliveryFee = (int)
-                    Math.Round(
-                        deliveryFee * (1 - discount.Value / 100),
-                        MidpointRounding.AwayFromZero
-                    );
+                deliveryFee = 
+                        deliveryFee * (1 - discount.Value / 100);
                 break;
         }
 

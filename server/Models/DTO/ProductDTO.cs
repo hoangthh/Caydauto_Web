@@ -4,7 +4,7 @@ public class ProductAllGetDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = "Blank product";
-    public decimal Price { get; set; }
+    public int Price { get; set; }
     public string Description { get; set; } = "This is a blank product";
     public string Brand { get; set; } = "Blank brand";
     public int StockQuantity { get; set; }
@@ -22,7 +22,7 @@ public class ProductDetailGetDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = "Blank product";
-    public decimal Price { get; set; }
+    public int Price { get; set; }
     public string Description { get; set; } = "This is a blank product";
     public string Brand { get; set; } = "Blank brand";
     public int StockQuantity { get; set; }
@@ -47,8 +47,7 @@ public class ProductCreateDto
     public string Name { get; set; } = "Blank product";
 
     [Required(ErrorMessage = "Price is required")]
-    [Range(0, double.MaxValue, ErrorMessage = "Price must be greater than or equal to 0")]
-    public decimal Price { get; set; }
+    public int Price { get; set; }
 
     [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters")]
     public string Description { get; set; } = "This is a blank product";
@@ -76,8 +75,7 @@ public class ProductPutDto
     public string Name { get; set; } = "Blank product";
 
     [Required(ErrorMessage = "Price is required")]
-    [Range(0, double.MaxValue, ErrorMessage = "Price must be greater than or equal to 0")]
-    public decimal Price { get; set; }
+    public int Price { get; set; }
 
     [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters")]
     public string Description { get; set; } = "This is a blank product";

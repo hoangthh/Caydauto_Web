@@ -19,8 +19,7 @@ public class Order
     public string PaymentMethod { get; set; } = "COD";
 
     [Required(ErrorMessage = "Subtotal is required")]
-    [Range(0, double.MaxValue, ErrorMessage = "Subtotal must be greater than or equal to 0")]
-    public decimal TotalPrice { get; set; }
+    public int TotalPrice { get; set; }
 
     [Range(0, double.MaxValue, ErrorMessage = "Discount amount must be greater than or equal to 0")]
     public decimal DiscountAmount { get; set; }
@@ -44,7 +43,7 @@ public class Order
         ErrorMessage = "Invalid order status"
     )]
     public string OrderStatus { get; set; } = "Pending";
-    public int? TransactionId {get; set;}
+    public int? TransactionId { get; set; }
 
     public int? DiscountId { get; set; }
 

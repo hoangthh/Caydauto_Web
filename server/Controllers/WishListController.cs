@@ -21,7 +21,7 @@ public class WishListController : ControllerBase
     }
 
     [HttpPost("{productId}")]
-    public async Task<IActionResult> AddWishList([FromQuery] int productId)
+    public async Task<IActionResult> AddWishList(int productId)
     {
         var result = await _wishListService.AddProductToWishList(productId).ConfigureAwait(false);
         if (!result.IsSuccess)
@@ -30,7 +30,7 @@ public class WishListController : ControllerBase
     }
 
     [HttpDelete("{productId}")]
-    public async Task<IActionResult> RemoveWishList([FromQuery] int productId)
+    public async Task<IActionResult> RemoveWishList(int productId)
     {
         var result = await _wishListService
             .RemoveProductFromWishList(productId)

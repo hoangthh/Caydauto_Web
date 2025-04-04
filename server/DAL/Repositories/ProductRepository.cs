@@ -26,7 +26,7 @@ public class ProductRepository(AppDbContext context)
             .ConfigureAwait(false);
     }
 
-    public async Task<decimal> GetProductPriceByIdAsync(int productId)
+    public async Task<int> GetProductPriceByIdAsync(int productId)
     {
         var product = await GetByIdAsync(productId).ConfigureAwait(false);
         if (product == null)
@@ -54,7 +54,7 @@ public class ProductRepository(AppDbContext context)
             .ConfigureAwait(false);
     }
 
-    public async Task<decimal> GetTotalPriceByProductsIdAsync(
+    public async Task<int> GetTotalPriceByProductsIdAsync(
         (int ProductId, int Quantity)[] productsId
     )
     {
@@ -70,7 +70,7 @@ public class ProductRepository(AppDbContext context)
             .ConfigureAwait(false);
 
         // Tính tổng giá
-        decimal totalPrice = 0m;
+        int totalPrice = 0;
         foreach (var productId in quantityDict.Keys)
         {
             if (productPrices.TryGetValue(productId, out var price))
@@ -131,7 +131,7 @@ public class ProductRepository(AppDbContext context)
             .ToList();
     }
 
-    public async Task<Dictionary<int, decimal>> GetProductPriceByIdsAsync(int[] productIds)
+    public async Task<Dictionary<int, int>> GetProductPriceByIdsAsync(int[] productIds)
     {
         var prices = await _entities
             .AsNoTracking()

@@ -105,8 +105,6 @@ public class DeliveryService : IDeliveryService
     {
         try
         {
-
-
             var response = await _httpClient
                 .GetAsync($"master-data/district?province_id={provinceId}")
                 .ConfigureAwait(false);
@@ -200,7 +198,7 @@ public class DeliveryService : IDeliveryService
             return null;
         }
     }
-    
+
     public async Task<int> GetShippingFeeAsync(
         int toDistrictId,
         string toWardCode,
@@ -301,7 +299,7 @@ public class FeeData
 
 public class Province
 {
-    public int ProvinceId { get; set; }
+    public int ProvinceID { get; set; }
 
     public string? ProvinceName { get; set; }
 }
