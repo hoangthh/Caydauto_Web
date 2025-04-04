@@ -186,7 +186,8 @@ namespace server.Services.Mapping
                 .ForMember(
                     dest => dest.ImageUrl,
                     opt => opt.MapFrom(src => src.Images.FirstOrDefault()!.Url)
-                );
+                )
+                .ForMember(dest => dest.IsWished, opt => opt.MapFrom(src => true));
         }
 
         public void DiscountMapping()
@@ -196,6 +197,5 @@ namespace server.Services.Mapping
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
             CreateMap<DiscountPutDto, Discount>().ForMember(dest => dest.Id, opt => opt.Ignore());
         }
-
     }
 }
