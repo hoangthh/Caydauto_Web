@@ -11,7 +11,8 @@ import { SupportPage } from "./pages/SupportPage/SupportPage";
 import { LoginPage } from "./pages/LoginPage/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage/RegisterPage";
 import { PrivateRoutes } from "./routes/PrivateRoutes";
-import { AuthProvider } from "./contexts/AuthContext"; // Import AuthProvider
+import { AuthProvider } from "./contexts/AuthContext";
+import { UserPage } from "./pages/UserPage/UserPage";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Routes>
           <Route element={<PrivateRoutes />}>
             <Route element={<MainLayout />}>
+              <Route path="/user" element={<UserPage />} />
               <Route path="/cart" element={<CartPage />} />
               <Route path="/payment" element={<PaymentPage />} />
             </Route>

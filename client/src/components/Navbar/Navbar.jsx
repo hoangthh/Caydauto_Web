@@ -31,6 +31,21 @@ const NavbarItem = styled(Typography)`
   }
 `;
 
+const LoginButton = styled(Button)`
+  text-transform: none;
+  color: green;
+`;
+const RegisterButton = styled(Button)`
+  text-transform: none;
+  background: green;
+  color: white;
+`;
+
+const LogoutButton = styled(Button)`
+  text-transform: none;
+  color: green;
+`;
+
 const navbarItemList = [
   { title: "Trang chủ", linkTo: "/" },
   { title: "Sản phẩm", linkTo: "/products" },
@@ -78,7 +93,7 @@ export const Navbar = () => {
         <div className="navbar--activity__actions">
           {isAuthenticated ? (
             <>
-              <Link to="/favor">
+              <Link to="/user?tab=1">
                 <img
                   src={favorIcon}
                   className="navbar--activity__actions img"
@@ -87,21 +102,32 @@ export const Navbar = () => {
               <Link to="/cart">
                 <img src={cartIcon} className="navbar--activity__actions img" />
               </Link>
-              <Link to="/profile">
+              <Link to="/user?tab=0">
                 <img
                   src={profileIcon}
                   className="navbar--activity__actions img"
                 />
               </Link>
+              <LogoutButton>Đăng xuất</LogoutButton>
             </>
           ) : (
             <>
-              <Button component="a" href="/login" variant="contained">
+              <LoginButton
+                component="a"
+                href="/login"
+                variant="outlined"
+                color="inherit"
+              >
                 Đăng nhập
-              </Button>
-              <Button component="a" href="/register" variant="contained">
+              </LoginButton>
+              <RegisterButton
+                component="a"
+                href="/register"
+                variant="contained"
+                color="inherit"
+              >
                 Đăng ký
-              </Button>
+              </RegisterButton>
             </>
           )}
           {/* Before Login */}

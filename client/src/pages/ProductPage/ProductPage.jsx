@@ -8,6 +8,7 @@ import {
   fetchFilterProducts,
 } from "../../apis/product";
 import { debounce } from "lodash";
+import { ProductList } from "../../components/ProductList/ProductList";
 
 const ProductPagination = styled(Pagination)`
   margin-top: 20px;
@@ -52,20 +53,7 @@ export const ProductPage = () => {
       {/* Product Filter */}
 
       <div className="product-page--product-wrapper">
-        {/* Product List */}
-        <div className="product-page--product-list">
-          {productList?.items?.length > 0 &&
-            productList.items.map((product) => (
-              <div
-                className="product-page--product-list__product-item"
-                key={product.id}
-              >
-                <Product product={product} />
-              </div>
-            ))}
-        </div>
-        {/* Product List */}
-
+        <ProductList productList={productList} itemPerRow={3} />
         {/* Product Pagination */}
         <ProductPagination
           count={productList.totalPages}
