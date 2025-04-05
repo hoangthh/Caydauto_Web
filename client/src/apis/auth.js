@@ -27,6 +27,17 @@ export const register = async ({ fullName, email, password }) => {
   }
 };
 
+export const logout = async () => {
+  try {
+    const response = await axiosInstance.post(`/api/Account/logout`);
+
+    return response;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
+
 export const checkAuthenticated = async () => {
   try {
     const response = await axiosInstance.get(`/api/Account/state`);

@@ -23,8 +23,10 @@ import {
 } from "../../apis/location";
 import { fetchShippingFee } from "../../apis/delivery";
 import { LocationSelect } from "../../components/LocationSelect/LocationSelect";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { createOrder } from "../../apis/order";
+import { convertNumberToPrice } from "../../helpers/string";
+import { useAlert } from "../../contexts/AlertContext";
 
 const PaymentPageHeader = styled(Typography)`
   font-weight: bold;
@@ -88,8 +90,8 @@ export const PaymentPage = () => {
   const [districtList, setDistrictList] = useState([]);
   const [wardList, setWardList] = useState([]);
   const [location, setLocation] = useState({
-    provinceId: null,
-    districtId: null,
+    provinceID: null,
+    districtID: null,
     wardCode: null,
     provinceName: "",
     districtName: "",
@@ -99,6 +101,9 @@ export const PaymentPage = () => {
   const [paymentMethod, setPaymentMethod] = useState("COD");
 
   const { state } = useLocation();
+  const navigate = useNavigate();
+
+  const { renderAlert } = useAlert();
 
   const shippingAddress =
     location.provinceName +
@@ -120,30 +125,30 @@ export const PaymentPage = () => {
   }, [fetchLocationData]);
 
   useEffect(() => {
-    if (location.provinceId) {
-      fetchLocationData(fetchDistricts, setDistrictList, location.provinceId);
+    if (location.provinceID) {
+      fetchLocationData(fetchDistricts, setDistrictList, location.provinceID);
       const selectedProvince = provinceList.find(
-        (p) => p.provinceId === location.provinceId
+        (p) => p.provinceID === location.provinceID
       );
       setLocation((prev) => ({
         ...prev,
         provinceName: selectedProvince ? selectedProvince.provinceName : "",
       }));
     }
-  }, [location.provinceId, fetchLocationData, provinceList]);
+  }, [location.provinceID, fetchLocationData, provinceList]);
 
   useEffect(() => {
-    if (location.districtId) {
-      fetchLocationData(fetchWards, setWardList, location.districtId);
+    if (location.districtID) {
+      fetchLocationData(fetchWards, setWardList, location.districtID);
       const selectedDistrict = districtList.find(
-        (d) => d.districtID === location.districtId
+        (d) => d.districtID === location.districtID
       );
       setLocation((prev) => ({
         ...prev,
         districtName: selectedDistrict ? selectedDistrict.districtName : "",
       }));
     }
-  }, [location.districtId, fetchLocationData, districtList]);
+  }, [location.districtID, fetchLocationData, districtList]);
 
   useEffect(() => {
     if (location.wardCode) {
@@ -160,7 +165,7 @@ export const PaymentPage = () => {
   useEffect(() => {
     const fetchFee = async () => {
       const shippingFeeParams = {
-        toDistrictId: location.districtId,
+        toDistrictId: location.districtID,
         toWardCode: location.wardCode,
         insuranceValue: parseInt(state.totalPrice),
       };
@@ -178,20 +183,31 @@ export const PaymentPage = () => {
   };
 
   const handleCreateOrder = async () => {
-    if (!location.wardCode) return;
+    if (!location.wardCode) {
+      renderAlert("info", "Vui lòng chọn địa chỉ của bạn");
+      return;
+    }
 
     const order = {
       paymentMethod,
       shippingAddress,
-      toProvinceId: location.provinceId,
-      toDistrictId: location.districtId,
+      toProvinceId: location.provinceID,
+      toDistrictId: location.districtID,
       toWardId: location.wardCode,
       discountCode: null,
       cartProductList: state.selectedCartProduct,
     };
 
     const res = await createOrder(order);
-    console.log(res);
+    if (res?.status === 200) {
+      renderAlert(
+        "success",
+        "Tạo đơn hàng thành công! Vui lòng chờ nhân viên xác nhận đơn hàng của bạn"
+      );
+      navigate("/payment/success");
+    } else {
+      renderAlert("warning", "Tạo đơn hàng thất bại");
+    }
   };
 
   return (
@@ -207,7 +223,11 @@ export const PaymentPage = () => {
             <AccordionDetails>
               <div className="payment-page--main__left order-list">
                 {state.selectedCartProduct.map((cartItem) => (
-                  <CartProduct cartItem={cartItem} key={cartItem.id} />
+                  <CartProduct
+                    cartItem={cartItem}
+                    key={cartItem.id}
+                    changeQuantity={false}
+                  />
                 ))}
               </div>
             </AccordionDetails>
@@ -242,20 +262,20 @@ export const PaymentPage = () => {
                 <div className="payment-page--main__left customer-info item location">
                   <LocationSelect
                     label="Tỉnh/ Thành phố"
-                    value={location.provinceId}
+                    value={location.provinceID}
                     onChange={(value) =>
-                      handleLocationChange("provinceId", value)
+                      handleLocationChange("provinceID", value)
                     }
                     options={provinceList}
-                    valueKey="provinceId"
+                    valueKey="provinceID"
                     labelKey="provinceName"
                   />
 
                   <LocationSelect
                     label="Huyện/ Thị xã"
-                    value={location.districtId}
+                    value={location.districtID}
                     onChange={(value) =>
-                      handleLocationChange("districtId", value)
+                      handleLocationChange("districtID", value)
                     }
                     options={districtList}
                     valueKey="districtID"
@@ -305,17 +325,23 @@ export const PaymentPage = () => {
         <div className="payment-page--main__right">
           <div className="payment-page--main__right order">
             <OrderValueHeader>Giá trị đơn hàng</OrderValueHeader>
-            <OrderValueHeader>{state?.totalPrice}đ</OrderValueHeader>
+            <OrderValueHeader>
+              {convertNumberToPrice(parseInt(state?.totalPrice)) || 0}
+            </OrderValueHeader>
           </div>
 
           <div className="payment-page--main__right shipping">
             <ShippingValueHeader>Phí vận chuyển</ShippingValueHeader>
-            <ShippingValueHeader>{shippingFee}đ</ShippingValueHeader>
+            <ShippingValueHeader>
+              {convertNumberToPrice(parseInt(shippingFee)) || 0}
+            </ShippingValueHeader>
           </div>
 
           <div className="payment-page--main__right price">
             <TotalPriceHeader>Thành tiền</TotalPriceHeader>
-            <TotalPrice>{state?.totalPrice + shippingFee}đ</TotalPrice>
+            <TotalPrice>
+              {convertNumberToPrice(parseInt(state?.totalPrice + shippingFee))}
+            </TotalPrice>
           </div>
 
           <PaymentButton variant="contained" onClick={handleCreateOrder}>

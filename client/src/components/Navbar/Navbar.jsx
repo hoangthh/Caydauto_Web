@@ -15,6 +15,8 @@ import {
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import { logout } from "../../apis/auth";
+import { useAlert } from "../../contexts/AlertContext";
 
 const SearchInput = styled(TextField)`
   width: 100%;
@@ -44,6 +46,12 @@ const RegisterButton = styled(Button)`
 const LogoutButton = styled(Button)`
   text-transform: none;
   color: green;
+  border: 1px solid green;
+
+  &:hover {
+    background: green;
+    color: white;
+  }
 `;
 
 const navbarItemList = [
@@ -55,7 +63,16 @@ const navbarItemList = [
 
 export const Navbar = () => {
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, setIsAuthenticated } = useAuth();
+  const { renderAlert } = useAlert();
+
+  const handleLogout = async () => {
+    const response = await logout();
+    if (response.status === 200) {
+      setIsAuthenticated(false);
+      renderAlert("info", "Bạn vừa đăng xuất khỏi tài khoản");
+    }
+  };
 
   return (
     <div className="navbar">
@@ -93,12 +110,6 @@ export const Navbar = () => {
         <div className="navbar--activity__actions">
           {isAuthenticated ? (
             <>
-              <Link to="/user?tab=1">
-                <img
-                  src={favorIcon}
-                  className="navbar--activity__actions img"
-                />
-              </Link>
               <Link to="/cart">
                 <img src={cartIcon} className="navbar--activity__actions img" />
               </Link>
@@ -108,7 +119,15 @@ export const Navbar = () => {
                   className="navbar--activity__actions img"
                 />
               </Link>
-              <LogoutButton>Đăng xuất</LogoutButton>
+              <Link to="/user?tab=1">
+                <img
+                  src={favorIcon}
+                  className="navbar--activity__actions img"
+                />
+              </Link>
+              <LogoutButton variant="outlined" onClick={handleLogout}>
+                Đăng xuất
+              </LogoutButton>
             </>
           ) : (
             <>
@@ -130,10 +149,6 @@ export const Navbar = () => {
               </RegisterButton>
             </>
           )}
-          {/* Before Login */}
-          {/* <div>Đăng nhập</div>
-        <div>Đăng ký</div> */}
-          {/* After Login */}
         </div>
         {/* Actions */}
       </div>

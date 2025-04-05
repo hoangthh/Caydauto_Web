@@ -3,10 +3,12 @@ import "./LoginPage.scss";
 import loginDecor from "../../assets/login-decor.svg";
 import logo from "../../assets/logo.svg";
 import titleLogo from "../../assets/title-logo.svg";
+import googleLogo from "../../assets/google-logo.png";
 import { Button, styled, TextField, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../apis/auth";
 import { useAuth } from "../../contexts/AuthContext";
+import { useAlert } from "../../contexts/AlertContext";
 
 const LoginHeader = styled(Typography)`
   font-weight: bold;
@@ -25,10 +27,22 @@ const PasswordInput = styled(TextField)`
 `;
 
 const LoginButton = styled(Button)`
+  text-transform: none;
   margin-top: 20px;
   padding: 15px 50px;
   background: green;
   border-radius: 30px;
+`;
+
+const LoginGoogleButton = styled(Button)`
+  margin-top: 20px;
+  text-transform: none;
+  padding: 10px 40px;
+  border-radius: 50px;
+  background: #fff;
+  border: 1px solid black;
+  color: black;
+  box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.1);
 `;
 
 export const LoginPage = () => {
@@ -39,6 +53,7 @@ export const LoginPage = () => {
 
   const navigate = useNavigate();
   const { setIsAuthenticated } = useAuth();
+  const { renderAlert } = useAlert();
 
   const handleChange = (e) => {
     setLoginForm({
@@ -48,12 +63,24 @@ export const LoginPage = () => {
   };
 
   const handleLogin = async () => {
+    if (!loginForm.email || !loginForm.password) {
+      renderAlert("info", "Vui lòng điền đẩy đủ thông tin");
+      return;
+    }
     const response = await login(loginForm);
     if (response?.isSuccess) {
       setIsAuthenticated(true);
       navigate("/");
+      renderAlert("success", "Đăng nhập thành công");
+    } else {
+      renderAlert("warning", "Đăng nhập thất bại");
     }
-    console.log(response);
+  };
+
+  const handleLoginGoogle = () => {
+    window.location.href = `${
+      import.meta.env.VITE_BACKEND_URL
+    }/api/Account/google-login`;
   };
 
   return (
@@ -94,6 +121,14 @@ export const LoginPage = () => {
         <LoginButton variant="contained" onClick={handleLogin}>
           Đăng nhập
         </LoginButton>
+
+        <LoginGoogleButton variant="outlined" onClick={handleLoginGoogle}>
+          <img
+            src={googleLogo}
+            style={{ width: "30px", height: "30px", marginRight: "20px" }}
+          />
+          Đăng nhập với Google
+        </LoginGoogleButton>
 
         <Link to="/forgot-password" style={{ marginTop: "20px" }}>
           Quên mật khẩu

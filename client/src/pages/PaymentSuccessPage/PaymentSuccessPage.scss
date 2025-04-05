@@ -1,0 +1,21 @@
+.payment-success-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  &--header {
+    margin-top: 20px;
+    font-size: 30px;
+    font-weight: bold;
+  }
+
+  &--img {
+    margin-top: 20px;
+  }
+
+  &--title {
+    margin-top: 5px;
+    font-size: 18px;
+  }
+}

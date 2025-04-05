@@ -3,7 +3,7 @@ import { axiosInstance } from "./axiosInstance";
 export const fetchProvinces = async () => {
   try {
     const response = await axiosInstance.get(`/api/Delivery/provinces`);
-    return response.data;
+    return response.data.reverse();
   } catch (error) {
     console.log(error);
   }

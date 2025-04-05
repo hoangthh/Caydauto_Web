@@ -18,9 +18,10 @@
   }
 
   &--right {
-    flex-basis: 30%;
+    min-width: 200px;
     display: flex;
     align-items: center;
+    justify-content: flex-start;
 
     &__quantity {
       display: flex;
@@ -28,7 +29,7 @@
     }
 
     &__price {
-      margin-left: 20px;
+      margin-left: 50px;
     }
   }
 }
