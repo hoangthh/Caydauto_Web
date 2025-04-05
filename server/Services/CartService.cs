@@ -16,6 +16,9 @@ public class CartService : ICartService
     public async Task<bool> AddToCart(CartItemCreateDto cartItemCreateDto)
     {
         var userId = _currentUserService.UserId ?? throw new UnauthorizedAccessException("User not authenticated");
+        var cartItemProductId = cartItemCreateDto.ProductId;
+        var cartItemColorId = cartItemCreateDto.ColorId;
+        var cartItemQuantity = cartItemCreateDto.Quantity;
         var cartItemEntity = _mapper.Map<CartItem>(cartItemCreateDto);
         return await _cartRepository.AddToCart(userId, cartItemEntity).ConfigureAwait(false);
     }

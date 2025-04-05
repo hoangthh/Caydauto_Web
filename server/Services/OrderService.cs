@@ -48,13 +48,13 @@ public class OrderService : IOrderService
         try
         {
             // Lấy danh sách sản phẩm và số lượng từ OrderItems
-            (int ProductId, int Quantity)[] productIdQuantity = order
-                .OrderItems.Select(oi => (oi.ProductId, oi.Quantity))
+            (int ProductId, int ColorId,int Quantity)[] productIdQuantity = order
+                .OrderItems.Select(oi => (oi.ProductId, oi.ColorId, oi.Quantity))
                 .ToArray();
 
             // Tính tổng giá sản phẩm (TotalPrice)
             var totalPrice = await _productRepository
-                .GetTotalPriceByProductsIdAsync(productIdQuantity)
+                .GetTotalPriceByProductsIdAsync(productIdQuantity.Select(p => (p.ProductId, p.Quantity)).ToArray())
                 .ConfigureAwait(false);
 
             // Tính phí vận chuyển (DeliveryFee)

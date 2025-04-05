@@ -205,9 +205,20 @@ public class DeliveryService : IDeliveryService
     {
         try
         {
+            List<ServiceInfo>? services = await GetAvailableServicesAsync(
+                    toDistrictId,
+                    fromDistrictId
+                )
+                .ConfigureAwait(false);
+            if (services == null || services.Count == 0)
+            {
+                _logger.LogError("No available services found");
+                return -1;
+            }
+            // Kiểm tra xem serviceId có hợp lệ không
             var requestBody = new
             {
-                service_id = serviceId,
+                service_id = services[0].ServiceId,
                 insurance_value = insuranceValue,
                 coupon = "",
                 from_district_id = fromDistrictId,
