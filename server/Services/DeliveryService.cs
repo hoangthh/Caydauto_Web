@@ -206,10 +206,9 @@ public class DeliveryService : IDeliveryService
         try
         {
             List<ServiceInfo>? services = await GetAvailableServicesAsync(
-                    toDistrictId,
-                    fromDistrictId
-                )
-                .ConfigureAwait(false);
+                toDistrictId,
+                fromDistrictId
+            ).ConfigureAwait(false);
             if (services == null || services.Count == 0)
             {
                 _logger.LogError("No available services found");
@@ -323,10 +322,10 @@ public class GHNShippingResponse<T>
     public int Code { get; set; }
 
     [JsonPropertyName("message")]
-    public string Message { get; set; }
+    public string Message { get; set; } = string.Empty;
 
     [JsonPropertyName("data")]
-    public T Data { get; set; }
+    public T Data { get; set; } = default!;
 }
 
 public class FeeData
@@ -368,7 +367,7 @@ public class ServiceInfo
     public int ServiceId { get; set; }
 
     [JsonPropertyName("short_name")]
-    public string ShortName { get; set; }
+    public string ShortName { get; set; } = string.Empty;
 
     [JsonPropertyName("service_type")]
     public int ServiceType { get; set; }
