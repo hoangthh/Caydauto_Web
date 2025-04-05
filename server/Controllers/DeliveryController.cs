@@ -37,10 +37,19 @@ public class DeliveryController : ControllerBase
         int insuranceValue
     )
     {
+
         return Ok(
             await _deliveryService
-                .GetShippingFeeAsync(toDistrictId, toWardCode, insuranceValue)
+                .GetShippingFeeAsync( toDistrictId, toWardCode, insuranceValue)
                 .ConfigureAwait(false)
+        );
+    }
+
+    [HttpGet("service-available")]
+    public async Task<IActionResult> GetServiceAvailable(int toDistrictId)
+    {
+        return Ok(
+            await _deliveryService.GetAvailableServicesAsync(toDistrictId).ConfigureAwait(false)
         );
     }
 }
