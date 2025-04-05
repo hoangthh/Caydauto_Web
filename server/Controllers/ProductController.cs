@@ -30,6 +30,23 @@ public class ProductController : ControllerBase
         _logger = logger;
     }
 
+    [HttpPost()]
+    public async Task<IActionResult> CreateProductAsync([FromBody] ProductCreateDto product)
+    {
+        try
+        {
+            var result = await _productService.AddProduct(product).ConfigureAwait(false);
+            if (result == null)
+                return BadRequest(new { Message = "Failed to create product." });
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating product");
+            return StatusCode(500, new { Message = "Internal server error" });
+        }
+    }
+
     [HttpGet("filter")]
     public async Task<IActionResult> GetFilter()
     {

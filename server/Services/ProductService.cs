@@ -9,6 +9,7 @@ public class ProductService : IProductService
     private readonly FileService _fileService;
     private readonly ICategoryRepository _categoryRepository;
     private readonly IWishListService _wishListService;
+    private readonly IColorRepository _colorRepository;
     private readonly ILogger<ProductService> _logger;
     private readonly IMapper _mapper;
     private readonly ICurrentUserService _currentUserService;
@@ -22,7 +23,8 @@ public class ProductService : IProductService
         IMapper mapper,
         IWishListService wishListService,
         ICurrentUserService currentUserService,
-        ILogger<ProductService> logger
+        ILogger<ProductService> logger,
+        IColorRepository colorRepository
     )
     {
         _productRepository = productRepository;
@@ -34,11 +36,117 @@ public class ProductService : IProductService
         _wishListService = wishListService;
         _currentUserService = currentUserService;
         _logger = logger;
+        _colorRepository = colorRepository;
     }
 
-    public Task<ProductDetailGetDto> AddProduct(ProductCreateDto productPostDto)
+    public async Task<ProductDetailGetDto?> AddProduct(ProductCreateDto productDto)
     {
-        throw new NotImplementedException();
+        if (productDto == null)
+            throw new ArgumentNullException(nameof(productDto));
+
+        // Step 1: Validate the DTO (already handled by data annotations, but we can add additional checks if needed)
+        if (productDto.Price <= 0)
+            throw new ArgumentException("Price must be greater than 0.", nameof(productDto.Price));
+
+        if (productDto.StockQuantity < 0)
+            throw new ArgumentException(
+                "Stock quantity cannot be negative.",
+                nameof(productDto.StockQuantity)
+            );
+
+        // Step 2: Validate Categories
+        if (productDto.CategoryIds == null || !productDto.CategoryIds.Any())
+            throw new ArgumentException(
+                "At least one category must be specified.",
+                nameof(productDto.CategoryIds)
+            );
+
+        var categorieEntity = await _categoryRepository
+            .GetAllCategoriesAsync()
+            .ConfigureAwait(false);
+        var categories = categorieEntity.Where(c => productDto.CategoryIds.Contains(c.Id)).ToList();
+        if (categories.Count != productDto.CategoryIds.Count)
+        {
+            var invalidCategoryIds = productDto
+                .CategoryIds.Except(categories.Select(c => c.Id))
+                .ToList();
+            throw new ArgumentException(
+                $"Invalid category IDs: {string.Join(", ", invalidCategoryIds)}"
+            );
+        }
+
+        // Step 3: Validate Colors
+        if (productDto.ColorIds == null || !productDto.ColorIds.Any())
+            throw new ArgumentException(
+                "At least one color must be specified.",
+                nameof(productDto.ColorIds)
+            );
+
+        var colorEntities = await _colorRepository.GetAllAsync().ConfigureAwait(false);
+        var colors = colorEntities.Where(c => productDto.ColorIds.Contains(c.Id)).ToList();
+        if (colors.Count != productDto.ColorIds.Count)
+        {
+            var invalidColorIds = productDto.ColorIds.Except(colors.Select(c => c.Id)).ToList();
+            throw new ArgumentException($"Invalid color IDs: {string.Join(", ", invalidColorIds)}");
+        }
+
+        // Step 4: Validate Images
+        if (productDto.Images == null || !productDto.Images.Any())
+            throw new ArgumentException(
+                "At least one image must be provided.",
+                nameof(productDto.Images)
+            );
+
+        var imageFiles = productDto
+            .Images.Select(i => i.File)
+            .Where(f => f != null && f.Length > 0)
+            .ToList();
+        if (imageFiles == null || !imageFiles.Any())
+            throw new ArgumentException(
+                "No valid image files provided.",
+                nameof(productDto.Images)
+            );
+
+        // Step 5: Map ProductCreateDto to Product
+        var product = _mapper.Map<Product>(productDto);
+
+        // Set CreatedDate and UpdatedDate (from IDateTracking)
+        product.CreatedDate = DateTime.Now;
+        product.UpdatedDate = DateTime.Now;
+
+        // Step 6: Associate Categories and Colors
+        product.Categories = categories;
+        product.Colors = colors;
+
+        // Step 7: Add the Product to the database (without images for now)
+        var addedProduct = await _productRepository.AddAsync(product).ConfigureAwait(false);
+        if (addedProduct == null)
+            throw new Exception("Failed to add product to the database.");
+        // Step 8: Save Images using FileService
+        try
+        {
+            var imageUrls = await _fileService
+                .SaveImagesAsync(imageFiles!, "Products", product.Id)
+                .ConfigureAwait(false);
+
+            // Create Image entities and associate them with the Product
+            product.Images = imageUrls
+                .Select(url => new Image { Url = url, ProductId = product.Id })
+                .ToList();
+
+            // Update the Product with the images
+            addedProduct.Images = product.Images;
+            await _productRepository.UpdateAsync(addedProduct).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            // Rollback: Delete the product if image saving fails
+            await _productRepository.DeleteAsync(addedProduct.Id).ConfigureAwait(false);
+            throw new IOException("Failed to save product images: " + ex.Message, ex);
+        }
+
+        // Step 9: Return the created Product (including navigation properties if needed)
+        return await GetProduct(addedProduct.Id).ConfigureAwait(false);
     }
 
     public Task<bool> DeleteProduct(int id)
