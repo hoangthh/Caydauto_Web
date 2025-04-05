@@ -1,0 +1,11 @@
+.order-list {
+  width: 100%;
+  border: 1px solid green;
+  border-radius: 20px;
+  padding: 20px;
+
+  &--header {
+    display: flex;
+    justify-content: space-between;
+  }
+}

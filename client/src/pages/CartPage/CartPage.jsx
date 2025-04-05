@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import {
   Button,
   Checkbox,
-  Divider,
   List,
   ListItem,
   ListItemButton,
@@ -13,7 +12,9 @@ import {
   Typography,
 } from "@mui/material";
 import { CartProduct } from "../../components/CartProduct/CartProduct";
-import { fetchCartProducts } from "../../apis/cart";
+import { fetchCartProducts, removeProductFromCart } from "../../apis/cart";
+import { convertNumberToPrice } from "../../helpers/string";
+import { useAlert } from "../../contexts/AlertContext";
 
 const CartPageHeader = styled(Typography)`
   font-weight: bold;
@@ -28,10 +29,27 @@ const CartProductList = styled(List)`
 const SelectAllListItemText = styled(ListItemText)`
   display: flex;
   justify-content: flex-end;
-  padding-right: 30px;
+  padding-right: 50px;
 `;
+
 const SelectAllButtonHeader = styled(Typography)`
   font-weight: bold;
+`;
+
+const SelectAllButton = styled(Checkbox)`
+  margin-right: 15px;
+`;
+
+const DeleteCartProductButton = styled(Button)`
+  margin-left: 15px;
+  text-transform: none;
+  color: red;
+  border: 1px solid red;
+
+  &:hover {
+    background: red;
+    color: white;
+  }
 `;
 
 const TotalPriceHeader = styled(Typography)`
@@ -65,12 +83,14 @@ export const CartPage = () => {
   const [cartProductList, setCartProductList] = useState([]);
   const [selectedCartProduct, setSelectedCartProduct] = React.useState([]);
 
+  const { renderAlert } = useAlert();
+  console.log(selectedCartProduct);
   const totalPrice =
     selectedCartProduct?.length > 0
       ? selectedCartProduct.reduce((total, item) => {
           return total + item.product.price * item.quantity;
         }, 0)
-      : cartProductList.totalPrice;
+      : 0;
 
   useEffect(() => {
     const fetchCartProductList = async () => {
@@ -104,6 +124,36 @@ export const CartPage = () => {
     );
   };
 
+  const handleRemoveCartProduct = (cartItemId) => async () => {
+    const response = await removeProductFromCart(cartItemId);
+    if (response?.status === 200)
+      renderAlert("success", "Xóa sản phẩm khỏi giỏ hàng thành công");
+    else renderAlert("warning", "Xóa sản phẩm khỏi giỏ hàng thất bại");
+    setCartProductList({
+      ...cartProductList,
+      cartItems: cartProductList.cartItems.filter(
+        (cartItem) => cartItem.id !== cartItemId
+      ),
+    });
+    setSelectedCartProduct(
+      cartProductList.cartItems.filter((cartItem) => cartItem.id !== cartItemId)
+    );
+  };
+
+  const handleQuantityChange = (cartItemId, newQuantity) => {
+    // Cập nhật trong cartProductList nếu cần
+    const updatedCartItems = cartProductList.cartItems.map((item) =>
+      item.id === cartItemId ? { ...item, quantity: newQuantity } : item
+    );
+    setCartProductList({ ...cartProductList, cartItems: updatedCartItems });
+
+    // Cập nhật trong selectedCartProduct
+    const updatedSelected = selectedCartProduct.map((item) =>
+      item.id === cartItemId ? { ...item, quantity: newQuantity } : item
+    );
+    setSelectedCartProduct(updatedSelected);
+  };
+
   return (
     <div className="cart-page">
       <CartPageHeader>GIỎ HÀNG</CartPageHeader>
@@ -114,7 +164,7 @@ export const CartPage = () => {
             <CartProductList>
               <ListItem
                 secondaryAction={
-                  <Checkbox
+                  <SelectAllButton
                     edge="end"
                     onChange={handleSelectedAllCartProduct}
                     checked={
@@ -138,15 +188,37 @@ export const CartPage = () => {
                 <ListItem
                   disablePadding
                   secondaryAction={
-                    <Checkbox
-                      edge="end"
-                      onChange={handleSelectedCartProduct(cartItem)}
-                      checked={selectedCartProduct.includes(cartItem)}
-                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Checkbox
+                        edge="end"
+                        onChange={handleSelectedCartProduct(cartItem)}
+                        checked={selectedCartProduct.includes(cartItem)}
+                      />
+                      <DeleteCartProductButton
+                        variant="outlined"
+                        onClick={handleRemoveCartProduct(cartItem.id)}
+                      >
+                        Xóa
+                      </DeleteCartProductButton>
+                    </div>
                   }
                 >
                   <ListItemButton>
-                    <CartProduct cartItem={cartItem} key={cartItem.id} />
+                    <CartProduct
+                      cartItem={cartItem}
+                      key={cartItem.id}
+                      flexBasisRightInfo={"35%"}
+                      onQuantityChange={(newQuantity) =>
+                        handleQuantityChange(cartItem.id, newQuantity)
+                      }
+                    />
                   </ListItemButton>
                 </ListItem>
               ))}
@@ -159,7 +231,9 @@ export const CartPage = () => {
         <div className="cart-page--main__right">
           <div className="cart-page--main__right price">
             <TotalPriceHeader>Thành tiền</TotalPriceHeader>
-            <TotalPrice>{parseInt(totalPrice) || 0}đ</TotalPrice>
+            <TotalPrice>
+              {convertNumberToPrice(parseInt(totalPrice)) || 0}
+            </TotalPrice>
           </div>
 
           <Link

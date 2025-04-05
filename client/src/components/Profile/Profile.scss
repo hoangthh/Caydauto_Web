@@ -1,10 +1,12 @@
 .profile {
   display: flex;
+  align-items: center;
   gap: 50px;
 
   &--img {
-    width: 350px;
-    height: 350px;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
   }
 
   &--info {

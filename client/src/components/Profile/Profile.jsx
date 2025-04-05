@@ -13,7 +13,6 @@ const ProfileInfoHeader = styled(Typography)`
 `;
 
 export const Profile = () => {
-  console.log("Profile rerender");
   const [profile, setProfile] = useState({});
 
   useEffect(() => {

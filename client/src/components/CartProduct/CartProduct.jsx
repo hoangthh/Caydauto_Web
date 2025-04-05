@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./CartProduct.scss";
 import productImg from "../../assets/product.svg";
 import { styled, Typography } from "@mui/material";
@@ -29,27 +29,52 @@ const ProductPrice = styled(Typography)`
   font-size: 18px;
 `;
 
-export const CartProduct = ({ showQuantity = true, cartItem }) => {
+export const CartProduct = ({
+  cartItem,
+  flexBasisRightInfo = 0,
+  changeQuantity = true,
+  onQuantityChange = () => {},
+}) => {
+  const [quantity, setQuantity] = useState(cartItem.quantity);
+
+  const handleDecreaseQuantity = () => {
+    if (quantity === 1) return;
+    const newQuantity = quantity - 1;
+    setQuantity(newQuantity);
+    onQuantityChange(newQuantity);
+  };
+
+  const handleIncreaseQuantity = () => {
+    const newQuantity = quantity + 1;
+    setQuantity(newQuantity);
+    onQuantityChange(newQuantity);
+  };
+
   return (
     <div className="cart-product">
       <div className="cart-product--left">
         <img
-          src={cartItem.product.imageUrl || productImg}
+          src={cartItem?.product?.imageUrl || productImg}
           className="cart-product--left__img"
         />
         <div className="cart-product--left__info">
           <ProductName>{cartItem.product.name}</ProductName>
-          <ProductColor>{cartItem.color.name}</ProductColor>
+          <ProductColor>{cartItem?.color?.name}</ProductColor>
         </div>
       </div>
-      <div className="cart-product--right">
+      <div
+        className="cart-product--right"
+        style={{ flexBasis: flexBasisRightInfo }}
+      >
         {/* Main Product Quantity */}
-        {showQuantity && (
+        {changeQuantity ? (
           <div className="cart-product--right__quantity">
-            <DecreaseQuantityButton />
-            <ProductQuantity>{cartItem.quantity}</ProductQuantity>
-            <IncreaseQuantityButton />
+            <DecreaseQuantityButton onClick={handleDecreaseQuantity} />
+            <ProductQuantity>{quantity}</ProductQuantity>
+            <IncreaseQuantityButton onClick={handleIncreaseQuantity} />
           </div>
+        ) : (
+          <ProductQuantity>SL: {cartItem.quantity}</ProductQuantity>
         )}
 
         {/* Main Product Price */}

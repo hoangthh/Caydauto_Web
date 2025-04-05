@@ -16,7 +16,18 @@ export const addProductToCart = async ({ productId, colorId, quantity }) => {
       colorId,
       quantity,
     });
-    return response.data;
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const removeProductFromCart = async (cartItemId) => {
+  try {
+    const response = await axiosInstance.delete(
+      `/api/Cart/remove/${cartItemId}`
+    );
+    return response;
   } catch (error) {
     console.log(error);
   }

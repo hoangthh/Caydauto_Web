@@ -14,13 +14,14 @@ import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import RemoveCircleRoundedIcon from "@mui/icons-material/RemoveCircleRounded";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Product } from "../../components/Product/Product";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
   fetchDetailProductById,
   fetchSimilarProductsById,
 } from "../../apis/product";
 import { addProductToCart } from "../../apis/cart";
 import { convertNumberToPrice } from "../../helpers/string";
+import { useAlert } from "../../contexts/AlertContext";
 
 const ProductName = styled(Typography)`
   font-size: 20px;
@@ -81,9 +82,15 @@ export const DetailPage = () => {
   const [colorList, setColorList] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [similarProductList, setSimilarProductList] = useState([]);
-  const [colorId, setColorId] = useState(null);
+  const [selectedColor, setSelectedColor] = useState({
+    id: null,
+    name: null,
+    hexCode: null,
+  });
 
   const { productId } = useParams();
+
+  const { renderAlert } = useAlert();
 
   useEffect(() => {
     const fetchDetailProduct = async () => {
@@ -113,8 +120,40 @@ export const DetailPage = () => {
   };
 
   const handleAddToCart = async () => {
-    const response = await addProductToCart({ productId, colorId, quantity });
-    console.log(response);
+    if (!productId || !selectedColor.id || !quantity) {
+      renderAlert("info", "Vui lòng chọn màu");
+      return;
+    }
+    const response = await addProductToCart({
+      productId,
+      colorId: selectedColor.id,
+      quantity,
+    });
+    if (response?.status === 200)
+      renderAlert("success", "Thêm vào giỏ hàng thành công");
+  };
+
+  const buyState = {
+    selectedCartProduct: [
+      {
+        product: {
+          id: detailProduct.id,
+          name: detailProduct.name,
+          price: detailProduct.price,
+          imageUrl:
+            detailProduct.images?.length > 0
+              ? detailProduct.images[0].url
+              : null,
+        },
+        color: {
+          id: selectedColor.id,
+          name: selectedColor.name,
+          hexCode: selectedColor.hexCode,
+        },
+        quantity: 1,
+      },
+    ],
+    totalPrice: detailProduct.price,
   };
 
   if (isLoading) return <CircularProgress />;
@@ -127,7 +166,24 @@ export const DetailPage = () => {
       <div className="detail-page--product">
         {/* Main Product Image */}
         <div className="detail-page--product__image">
-          <img src={product} className="" />
+          <img
+            src={
+              detailProduct.images?.length > 0
+                ? detailProduct.images[0].url
+                : product
+            }
+            className=""
+          />
+          {detailProduct.images?.length > 0 &&
+            detailProduct.images
+              .slice(0, 5)
+              .map((image) => (
+                <img
+                  src={image.url}
+                  key={image.id}
+                  style={{ width: "calc(100%/5)" }}
+                />
+              ))}
         </div>
         {/* Main Product Image */}
 
@@ -145,11 +201,8 @@ export const DetailPage = () => {
                 type="checkbox"
                 className={`input detail-color ${color.name}`}
                 value={color.name}
-                checked={colorId === color.id}
-                onChange={(e) => {
-                  console.log(e.target.value);
-                  setColorId(color.id);
-                }}
+                checked={selectedColor.id === color.id}
+                onChange={() => setSelectedColor(color)}
               />
             ))}
           </div>
@@ -174,7 +227,9 @@ export const DetailPage = () => {
             <AddToCartButton variant="contained" onClick={handleAddToCart}>
               Thêm vào giỏ hàng
             </AddToCartButton>
-            <BuyButton variant="contained">Mua ngay</BuyButton>
+            <Link to="/payment" state={buyState}>
+              <BuyButton variant="contained">Mua ngay</BuyButton>
+            </Link>
           </div>
           {/* Main Product Action */}
 
@@ -184,6 +239,18 @@ export const DetailPage = () => {
               <ProductDescription>Chi tiết sản phẩm</ProductDescription>
             </AccordionSummary>
             <AccordionDetails>{detailProduct.description}</AccordionDetails>
+          </DescriptionAccordion>
+          {/* Main Product Description */}
+
+          {/* Main Product Description */}
+          <DescriptionAccordion>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <ProductDescription>Đánh giá sản phẩm</ProductDescription>
+            </AccordionSummary>
+            <AccordionDetails>
+              {detailProduct.avarageRating ||
+                "Hiện chưa có đánh giá về sản phẩm này"}
+            </AccordionDetails>
           </DescriptionAccordion>
           {/* Main Product Description */}
         </div>

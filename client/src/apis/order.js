@@ -10,10 +10,10 @@ export const createOrder = async ({
   cartProductList,
 }) => {
   try {
-    const orderItems = cartProductList.map((order) => ({
-      productId: order.id,
-      colorId: order.color.id,
-      quantity: order.quantity,
+    const orderItems = cartProductList.map((cartProduct) => ({
+      productId: cartProduct.product.id,
+      colorId: cartProduct.color.id,
+      quantity: cartProduct.quantity,
     }));
     const order = {
       paymentMethod,
@@ -25,6 +25,20 @@ export const createOrder = async ({
       orderItems,
     };
     const response = await axiosInstance.post(`/api/Order`, order);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const fetchOrderByUser = async (pageNumber, pageSize) => {
+  try {
+    const response = await axiosInstance.get(`/api/Order/user`, {
+      params: {
+        pageNumber,
+        pageSize,
+      },
+    });
     return response.data;
   } catch (error) {
     console.log(error);

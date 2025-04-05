@@ -33,10 +33,14 @@ const StyledTab = styled(Tab)``;
 export const UserPage = () => {
   const [value, setValue] = React.useState(0);
 
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Lấy giá trị của một query param cụ thể
   const tab = searchParams.get("tab") || 0;
+
+  const updatePage = (tab) => {
+    setSearchParams({ tab: tab });
+  };
 
   useEffect(() => {
     setValue(parseInt(tab));
@@ -44,6 +48,7 @@ export const UserPage = () => {
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+    updatePage(newValue);
   };
 
   return (

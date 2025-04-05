@@ -6,6 +6,7 @@ import titleLogo from "../../assets/title-logo.svg";
 import { Button, styled, TextField, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import { register } from "../../apis/auth";
+import { useAlert } from "../../contexts/AlertContext";
 
 const LoginHeader = styled(Typography)`
   font-weight: bold;
@@ -54,6 +55,8 @@ export const RegisterPage = () => {
   const [isNullEmail, setIsNullEmail] = useState(true);
   const [isInvalidForm, setIsInvalidForm] = useState(false);
 
+  const { renderAlert } = useAlert();
+
   const handleChange = (e) => {
     setRegisterForm({
       ...registerForm,
@@ -65,19 +68,28 @@ export const RegisterPage = () => {
   };
 
   const handleRegister = async () => {
-    console.log(registerForm);
     if (
       !registerForm.fullName ||
       !registerForm.email ||
       !registerForm.password
     ) {
       setIsInvalidForm(true);
+
       return;
     }
 
     const response = await register(registerForm);
-    // if (response.isSuccess) navigate("/")
-    console.log(response);
+    if (response?.isSuccess) {
+      renderAlert(
+        "info",
+        "Đăng kí thành công! Kiểm tra email để kích hoạt tài khoản của bạn"
+      );
+    } else {
+      renderAlert(
+        "warning",
+        "Email đã tồn tại! Vui lòng sử dụng email khác để đăng kí tài khoản"
+      );
+    }
   };
 
   return (
