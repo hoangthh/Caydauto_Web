@@ -8,4 +8,5 @@ public interface IOrderService
     Task<OrderResponse> UpdateOrderAsync(int orderId, string newStatus);
     Task<OrderGetDto?> GetOrderAsync(int orderId);
     Task<List<OrderGetDto>> GetOrdersAsync(int pageNumber, int pageSize);
+    Task<List<OrderGetDto>> GetOrdersByUserIdAsync(int pageNumber, int pageSize);
 }

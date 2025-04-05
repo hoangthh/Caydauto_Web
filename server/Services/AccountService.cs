@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using AutoMapper;
 using Azure.Core;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -14,6 +15,8 @@ public class AccountService : IAccountService
     private readonly IRoleRepository _roleRepository;
     private readonly IEmailSender _emailService;
     private readonly IConfiguration _configuration;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly IMapper _mapper;
 
     public AccountService(
         UserManager<User> userManager,
@@ -22,7 +25,9 @@ public class AccountService : IAccountService
         IUserRepostory userRepository,
         IRoleRepository roleRepository,
         SignInManager<User> signinManager,
-        ILogger<AccountService> logger
+        ILogger<AccountService> logger,
+        IMapper mapper,
+        ICurrentUserService currentUserService
     )
     {
         _userRepository = userRepository;
@@ -32,6 +37,30 @@ public class AccountService : IAccountService
         _roleRepository = roleRepository;
         _signinManager = signinManager;
         _logger = logger;
+        _mapper = mapper;
+        _currentUserService = currentUserService;
+    }
+
+    public async Task<UserGetDto?> GetUserByIdAsync(int id)
+    {
+        var userEntities = await _userRepository.GetByIdAsync(id).ConfigureAwait(false);
+        if (userEntities == null)
+            return null;
+        var user = _mapper.Map<UserGetDto>(userEntities);
+        return user;
+    }
+
+    public async Task<UserGetDto?> GetUserProfileAsync()
+    {
+        var userId = _currentUserService.UserId; // Lấy ID người dùng từ dịch vụ hiện tại
+        if (!userId.HasValue)
+            return null;
+        // Kiểm tra xem người dùng có tồn tại không
+        var userEntities = await _userRepository.GetByIdAsync(userId.Value).ConfigureAwait(false);
+        if (userEntities == null)
+            throw new Exception("User not found");
+        var user = _mapper.Map<UserGetDto>(userEntities);
+        return user;
     }
 
     public async Task<RegisterResponseDTO> RegisterAsync(RegisterDTO request)
@@ -48,10 +77,14 @@ public class AccountService : IAccountService
         var result = await _userManager.CreateAsync(user, request.Password).ConfigureAwait(false);
         if (result.Succeeded)
         {
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
+            var token = await _userManager
+                .GenerateEmailConfirmationTokenAsync(user)
+                .ConfigureAwait(false);
             var callbackUrl =
                 $"{_configuration["AppSettings:ServerUrl"]}/api/account/confirm-email?email={Uri.EscapeDataString(request.Email)}&token={Uri.EscapeDataString(token)}";
-            await _emailService.SendEmailAsync(request.Email, "Confirm your email", callbackUrl).ConfigureAwait(false);
+            await _emailService
+                .SendEmailAsync(request.Email, "Confirm your email", callbackUrl)
+                .ConfigureAwait(false);
             return new RegisterResponseDTO
             {
                 IsSuccess = true,
@@ -70,7 +103,9 @@ public class AccountService : IAccountService
 
     private async Task SignInWithCookies(User user, bool rememberMe)
     {
-        var userWithRole = await _userRepository.GetUserWithRoleByIdAsync(user.Id).ConfigureAwait(false); // Lấy tên vai trò của người dùng
+        var userWithRole = await _userRepository
+            .GetUserWithRoleByIdAsync(user.Id)
+            .ConfigureAwait(false); // Lấy tên vai trò của người dùng
         var roleName = userWithRole != null ? userWithRole.Role!.Name : "User"; // Lấy tên vai trò của người dùng
         var claims = new List<Claim>
         {
@@ -89,7 +124,9 @@ public class AccountService : IAccountService
         };
 
         // Đăng nhập người dùng và lưu thông tin vào cookie
-        await _signinManager.SignInWithClaimsAsync(user, authProperties, claims).ConfigureAwait(false);
+        await _signinManager
+            .SignInWithClaimsAsync(user, authProperties, claims)
+            .ConfigureAwait(false);
     }
 
     public async Task<GoogleLoginResponse> GoogleAuthen(AuthenticateResult result)
@@ -136,7 +173,6 @@ public class AccountService : IAccountService
                 guestRole,
                 avatarUrl: avatarUrl,
                 confirmedEmail: true // Đánh dấu email đã được xác nhận
-                
             );
             // Nếu người dùng chưa tồn tại, tạo người dùng mới
             await _userManager.CreateAsync(existingUser).ConfigureAwait(false);
@@ -154,7 +190,11 @@ public class AccountService : IAccountService
                 existingUser.EmailConfirmed = true; // Đánh dấu email đã được xác nhận
                 await _userManager.UpdateAsync(existingUser).ConfigureAwait(false);
             }
-            if (existingUser.LockoutEnabled && existingUser.LockoutEnd != null && existingUser.LockoutEnd > DateTime.UtcNow)
+            if (
+                existingUser.LockoutEnabled
+                && existingUser.LockoutEnd != null
+                && existingUser.LockoutEnd > DateTime.UtcNow
+            )
             {
                 return new GoogleLoginResponse
                 {
@@ -192,18 +232,19 @@ public class AccountService : IAccountService
                 Message = "Login failed.",
                 ErrorMessage = "User is locked out.",
             };
-        var result = await _signinManager.PasswordSignInAsync(
-            user,
-            request.Password,
-            isPersistent: true,
-            lockoutOnFailure: true
-        ).ConfigureAwait(false);
+        var result = await _signinManager
+            .PasswordSignInAsync(user, request.Password, isPersistent: true, lockoutOnFailure: true)
+            .ConfigureAwait(false);
         if (user.EmailConfirmed == false && result.Succeeded)
         {
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
+            var token = await _userManager
+                .GenerateEmailConfirmationTokenAsync(user)
+                .ConfigureAwait(false);
             var callbackUrl =
                 $"{_configuration["AppSettings:ServerUrl"]}/api/account/confirm-email?email={request.Email}&token={token}";
-            await _emailService.SendEmailAsync(request.Email, "Confirm your email", callbackUrl).ConfigureAwait(false);
+            await _emailService
+                .SendEmailAsync(request.Email, "Confirm your email", callbackUrl)
+                .ConfigureAwait(false);
             return new LoginResponseDTO
             {
                 IsSuccess = false,
