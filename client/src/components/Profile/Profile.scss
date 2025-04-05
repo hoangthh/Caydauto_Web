@@ -1,0 +1,13 @@
+.profile {
+  display: flex;
+  gap: 50px;
+
+  &--img {
+    width: 350px;
+    height: 350px;
+  }
+
+  &--info {
+    display: flex;
+  }
+}

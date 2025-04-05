@@ -20,6 +20,7 @@ import {
   fetchSimilarProductsById,
 } from "../../apis/product";
 import { addProductToCart } from "../../apis/cart";
+import { convertNumberToPrice } from "../../helpers/string";
 
 const ProductName = styled(Typography)`
   font-size: 20px;
@@ -155,7 +156,9 @@ export const DetailPage = () => {
           {/* Main Product Color */}
 
           {/* Main Product Price */}
-          <ProductPrice>{parseInt(detailProduct.price)}đ</ProductPrice>
+          <ProductPrice>
+            {convertNumberToPrice(parseInt(detailProduct.price))}
+          </ProductPrice>
           {/* Main Product Price */}
 
           {/* Main Product Quantity */}
