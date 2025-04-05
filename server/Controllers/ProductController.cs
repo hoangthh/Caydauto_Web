@@ -30,7 +30,7 @@ public class ProductController : ControllerBase
         _logger = logger;
     }
 
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<IActionResult> CreateProductAsync([FromBody] ProductCreateDto product)
     {
         try
