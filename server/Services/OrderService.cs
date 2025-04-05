@@ -64,7 +64,7 @@ public class OrderService : IOrderService
 
             // Áp dụng mã giảm giá
             var (totalPriceAfterDiscount, updatedDeliveryFee, discountAmount) =
-                await ApplyDiscountAsync(totalPrice, deliveryFee, order.DiscountCode)
+                await ApplyDiscountAsync(totalPrice, deliveryFee, order.DiscountCode ?? string.Empty)
                     .ConfigureAwait(false);
 
             // Lấy địa chỉ giao hàng
