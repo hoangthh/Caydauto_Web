@@ -8,9 +8,11 @@ using Microsoft.AspNetCore.Mvc;
 public class OrderController : ControllerBase
 {
     private readonly IOrderService _orderService;
+    private readonly IVnPayOrderService _vnPayOrderService;
 
-    public OrderController(IOrderService orderService)
+    public OrderController(IOrderService orderService, IVnPayOrderService vnPayOrderService)
     {
+        _vnPayOrderService = vnPayOrderService;
         _orderService = orderService;
     }
 
@@ -40,12 +42,59 @@ public class OrderController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateOrder([FromBody] OrderCreateDto orderCreateDto)
     {
-        var order = await _orderService.CreateOrderAsync(orderCreateDto).ConfigureAwait(false);
-        if (!order.IsSuccess)
+        if (!ModelState.IsValid)
         {
-            return BadRequest(order.Message);
+            return BadRequest(ModelState);
         }
-        return Ok(order);
+
+        // Xử lý dựa trên PaymentMethod
+        switch (orderCreateDto.PaymentMethod.ToUpper())
+        {
+            case "COD":
+                var orderResult = await _orderService
+                    .CreateOrderAsync(orderCreateDto)
+                    .ConfigureAwait(false);
+                if (!orderResult.IsSuccess)
+                {
+                    return BadRequest(new { Success = false, Message = orderResult.Message });
+                }
+                return Ok(
+                    new
+                    {
+                        Success = true,
+                        Message = orderResult.Message,
+                        OrderId = orderResult.OrderId,
+                    }
+                );
+
+            case "VNPAY":
+                var (paymentUrl, vnPayOrderResult) = await _vnPayOrderService
+                    .CreateOrderAndPaymentUrlAsync(HttpContext, orderCreateDto)
+                    .ConfigureAwait(false);
+
+                if (!vnPayOrderResult.IsSuccess)
+                {
+                    return BadRequest(new { Success = false, Message = vnPayOrderResult.Message });
+                }
+                return Ok(
+                    new
+                    {
+                        Success = true,
+                        Message = vnPayOrderResult.Message,
+                        OrderId = vnPayOrderResult.OrderId,
+                        PaymentUrl = paymentUrl,
+                    }
+                );
+
+            default:
+                return BadRequest(
+                    new
+                    {
+                        Success = false,
+                        Message = "Invalid payment method. Must be COD or VnPay",
+                    }
+                );
+        }
     }
 
     [HttpPut("{id}/{newStatus}")]
@@ -57,5 +106,30 @@ public class OrderController : ControllerBase
             return BadRequest(order.Message);
         }
         return Ok(order);
+    }
+
+    [HttpGet("payment-callback")]
+    public async Task<IActionResult> PaymentCallback()
+    {
+        var response = await _vnPayOrderService
+            .PaymentExecuteAsync(HttpContext.Request.Query)
+            .ConfigureAwait(false);
+
+        if (!response.Success)
+        {
+            return BadRequest(
+                new { Success = false, Message = response.Message ?? "Payment processing failed" }
+            );
+        }
+
+        return Ok(
+            new
+            {
+                Success = true,
+                OrderId = response.OrderId,
+                TransactionId = response.TransactionId,
+                Message = "Payment processed successfully",
+            }
+        );
     }
 }

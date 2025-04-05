@@ -100,6 +100,10 @@ public class ProductRepository(AppDbContext context)
         (int productId, int quantity)[] productsId
     )
     {
+        productsId = productsId
+            .GroupBy(p => p.productId) // Nhóm theo productId
+            .Select(g => (productId: g.Key, quantity: g.Sum(p => p.quantity))) // Cộng dồn quantity cho mỗi nhóm
+            .ToArray();
         // Tạo dictionary từ productsId để tra cứu nhanh số lượng
         var quantityDict = productsId.ToDictionary(p => p.productId, p => p.quantity);
         var missingProducts = quantityDict
@@ -133,13 +137,21 @@ public class ProductRepository(AppDbContext context)
 
     public async Task<Dictionary<int, int>> GetProductPriceByIdsAsync(int[] productIds)
     {
-        var prices = await _entities
+        // Lấy danh sách sản phẩm với giá
+        var products = await _entities
             .AsNoTracking()
             .Where(p => productIds.Contains(p.Id))
             .Select(p => new { p.Id, p.Price })
-            .ToDictionaryAsync(p => p.Id, p => p.Price)
+            .ToListAsync()
             .ConfigureAwait(false);
 
+        // Sử dụng Distinct để loại bỏ trùng lặp dựa trên Id
+        var distinctProducts = products
+            .GroupBy(p => p.Id) // Nhóm các sản phẩm theo Id
+            .Select(g => g.First()) // Lấy phần tử đầu tiên của mỗi nhóm
+            .ToList();
+
+        var prices = distinctProducts.ToDictionary(p => p.Id, p => p.Price);
         // Kiểm tra xem có sản phẩm nào không tìm thấy không
         var missingIds = productIds.Except(prices.Keys).ToList();
         if (missingIds.Any())

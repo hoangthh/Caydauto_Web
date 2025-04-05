@@ -48,13 +48,13 @@ public class OrderService : IOrderService
         try
         {
             // Lấy danh sách sản phẩm và số lượng từ OrderItems
-            (int ProductId, int Quantity)[] productIdQuantity = order
-                .OrderItems.Select(oi => (oi.ProductId, oi.Quantity))
+            (int ProductId, int ColorId,int Quantity)[] productIdQuantity = order
+                .OrderItems.Select(oi => (oi.ProductId, oi.ColorId, oi.Quantity))
                 .ToArray();
 
             // Tính tổng giá sản phẩm (TotalPrice)
             var totalPrice = await _productRepository
-                .GetTotalPriceByProductsIdAsync(productIdQuantity)
+                .GetTotalPriceByProductsIdAsync(productIdQuantity.Select(p => (p.ProductId, p.Quantity)).ToArray())
                 .ConfigureAwait(false);
 
             // Tính phí vận chuyển (DeliveryFee)
@@ -64,7 +64,11 @@ public class OrderService : IOrderService
 
             // Áp dụng mã giảm giá
             var (totalPriceAfterDiscount, updatedDeliveryFee, discountAmount) =
-                await ApplyDiscountAsync(totalPrice, deliveryFee, order.DiscountCode)
+                await ApplyDiscountAsync(
+                        totalPrice,
+                        deliveryFee,
+                        order.DiscountCode ?? string.Empty
+                    )
                     .ConfigureAwait(false);
 
             // Lấy địa chỉ giao hàng
@@ -146,6 +150,7 @@ public class OrderService : IOrderService
             .ConfigureAwait(false);
         if (order == null)
             return null;
+        Console.WriteLine(order.OrderItems.ElementAt(0).Color);
         return MapToOrderGetDto(order);
     }
 
@@ -334,7 +339,9 @@ public class OrderService : IOrderService
         var currentUserId = _currentUserService.UserId;
         if (currentUserId == null)
         {
-            throw new UnauthorizedAccessException("You do not have permission to access this user's orders.");
+            throw new UnauthorizedAccessException(
+                "You do not have permission to access this user's orders."
+            );
         }
         // Lấy danh sách đơn hàng của người dùng hiện tại
         return _orderRepository
