@@ -7,6 +7,7 @@ import { convertNumberToPrice } from "../../helpers/string";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import { addToWishList, deleteFromWishList } from "../../apis/favor";
+import { useAuth } from "../../contexts/AuthContext";
 import { useAlert } from "../../contexts/AlertContext";
 
 const ProductName = styled(Typography)`
@@ -54,9 +55,15 @@ const BuyButton = styled(Button)`
 export const Product = ({ product }) => {
   const [isWished, setIsWished] = useState(product.isWished);
 
+  const { isAuthenticated } = useAuth();
   const { renderAlert } = useAlert();
 
   const handleAddFavor = async () => {
+    console.log(isAuthenticated);
+    if (!isAuthenticated) {
+      renderAlert("info", "Vui lòng đăng nhập để thêm sản phẩm vào yêu thích");
+      return;
+    }
     const res = await addToWishList(product.id);
     if (res?.status === 200) {
       setIsWished(true);

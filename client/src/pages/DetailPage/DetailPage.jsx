@@ -21,6 +21,7 @@ import {
 } from "../../apis/product";
 import { addProductToCart } from "../../apis/cart";
 import { convertNumberToPrice } from "../../helpers/string";
+import { useAuth } from "../../contexts/AuthContext";
 import { useAlert } from "../../contexts/AlertContext";
 
 const ProductName = styled(Typography)`
@@ -89,7 +90,7 @@ export const DetailPage = () => {
   });
 
   const { productId } = useParams();
-
+  const { isAuthenticated } = useAuth();
   const { renderAlert } = useAlert();
 
   useEffect(() => {
@@ -120,6 +121,10 @@ export const DetailPage = () => {
   };
 
   const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      renderAlert("info", "Vui lòng đăng nhập để thêm vào giỏ hàng");
+      return;
+    }
     if (!productId || !selectedColor.id || !quantity) {
       renderAlert("info", "Vui lòng chọn màu");
       return;
@@ -131,6 +136,13 @@ export const DetailPage = () => {
     });
     if (response?.status === 200)
       renderAlert("success", "Thêm vào giỏ hàng thành công");
+  };
+
+  const handleBuy = () => {
+    if (!isAuthenticated) {
+      renderAlert("info", "Vui lòng đăng nhập trước khi mua hàng");
+      return;
+    }
   };
 
   const buyState = {
@@ -228,7 +240,9 @@ export const DetailPage = () => {
               Thêm vào giỏ hàng
             </AddToCartButton>
             <Link to="/payment" state={buyState}>
-              <BuyButton variant="contained">Mua ngay</BuyButton>
+              <BuyButton variant="contained" onClick={handleBuy}>
+                Mua ngay
+              </BuyButton>
             </Link>
           </div>
           {/* Main Product Action */}
