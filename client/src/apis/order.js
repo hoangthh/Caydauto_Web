@@ -44,3 +44,26 @@ export const fetchOrderByUser = async (pageNumber, pageSize) => {
     console.log(error);
   }
 };
+
+export const fetchOrderAll = async (pageNumber, pageSize) => {
+  try {
+    const response = await axiosInstance.get(`/api/Order/all`, {
+      params: {
+        pageNumber,
+        pageSize,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const updateOrder = async (id, newStatus) => {
+  try {
+    const response = await axiosInstance.put(`/api/Order/${id}/${newStatus}`);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};

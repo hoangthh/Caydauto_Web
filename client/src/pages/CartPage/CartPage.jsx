@@ -84,7 +84,7 @@ export const CartPage = () => {
   const [selectedCartProduct, setSelectedCartProduct] = React.useState([]);
 
   const { renderAlert } = useAlert();
-  console.log(selectedCartProduct);
+
   const totalPrice =
     selectedCartProduct?.length > 0
       ? selectedCartProduct.reduce((total, item) => {

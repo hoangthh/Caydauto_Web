@@ -15,6 +15,7 @@ import { PrivateRoutes } from "./routes/PrivateRoutes";
 import { AuthProvider } from "./contexts/AuthContext";
 import { UserPage } from "./pages/UserPage/UserPage";
 import { AlertProvider } from "./contexts/AlertContext";
+import { AdminPage } from "./pages/AdminPage/AdminPage";
 
 function App() {
   return (
@@ -46,6 +47,8 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
             </Route>
+
+            <Route path="/admin" element={<AdminPage />} />
           </Routes>
         </BrowserRouter>
       </AlertProvider>

@@ -14,13 +14,14 @@ import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import RemoveCircleRoundedIcon from "@mui/icons-material/RemoveCircleRounded";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Product } from "../../components/Product/Product";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   fetchDetailProductById,
   fetchSimilarProductsById,
 } from "../../apis/product";
 import { addProductToCart } from "../../apis/cart";
 import { convertNumberToPrice } from "../../helpers/string";
+import { useAuth } from "../../contexts/AuthContext";
 import { useAlert } from "../../contexts/AlertContext";
 
 const ProductName = styled(Typography)`
@@ -89,8 +90,10 @@ export const DetailPage = () => {
   });
 
   const { productId } = useParams();
-
+  const { isAuthenticated } = useAuth();
   const { renderAlert } = useAlert();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDetailProduct = async () => {
@@ -120,6 +123,10 @@ export const DetailPage = () => {
   };
 
   const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      renderAlert("info", "Vui lòng đăng nhập để thêm vào giỏ hàng");
+      return;
+    }
     if (!productId || !selectedColor.id || !quantity) {
       renderAlert("info", "Vui lòng chọn màu");
       return;
@@ -131,6 +138,20 @@ export const DetailPage = () => {
     });
     if (response?.status === 200)
       renderAlert("success", "Thêm vào giỏ hàng thành công");
+  };
+
+  const handleBuy = (e) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      renderAlert("info", "Vui lòng đăng nhập trước khi mua hàng");
+      return;
+    }
+    if (!selectedColor.id) {
+      renderAlert("info", "Vui lòng chọn màu");
+      return;
+    }
+    // Điều hướng đến trang thanh toán nếu mọi điều kiện đều thỏa mãn
+    navigate("/payment", { state: buyState });
   };
 
   const buyState = {
@@ -227,7 +248,7 @@ export const DetailPage = () => {
             <AddToCartButton variant="contained" onClick={handleAddToCart}>
               Thêm vào giỏ hàng
             </AddToCartButton>
-            <Link to="/payment" state={buyState}>
+            <Link to="/payment" state={buyState} onClick={handleBuy}>
               <BuyButton variant="contained">Mua ngay</BuyButton>
             </Link>
           </div>

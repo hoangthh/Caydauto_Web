@@ -18,7 +18,6 @@ export const Profile = () => {
   useEffect(() => {
     const fetchProfileUser = async () => {
       const profile = await fetchProfile();
-      console.log(profile);
       setProfile(profile);
     };
 
