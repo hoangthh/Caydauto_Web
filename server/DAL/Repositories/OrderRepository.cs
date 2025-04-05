@@ -6,7 +6,9 @@ public class OrderRepository : Repository<Order>, IOrderRepository
     public OrderRepository(AppDbContext context)
         : base(context) { }
 
-    public Func<IQueryable<Order>, IQueryable<Order>> OrderNavigate(Expression<Func<Order, bool>>? predicate = null)
+    public Func<IQueryable<Order>, IQueryable<Order>> OrderNavigate(
+        Expression<Func<Order, bool>>? predicate = null
+    )
     {
         var query = _entities.IncludeMultiple(o => o.User, o => o.Discount);
         // Bao gồm OrderItems và các thực thể liên quan
@@ -18,8 +20,7 @@ public class OrderRepository : Repository<Order>, IOrderRepository
             q =>
                 query
                     .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Product)
-                    .ThenInclude(p => p.Colors)
+                    .ThenInclude(p => p.Color)
                     .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.Product)
                     .ThenInclude(p => p.Images)

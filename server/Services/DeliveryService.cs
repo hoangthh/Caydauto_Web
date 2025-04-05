@@ -175,11 +175,7 @@ public class DeliveryService : IDeliveryService
                 _logger.LogError($"Invalid GHN API response: {responseString}");
                 return null;
             }
-            var options = new DistributedCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(30),
-            };
-            var ward = JsonSerializer.Serialize(apiResponse.Data);
+
             return apiResponse.Data;
         }
         catch (HttpRequestException ex)
@@ -203,14 +199,26 @@ public class DeliveryService : IDeliveryService
         int toDistrictId,
         string toWardCode,
         int insuranceValue,
-        int fromDistrictId = 1448
+        int fromDistrictId = 1448,
+        int serviceId = 53320
     )
     {
         try
         {
+            List<ServiceInfo>? services = await GetAvailableServicesAsync(
+                    toDistrictId,
+                    fromDistrictId
+                )
+                .ConfigureAwait(false);
+            if (services == null || services.Count == 0)
+            {
+                _logger.LogError("No available services found");
+                return -1;
+            }
+            // Kiểm tra xem serviceId có hợp lệ không
             var requestBody = new
             {
-                service_id = 53320,
+                service_id = services[0].ServiceId,
                 insurance_value = insuranceValue,
                 coupon = "",
                 from_district_id = fromDistrictId,
@@ -271,6 +279,42 @@ public class DeliveryService : IDeliveryService
             return -1;
         }
     }
+
+    public async Task<List<ServiceInfo>?> GetAvailableServicesAsync(
+        int toDistrictId,
+        int fromDistrictId = 1448
+    )
+    {
+        var requestBody = new
+        {
+            from_district = fromDistrictId,
+            to_district = toDistrictId,
+            shop_id = _shopId,
+        };
+
+        var jsonContent = new StringContent(
+            JsonSerializer.Serialize(requestBody),
+            Encoding.UTF8,
+            "application/json"
+        );
+
+        var response = await _httpClient
+            .PostAsync("v2/shipping-order/available-services", jsonContent)
+            .ConfigureAwait(false);
+        var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var apiResponse = JsonSerializer.Deserialize<GHNShippingResponse<List<ServiceInfo>>>(
+            responseString,
+            _options
+        );
+
+        if (apiResponse?.Code != 200 || apiResponse.Data == null)
+        {
+            _logger.LogError($"Invalid GHN API response: {responseString}");
+            return null;
+        }
+
+        return apiResponse.Data;
+    }
 }
 
 public class GHNShippingResponse<T>
@@ -317,32 +361,15 @@ public class Ward
     public int DistrictID { get; set; }
     public string? WardName { get; set; }
 }
-// public async Task<string> GetAvailableServicesAsync(int fromDistrictId, int toDistrictId)
-// {
-//     var requestBody = new
-//     {
-//         from_district = fromDistrictId,
-//         to_district = toDistrictId,
-//         shop_id = _shopId,
-//     };
 
-//     var jsonContent = new StringContent(
-//         System.Text.Json.JsonSerializer.Serialize(requestBody),
-//         Encoding.UTF8,
-//         "application/json"
-//     );
+public class ServiceInfo
+{
+    [JsonPropertyName("service_id")]
+    public int ServiceId { get; set; }
 
-//     var response = await _httpClient
-//         .PostAsync("v2/shipping-order/available-services", jsonContent)
-//         .ConfigureAwait(false);
+    [JsonPropertyName("short_name")]
+    public string ShortName { get; set; }
 
-//     var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-//     if (!response.IsSuccessStatusCode)
-//     {
-//         _logger.LogError($"GHN API Error {response.StatusCode}: {responseContent}");
-//         throw new Exception($"API Error {response.StatusCode}: {responseContent}");
-//     }
-
-//     return responseContent;
-// }
+    [JsonPropertyName("service_type")]
+    public int ServiceType { get; set; }
+}

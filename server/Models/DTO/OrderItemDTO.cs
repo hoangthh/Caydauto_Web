@@ -4,11 +4,12 @@ public class OrderItemGetDto
 {
     public int Id { get; set; }
     public int OrderId { get; set; }
-    public ColorGetDto Color { get; set; } = new ColorGetDto();
-    public OrderItemProdutGetDto Product { get; set; } = new OrderItemProdutGetDto();
+    public ColorGetDto? Color { get; set; }
+    public OrderItemProdutGetDto? Product { get; set; }
     public int Quantity { get; set; }
     public int UnitPrice { get; set; }
 }
+
 public class OrderItemProdutGetDto
 {
     public int Id { get; set; }
@@ -16,6 +17,7 @@ public class OrderItemProdutGetDto
     public int Price { get; set; }
     public string ImageUrl { get; set; } = Constraint.Image.DefaultProductImageUrl;
 }
+
 public class OrderItemCreateDto
 {
     [Required(ErrorMessage = "Product ID is required")]
@@ -27,6 +29,4 @@ public class OrderItemCreateDto
     [Required(ErrorMessage = "Quantity is required")]
     [Range(1, int.MaxValue, ErrorMessage = "Quantity must be greater than 0")]
     public int Quantity { get; set; }
-
 }
-
