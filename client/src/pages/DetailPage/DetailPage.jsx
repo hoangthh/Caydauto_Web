@@ -14,7 +14,7 @@ import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import RemoveCircleRoundedIcon from "@mui/icons-material/RemoveCircleRounded";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Product } from "../../components/Product/Product";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   fetchDetailProductById,
   fetchSimilarProductsById,
@@ -93,6 +93,8 @@ export const DetailPage = () => {
   const { isAuthenticated } = useAuth();
   const { renderAlert } = useAlert();
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchDetailProduct = async () => {
       const detailProduct = await fetchDetailProductById(productId);
@@ -138,11 +140,18 @@ export const DetailPage = () => {
       renderAlert("success", "Thêm vào giỏ hàng thành công");
   };
 
-  const handleBuy = () => {
+  const handleBuy = (e) => {
+    e.preventDefault();
     if (!isAuthenticated) {
       renderAlert("info", "Vui lòng đăng nhập trước khi mua hàng");
       return;
     }
+    if (!selectedColor.id) {
+      renderAlert("info", "Vui lòng chọn màu");
+      return;
+    }
+    // Điều hướng đến trang thanh toán nếu mọi điều kiện đều thỏa mãn
+    navigate("/payment", { state: buyState });
   };
 
   const buyState = {
@@ -239,10 +248,8 @@ export const DetailPage = () => {
             <AddToCartButton variant="contained" onClick={handleAddToCart}>
               Thêm vào giỏ hàng
             </AddToCartButton>
-            <Link to="/payment" state={buyState}>
-              <BuyButton variant="contained" onClick={handleBuy}>
-                Mua ngay
-              </BuyButton>
+            <Link to="/payment" state={buyState} onClick={handleBuy}>
+              <BuyButton variant="contained">Mua ngay</BuyButton>
             </Link>
           </div>
           {/* Main Product Action */}

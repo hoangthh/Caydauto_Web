@@ -59,7 +59,6 @@ export const Product = ({ product }) => {
   const { renderAlert } = useAlert();
 
   const handleAddFavor = async () => {
-    console.log(isAuthenticated);
     if (!isAuthenticated) {
       renderAlert("info", "Vui lòng đăng nhập để thêm sản phẩm vào yêu thích");
       return;

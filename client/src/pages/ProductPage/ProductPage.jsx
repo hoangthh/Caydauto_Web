@@ -27,7 +27,7 @@ export const ProductPage = () => {
         page,
         PAGE_SIZE
       );
-      console.log("productList: ", productList);
+
       setProductList(productList);
     };
 
@@ -37,7 +37,7 @@ export const ProductPage = () => {
   useEffect(() => {
     const fetchFilteredProducts = debounce(async () => {
       const response = await fetchFilterProducts(filters); // Hàm gọi API với filters
-      console.log("filter: ", { filters, response });
+
       setProductList(response); // Cập nhật danh sách sản phẩm
     }, 300); // Chờ 300ms trước khi gọi API
 

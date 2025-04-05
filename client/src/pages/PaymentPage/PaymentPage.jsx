@@ -169,9 +169,9 @@ export const PaymentPage = () => {
         toWardCode: location.wardCode,
         insuranceValue: parseInt(state.totalPrice),
       };
-      console.log(shippingFeeParams);
+
       const fee = await fetchShippingFee(shippingFeeParams);
-      console.log("fee", fee);
+
       setShippingFee(fee);
     };
 
